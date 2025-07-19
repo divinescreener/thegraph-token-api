@@ -4,8 +4,6 @@ EVM-specific client for The Graph Token API.
 Provides access to EVM blockchain data including NFTs, tokens, balances, transfers, and DEX data.
 """
 
-from typing import cast
-
 from .base import BaseTokenAPI
 from .types import (
     BalancesResponse,
@@ -103,7 +101,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTOwnershipsResponse,
         )
-        return cast(NFTOwnershipsResponse, response.data)
+        return response.data
 
     async def get_nft_collection(self, contract: str) -> NFTCollectionsResponse:
         """
@@ -123,7 +121,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTCollectionsResponse,
         )
-        return cast(NFTCollectionsResponse, response.data)
+        return response.data
 
     async def get_nft_item(self, contract: str, token_id: str) -> NFTItemsResponse:
         """
@@ -144,7 +142,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTItemsResponse,
         )
-        return cast(NFTItemsResponse, response.data)
+        return response.data
 
     async def get_nft_activities(
         self,
@@ -204,7 +202,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTActivitiesResponse,
         )
-        return cast(NFTActivitiesResponse, response.data)
+        return response.data
 
     async def get_nft_holders(self, contract: str) -> NFTHoldersResponse:
         """
@@ -224,7 +222,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTHoldersResponse,
         )
-        return cast(NFTHoldersResponse, response.data)
+        return response.data
 
     async def get_nft_sales(
         self,
@@ -285,7 +283,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/nft/sales/evm", headers=self._headers, params=params, expected_type=NFTSalesResponse
         )
-        return cast(NFTSalesResponse, response.data)
+        return response.data
 
     # ===== Balance Methods =====
 
@@ -316,7 +314,7 @@ class EVMTokenAPI(BaseTokenAPI):
             expected_type=BalancesResponse,
         )
         # Return the full response object
-        return cast(BalancesResponse, response.data)
+        return response.data
 
     # ===== Transfer Methods =====
 
@@ -376,7 +374,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/transfers/evm", headers=self._headers, params=params, expected_type=TransfersResponse
         )
-        return cast(TransfersResponse, response.data)
+        return response.data
 
     # ===== Token Methods =====
 
@@ -396,7 +394,7 @@ class EVMTokenAPI(BaseTokenAPI):
             f"{self.base_url}/tokens/evm/{contract}", headers=self._headers, params=params, expected_type=TokensResponse
         )
         # Return the full response object
-        return cast(TokensResponse, response.data)
+        return response.data
 
     async def get_token_holders(
         self,
@@ -434,7 +432,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=TokenHoldersResponse,
         )
-        return cast(TokenHoldersResponse, response.data)
+        return response.data
 
     # ===== Swap Methods =====
 
@@ -503,7 +501,7 @@ class EVMTokenAPI(BaseTokenAPI):
             f"{self.base_url}/swaps/evm", headers=self._headers, params=params, expected_type=SwapsResponse
         )
         # Return the full response object, since response is already the validated dict
-        return cast(SwapsResponse, response.data)
+        return response.data
 
     # ===== Pool Methods =====
 
@@ -549,7 +547,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/pools/evm", headers=self._headers, params=params, expected_type=PoolsResponse
         )
-        return cast(PoolsResponse, response.data)
+        return response.data
 
     # ===== OHLC Methods =====
 
@@ -587,7 +585,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/ohlc/pools/evm/{pool}", headers=self._headers, params=params, expected_type=OHLCResponse
         )
-        return cast(OHLCResponse, response.data)
+        return response.data
 
     async def get_ohlc_prices(
         self,
@@ -623,7 +621,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/ohlc/prices/evm/{token}", headers=self._headers, params=params, expected_type=OHLCResponse
         )
-        return cast(OHLCResponse, response.data)
+        return response.data
 
     # ===== Historical Methods =====
 
@@ -668,4 +666,4 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=HistoricalBalancesResponse,
         )
-        return cast(HistoricalBalancesResponse, response.data)
+        return response.data

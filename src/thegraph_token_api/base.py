@@ -5,7 +5,6 @@ Provides shared functionality for authentication, networking, and monitoring end
 """
 
 import os
-from typing import cast
 
 # Import divine-requests (should be installed as a package)
 from requests import NetworkingManager  # type: ignore[attr-defined]
@@ -69,7 +68,7 @@ class BaseTokenAPI:
             Health status string (should be "OK")
         """
         response = await self.manager.get(f"{self.base_url}/health", headers=self._headers)
-        return cast(str, response.text)
+        return response.text
 
     async def get_version(self) -> VersionResponse:
         """
@@ -81,7 +80,7 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/version", headers=self._headers, expected_type=VersionResponse
         )
-        return cast(VersionResponse, response.data)
+        return response.data
 
     async def get_networks(self) -> NetworksResponse:
         """
@@ -93,4 +92,4 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/networks", headers=self._headers, expected_type=NetworksResponse
         )
-        return cast(NetworksResponse, response.data)
+        return response.data

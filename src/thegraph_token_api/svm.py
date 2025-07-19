@@ -4,8 +4,6 @@ SVM-specific client for The Graph Token API.
 Provides access to Solana blockchain data including SPL tokens, balances, transfers, and DEX swaps.
 """
 
-from typing import cast
-
 from .base import BaseTokenAPI
 from .types import (
     OrderBy,
@@ -105,7 +103,7 @@ class SVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/balances/svm", headers=self._headers, params=params, expected_type=SolanaBalancesResponse
         )
-        return cast(SolanaBalancesResponse, response.data)
+        return response.data
 
     # ===== Transfer Methods =====
 
@@ -176,7 +174,7 @@ class SVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=SolanaTransfersResponse,
         )
-        return cast(SolanaTransfersResponse, response.data)
+        return response.data
 
     # ===== Swap Methods =====
 
@@ -247,4 +245,4 @@ class SVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/swaps/svm", headers=self._headers, params=params, expected_type=SolanaSwapsResponse
         )
-        return cast(SolanaSwapsResponse, response.data)
+        return response.data
