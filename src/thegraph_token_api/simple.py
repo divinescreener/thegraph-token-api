@@ -16,6 +16,7 @@ Usage:
 """
 
 import os
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 
@@ -312,7 +313,7 @@ class TokenAPI:
         # SVM (Solana)
         sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
         sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=10)
-        sol_transfers = await api.svm.transfers(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+        sol_transfers = await api.svm.transfers(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")  # pragma: allowlist secret
 
         # Utility
         health = await api.health()
@@ -497,7 +498,6 @@ class TokenAPI:
     ) -> list[dict]:
         """Internal EVM price history implementation."""
         net = str(network) if network else self._default_network
-        from datetime import datetime, timedelta
 
         start_time = int((datetime.now() - timedelta(days=days)).timestamp())
 
@@ -515,7 +515,6 @@ class TokenAPI:
     ) -> list[dict]:
         """Internal EVM pool history implementation."""
         net = str(network) if network else self._default_network
-        from datetime import datetime, timedelta
 
         start_time = int((datetime.now() - timedelta(days=days)).timestamp())
 

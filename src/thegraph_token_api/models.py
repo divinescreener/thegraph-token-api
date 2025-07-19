@@ -7,6 +7,7 @@ both attribute access (obj.symbol) and dictionary access (obj['symbol'])
 for backward compatibility.
 """
 
+import inspect
 from dataclasses import dataclass
 
 
@@ -340,8 +341,6 @@ def convert_to_model(data: dict, model_class) -> BaseModel:
             converted_data["token1"] = SwapToken(**converted_data["token1"])
 
     # Filter only fields that exist in the dataclass
-    import inspect
-
     signature = inspect.signature(model_class)
     valid_fields = set(signature.parameters.keys())
     filtered_data = {k: v for k, v in converted_data.items() if k in valid_fields}
