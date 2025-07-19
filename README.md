@@ -9,7 +9,7 @@ A clean, intuitive Python client for The Graph Token API with elegant EVM/SVM se
 ### Installation
 
 ```bash
-pip install token-api
+pip install divine-thegraph-token-api
 ```
 
 ### Basic Usage

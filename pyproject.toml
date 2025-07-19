@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "token-api"
-version = "0.1.0"
+name = "divine-thegraph-token-api"
+version = "0.1.3"
 authors = [
   { name="DIVINE", email="admin@divine.sh" },
 ]
-description = "A type-safe Python client for The Graph Token API with convenience features"
+description = "Clean Python client for The Graph Token API with elegant EVM/SVM separation and 98% test coverage"
 readme = "README.md"
 requires-python = ">=3.13"
 classifiers = [
@@ -19,8 +19,12 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Information Analysis",
     "Typing :: Typed",
 ]
+keywords = ["blockchain", "ethereum", "solana", "defi", "nft", "api", "thegraph", "web3", "crypto"]
 dependencies = [
     "divine-requests>=0.1.1",
     "divine-type-enforcer>=0.1.1",
@@ -44,10 +48,10 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-addopts = "--cov=token_api --cov-report term-missing"
+addopts = "--cov=thegraph_token_api --cov-report term-missing"
 
 [tool.coverage.run]
-source = ["src/token_api"]
+source = ["src/thegraph_token_api"]
 
 [tool.coverage.report]
 fail_under = 90
