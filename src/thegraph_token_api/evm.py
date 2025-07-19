@@ -313,7 +313,6 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=BalancesResponse,
         )
-        # Return the full response object
         return response.data  # type: ignore[no-any-return]
 
     # ===== Transfer Methods =====

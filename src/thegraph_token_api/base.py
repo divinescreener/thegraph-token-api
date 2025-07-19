@@ -80,7 +80,6 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/version", headers=self._headers, expected_type=VersionResponse
         )
-        # Type assertion to help mypy understand divine-requests TypedResponse
         return response.data  # type: ignore[no-any-return]
 
     async def get_networks(self) -> NetworksResponse:
@@ -93,5 +92,4 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/networks", headers=self._headers, expected_type=NetworksResponse
         )
-        # Type assertion to help mypy understand divine-requests TypedResponse
         return response.data  # type: ignore[no-any-return]
