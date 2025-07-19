@@ -354,7 +354,8 @@ class TokenAPI:
     def _extract_data(self, response) -> list[dict[Any, Any]]:
         """Extract clean data from API response."""
         if hasattr(response, "data") and isinstance(response.data, dict):
-            return response.data.get("data", [])
+            data = response.data.get("data", [])
+            return data if isinstance(data, list) else []
         return []
 
     # ===== EVM Internal Methods =====

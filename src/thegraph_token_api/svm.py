@@ -103,7 +103,7 @@ class SVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/balances/svm", headers=self._headers, params=params, expected_type=SolanaBalancesResponse
         )
-        return response.data
+        return response.data  # type: ignore[no-any-return]
 
     # ===== Transfer Methods =====
 
@@ -174,7 +174,7 @@ class SVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=SolanaTransfersResponse,
         )
-        return response.data
+        return response.data  # type: ignore[no-any-return]
 
     # ===== Swap Methods =====
 
@@ -245,4 +245,4 @@ class SVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/swaps/svm", headers=self._headers, params=params, expected_type=SolanaSwapsResponse
         )
-        return response.data
+        return response.data  # type: ignore[no-any-return]

@@ -68,7 +68,7 @@ class BaseTokenAPI:
             Health status string (should be "OK")
         """
         response = await self.manager.get(f"{self.base_url}/health", headers=self._headers)
-        return response.text
+        return str(response.text)
 
     async def get_version(self) -> VersionResponse:
         """
@@ -80,7 +80,8 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/version", headers=self._headers, expected_type=VersionResponse
         )
-        return response.data
+        # Type assertion to help mypy understand divine-requests TypedResponse
+        return response.data  # type: ignore[no-any-return]
 
     async def get_networks(self) -> NetworksResponse:
         """
@@ -92,4 +93,5 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/networks", headers=self._headers, expected_type=NetworksResponse
         )
-        return response.data
+        # Type assertion to help mypy understand divine-requests TypedResponse
+        return response.data  # type: ignore[no-any-return]
