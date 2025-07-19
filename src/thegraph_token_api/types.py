@@ -111,8 +111,8 @@ class Protocol(str, Enum):
 class SolanaPrograms(str, Enum):
     """Solana program IDs."""
 
-    TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-    TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+    TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # nosec B105  # pragma: allowlist secret
+    TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # nosec B105  # pragma: allowlist secret
 
     def __str__(self) -> str:
         return self.value
@@ -121,11 +121,11 @@ class SolanaPrograms(str, Enum):
 class SwapPrograms(str, Enum):
     """Solana swap program IDs."""
 
-    RAYDIUM = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"  # Raydium Liquidity Pool V4
-    PUMP_FUN_CORE = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"  # Pump.fun
-    PUMP_FUN_AMM = "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"  # Pump.fun AMM
-    JUPITER_V4 = "JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB"  # Jupiter Aggregator v4
-    JUPITER_V6 = "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"  # Jupiter Aggregator v6
+    RAYDIUM = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"  # Raydium Liquidity Pool V4  # pragma: allowlist secret
+    PUMP_FUN_CORE = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"  # Pump.fun  # pragma: allowlist secret
+    PUMP_FUN_AMM = "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"  # Pump.fun AMM  # pragma: allowlist secret
+    JUPITER_V4 = "JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB"  # Jupiter Aggregator v4  # pragma: allowlist secret
+    JUPITER_V6 = "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"  # Jupiter Aggregator v6  # pragma: allowlist secret
 
     def __str__(self) -> str:
         return self.value
