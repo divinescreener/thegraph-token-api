@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "divine-thegraph-token-api"
-version = "0.1.15"
+version = "0.1.16"
 authors = [
   { name="DIVINE", email="admin@divine.sh" },
 ]
@@ -26,7 +26,7 @@ classifiers = [
 ]
 keywords = ["blockchain", "ethereum", "solana", "defi", "nft", "api", "thegraph", "web3", "crypto"]
 dependencies = [
-    "divine-requests==0.1.11",
+    "divine-requests==0.1.12",
     "divine-type-enforcer==0.1.8",
     "anyio>=4.0.0",
 ]
