@@ -7,8 +7,14 @@ on:
       - 'v*.*.*'
 
 jobs:
+  # Run CI tests first to ensure quality
+  test:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
   build:
     name: Build distribution
+    needs: [test]
     runs-on: ubuntu-latest
 
     steps:
