@@ -9,6 +9,9 @@ for backward compatibility.
 
 import inspect
 from dataclasses import dataclass
+from typing import TypeVar
+
+T = TypeVar('T', bound='BaseModel')
 
 
 @dataclass
@@ -306,7 +309,7 @@ class OHLC(BaseModel):
     transactions: float
 
 
-def convert_to_model(data: dict, model_class) -> BaseModel:
+def convert_to_model(data: dict, model_class: type[T]) -> T | None:
     """Convert dictionary data to structured model."""
     if not data:
         return None
@@ -356,6 +359,6 @@ def convert_to_model(data: dict, model_class) -> BaseModel:
         return model_class(**working_data)
 
 
-def convert_list_to_models(data_list: list[dict], model_class) -> list[BaseModel]:
+def convert_list_to_models(data_list: list[dict], model_class: type[T]) -> list[T]:
     """Convert list of dictionaries to list of structured models."""
-    return [convert_to_model(item, model_class) for item in data_list if item]
+    return [model for item in data_list if item and (model := convert_to_model(item, model_class)) is not None]

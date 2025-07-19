@@ -14,7 +14,6 @@ from typing import TypedDict
 class BaseResponse(TypedDict, total=False):
     """Base response structure for all API endpoints."""
 
-    data: list[dict]
     results: int | None  # Number of results returned
     statistics: dict | None
     duration_ms: float | None
