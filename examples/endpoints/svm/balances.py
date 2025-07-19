@@ -36,7 +36,10 @@ async def main():
 
         # Get USDC balances
         print("\nUSDC Balances:")
-        usdc_balances = await api.svm.balances(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", limit=3)  # pragma: allowlist secret
+        usdc_balances = await api.svm.balances(
+            mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
+            limit=3,
+        )
 
         for i, balance in enumerate(usdc_balances, 1):
             account = balance.token_account[:12] + "..."
