@@ -7,8 +7,7 @@ Provides shared functionality for authentication, networking, and monitoring end
 import os
 
 # Import divine-requests (should be installed as a package)
-# NOTE: Using old 'requests' import until divine-requests 0.1.22+ is available
-from requests import NetworkingManager  # type: ignore[attr-defined]
+from divine_requests import NetworkingManager  # type: ignore[attr-defined]
 
 from .types import NetworksResponse, VersionResponse
 
