@@ -226,7 +226,7 @@ class NFTActivity(BaseModel):
         """Support dictionary-style access with special key mappings."""
         if key == "@type":
             return self.activity_type
-        elif key == "from":
+        if key == "from":
             return self.from_address
         return super().__getitem__(key)
 
@@ -234,7 +234,7 @@ class NFTActivity(BaseModel):
         """Support .get() method with special key mappings."""
         if key == "@type":
             return self.activity_type
-        elif key == "from":
+        if key == "from":
             return self.from_address
         return super().get(key, default)
 

@@ -28,9 +28,9 @@ async def main():
 
             # Simple number formatting
             if value > 1_000_000:
-                formatted = f"{value/1_000_000:.1f}M"
+                formatted = f"{value / 1_000_000:.1f}M"
             elif value > 1_000:
-                formatted = f"{value/1_000:.1f}K"
+                formatted = f"{value / 1_000:.1f}K"
             else:
                 formatted = f"{value:.2f}"
 
