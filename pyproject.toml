@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "token-api"
+version = "0.1.0"
+authors = [
+  { name="DIVINE", email="admin@divine.sh" },
+]
+description = "A type-safe Python client for The Graph Token API with convenience features"
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "divine-requests>=0.1.1",
+    "divine-type-enforcer>=0.1.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "pytest-anyio>=0.21",
+    "python-dotenv>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/codebydivine/token-api"
+Issues = "https://github.com/codebydivine/token-api/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "--cov=token_api --cov-report term-missing"
+
+[tool.coverage.run]
+source = ["src/token_api"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
