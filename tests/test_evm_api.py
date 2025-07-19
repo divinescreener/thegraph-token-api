@@ -25,19 +25,23 @@ class TestEVMTokenAPIInitialization:
         """Test EVMTokenAPI initialization with string network (line 66)."""
         client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
         assert client.network == "mainnet"
-        assert client.api_key == "test_key"
+        assert client.api_key == "test_key"  # pragma: allowlist secret
 
     def test_initialization_with_enum_network(self):
         """Test EVMTokenAPI initialization with enum network."""
         client = EVMTokenAPI(network=NetworkId.MATIC, api_key="test_key")  # pragma: allowlist secret
         assert client.network == "matic"  # Enum value
-        assert client.api_key == "test_key"
+        assert client.api_key == "test_key"  # pragma: allowlist secret
 
     def test_initialization_with_custom_base_url(self):
         """Test EVMTokenAPI initialization with custom base URL."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key", base_url="https://custom.api.com")  # pragma: allowlist secret
+        client = EVMTokenAPI(
+            network="mainnet",
+            api_key="test_key",  # pragma: allowlist secret
+            base_url="https://custom.api.com",
+        )
         assert client.network == "mainnet"
-        assert client.api_key == "test_key"
+        assert client.api_key == "test_key"  # pragma: allowlist secret
         assert client.base_url == "https://custom.api.com"
 
 

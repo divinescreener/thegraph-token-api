@@ -22,19 +22,19 @@ class TestSVMTokenAPIInitialization:
         """Test SVMTokenAPI initialization with string network."""
         client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
         assert client.network == "solana"
-        assert client.api_key == "test_key"
+        assert client.api_key == "test_key"  # pragma: allowlist secret
 
     def test_initialization_with_enum_network(self):
         """Test SVMTokenAPI initialization with enum network."""
         client = SVMTokenAPI(network=SolanaNetworkId.SOLANA, api_key="test_key")
         assert client.network == "solana"
-        assert client.api_key == "test_key"
+        assert client.api_key == "test_key"  # pragma: allowlist secret
 
     def test_initialization_with_custom_base_url(self):
         """Test SVMTokenAPI initialization with custom base URL."""
         client = SVMTokenAPI(network="solana", api_key="test_key", base_url="https://custom.api.com")
         assert client.network == "solana"
-        assert client.api_key == "test_key"
+        assert client.api_key == "test_key"  # pragma: allowlist secret
         assert client.base_url == "https://custom.api.com"
 
 
@@ -69,11 +69,15 @@ class TestSVMBalancesMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            await client.get_balances(token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A")  # pragma: allowlist secret
+            await client.get_balances(
+                token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"  # pragma: allowlist secret
+            )
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
-            assert params["token_account"] == "4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"
+            assert (
+                params["token_account"] == "4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"  # pragma: allowlist secret
+            )
 
     @pytest.mark.anyio
     async def test_get_balances_full_parameters(self):
@@ -86,7 +90,7 @@ class TestSVMBalancesMethods:
             mock_manager.get = AsyncMock(return_value=mock_response)
 
             await client.get_balances(
-                token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",
+                token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",  # pragma: allowlist secret
                 mint="So11111111111111111111111111111111111111112",
                 program_id=SolanaPrograms.TOKEN,
                 limit=25,
@@ -95,7 +99,9 @@ class TestSVMBalancesMethods:
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
-            assert params["token_account"] == "4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"
+            assert (
+                params["token_account"] == "4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"  # pragma: allowlist secret
+            )
             assert params["mint"] == "So11111111111111111111111111111111111111112"
             assert params["program_id"] == "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             assert params["limit"] == 25
@@ -112,7 +118,9 @@ class TestSVMBalancesMethods:
             mock_manager.get = AsyncMock(return_value=mock_response)
 
             await client.get_balances(
-                mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", program_id=SolanaPrograms.TOKEN_2022, limit=50
+                mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
+                program_id=SolanaPrograms.TOKEN_2022,
+                limit=50,
             )
 
             call_args = mock_manager.get.call_args
@@ -152,11 +160,16 @@ class TestSVMTransfersMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            await client.get_transfers(signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M")  # pragma: allowlist secret
+            await client.get_transfers(
+                signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M"  # pragma: allowlist secret
+            )
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
-            assert params["signature"] == "5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M"
+            assert (
+                params["signature"]
+                == "5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M"  # pragma: allowlist secret  # pragma: allowlist secret
+            )
 
     @pytest.mark.anyio
     async def test_get_transfers_full_parameters(self):
@@ -169,7 +182,7 @@ class TestSVMTransfersMethods:
             mock_manager.get = AsyncMock(return_value=mock_response)
 
             await client.get_transfers(
-                signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M",
+                signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M",  # pragma: allowlist secret
                 program_id=SolanaPrograms.TOKEN,
                 mint="So11111111111111111111111111111111111111112",
                 authority="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",  # pragma: allowlist secret
@@ -183,12 +196,19 @@ class TestSVMTransfersMethods:
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
-            assert params["signature"] == "5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M"
+            assert (
+                params["signature"]
+                == "5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M"  # pragma: allowlist secret
+            )
             assert params["program_id"] == "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             assert params["mint"] == "So11111111111111111111111111111111111111112"
-            assert params["authority"] == "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
-            assert params["source"] == "4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"
-            assert params["destination"] == "5dt8br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v360B"
+            assert (
+                params["authority"] == "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"  # pragma: allowlist secret
+            )
+            assert params["source"] == "4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"  # pragma: allowlist secret
+            assert (
+                params["destination"] == "5dt8br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v360B"  # pragma: allowlist secret
+            )
             assert params["startTime"] == 1640995200
             assert params["endTime"] == 1640995300
             assert params["limit"] == 35
@@ -204,7 +224,7 @@ class TestSVMTransfersMethods:
             mock_manager.get = AsyncMock(return_value=mock_response)
 
             await client.get_transfers(
-                mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
                 start_time=1640995200,
                 end_time=1640995300,
                 limit=100,
@@ -212,7 +232,7 @@ class TestSVMTransfersMethods:
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
-            assert params["mint"] == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+            assert params["mint"] == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # pragma: allowlist secret
             assert params["startTime"] == 1640995200
             assert params["endTime"] == 1640995300
             assert params["limit"] == 100
@@ -254,7 +274,7 @@ class TestSVMSwapsMethods:
                 program_id=SwapPrograms.RAYDIUM,
                 amm="AMM123",
                 amm_pool="POOL123",
-                user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+                user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",  # pragma: allowlist secret
                 limit=20,
             )
 
@@ -263,7 +283,9 @@ class TestSVMSwapsMethods:
             assert params["program_id"] == "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
             assert params["amm"] == "AMM123"
             assert params["amm_pool"] == "POOL123"
-            assert params["user"] == "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+            assert (
+                params["user"] == "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"  # pragma: allowlist secret
+            )
             assert params["limit"] == 20
 
     @pytest.mark.anyio
@@ -280,9 +302,9 @@ class TestSVMSwapsMethods:
                 program_id=SwapPrograms.RAYDIUM,
                 amm="AMM123",
                 amm_pool="POOL123",
-                user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+                user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",  # pragma: allowlist secret
                 input_mint="So11111111111111111111111111111111111111112",
-                output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret  # pragma: allowlist secret
                 signature="swap_sig123",
                 start_time=1640995200,
                 end_time=1640995300,
@@ -294,7 +316,7 @@ class TestSVMSwapsMethods:
             params = call_args[1]["params"]
             assert params["program_id"] == "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
             assert params["input_mint"] == "So11111111111111111111111111111111111111112"
-            assert params["output_mint"] == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+            assert params["output_mint"] == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # pragma: allowlist secret
             assert params["signature"] == "swap_sig123"
             assert params["startTime"] == 1640995200
             assert params["endTime"] == 1640995300
@@ -313,9 +335,9 @@ class TestSVMSwapsMethods:
 
             await client.get_swaps(
                 program_id=SwapPrograms.JUPITER_V6,
-                user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+                user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",  # pragma: allowlist secret
                 input_mint="So11111111111111111111111111111111111111112",
-                output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret  # pragma: allowlist secret
                 limit=10,
             )
 
@@ -375,7 +397,7 @@ class TestSVMMethodCombinations:
             await client.get_swaps(
                 program_id=SwapPrograms.RAYDIUM,
                 input_mint="So11111111111111111111111111111111111111112",
-                output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
             )
 
             assert mock_manager.get.call_count == 3
