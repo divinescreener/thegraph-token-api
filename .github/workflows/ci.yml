@@ -17,8 +17,7 @@ jobs:
         include:
           # Test on additional Python versions on Ubuntu only
           - os: ubuntu-latest
-            python-version: "3.14"
-            experimental: true
+            python-version: "3.13"
 
     continue-on-error: ${{ matrix.experimental == true }}
 
