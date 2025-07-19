@@ -7,7 +7,7 @@ Provides shared functionality for authentication, networking, and monitoring end
 import os
 
 # Import divine-requests (should be installed as a package)
-from requests import NetworkingManager  # type: ignore[import-untyped]
+from requests import NetworkingManager
 
 from .types import NetworksResponse, VersionResponse
 
@@ -68,7 +68,7 @@ class BaseTokenAPI:
             Health status string (should be "OK")
         """
         response = await self.manager.get(f"{self.base_url}/health", headers=self._headers)
-        return response.text  # type: ignore[no-any-return]
+        return response.text
 
     async def get_version(self) -> VersionResponse:
         """
@@ -80,7 +80,7 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/version", headers=self._headers, expected_type=VersionResponse
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_networks(self) -> NetworksResponse:
         """
@@ -92,4 +92,4 @@ class BaseTokenAPI:
         response = await self.manager.get(
             f"{self.base_url}/networks", headers=self._headers, expected_type=NetworksResponse
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
