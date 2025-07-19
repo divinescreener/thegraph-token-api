@@ -668,3 +668,191 @@ class TestWrapperClasses:
                 )
 
                 assert result == ["solana_swap"]
+
+
+class TestEVMWrapperMissingMethods:
+    """Test EVMWrapper methods not covered by existing tests."""
+
+    @pytest.mark.anyio
+    async def test_evm_wrapper_transfers(self):
+        """Test EVMWrapper.transfers method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_transfers") as mock_transfers:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_transfers.return_value = [{"hash": "0xtx123"}]
+                mock_convert.return_value = ["transfer"]
+
+                result = await api.evm.transfers(
+                    from_address="0xfrom", to_address="0xto", contract="0xtoken", limit=5, network="mainnet"
+                )
+
+                assert result == ["transfer"]
+                mock_transfers.assert_called_with(
+                    from_address="0xfrom", to_address="0xto", contract="0xtoken", limit=5, network="mainnet"
+                )
+
+    @pytest.mark.anyio
+    async def test_evm_wrapper_swaps(self):
+        """Test EVMWrapper.swaps method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_swaps") as mock_swaps:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_swaps.return_value = [{"protocol": "uniswap_v3"}]
+                mock_convert.return_value = ["swap"]
+
+                result = await api.evm.swaps(pool="0xpool", protocol=Protocol.UNISWAP_V3, limit=10, network="polygon")
+
+                assert result == ["swap"]
+                mock_swaps.assert_called_with(pool="0xpool", protocol=Protocol.UNISWAP_V3, limit=10, network="polygon")
+
+    @pytest.mark.anyio
+    async def test_evm_wrapper_swaps_advanced(self):
+        """Test EVMWrapper.swaps_advanced method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_swaps_advanced") as mock_swaps_advanced:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_swaps_advanced.return_value = [{"transaction_id": "0xtx"}]
+                mock_convert.return_value = ["swap"]
+
+                result = await api.evm.swaps_advanced(
+                    pool="0xpool",
+                    caller="0xcaller",
+                    sender="0xsender",
+                    recipient="0xrecipient",
+                    protocol=Protocol.UNISWAP_V2,
+                    transaction_id="0xtx123",
+                    start_time=1640995200,
+                    end_time=1640995300,
+                    order_by=OrderBy.TIMESTAMP,
+                    order_direction=OrderDirection.DESC,
+                    limit=20,
+                    network="arbitrum",
+                )
+
+                assert result == ["swap"]
+                mock_swaps_advanced.assert_called_with(
+                    pool="0xpool",
+                    caller="0xcaller",
+                    sender="0xsender",
+                    recipient="0xrecipient",
+                    protocol=Protocol.UNISWAP_V2,
+                    transaction_id="0xtx123",
+                    start_time=1640995200,
+                    end_time=1640995300,
+                    order_by=OrderBy.TIMESTAMP,
+                    order_direction=OrderDirection.DESC,
+                    limit=20,
+                    network="arbitrum",
+                )
+
+    @pytest.mark.anyio
+    async def test_evm_wrapper_pools(self):
+        """Test EVMWrapper.pools method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_pools") as mock_pools:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_pools.return_value = [{"pool": "0xpool123"}]
+                mock_convert.return_value = ["pool"]
+
+                result = await api.evm.pools(
+                    pool="0xpool", token="0xtoken", protocol=Protocol.UNISWAP_V3, limit=15, network="optimism"
+                )
+
+                assert result == ["pool"]
+                mock_pools.assert_called_with(
+                    pool="0xpool", token="0xtoken", protocol=Protocol.UNISWAP_V3, limit=15, network="optimism"
+                )
+
+    @pytest.mark.anyio
+    async def test_evm_wrapper_price_history(self):
+        """Test EVMWrapper.price_history method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_price_history") as mock_price_history:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_price_history.return_value = [{"close": 1500.0}]
+                mock_convert.return_value = ["ohlc"]
+
+                result = await api.evm.price_history(
+                    token="0xtoken", interval=Interval.ONE_DAY, days=7, limit=168, network="base"
+                )
+
+                assert result == ["ohlc"]
+                mock_price_history.assert_called_with(
+                    token="0xtoken", interval=Interval.ONE_DAY, days=7, limit=168, network="base"
+                )
+
+    @pytest.mark.anyio
+    async def test_evm_wrapper_pool_history(self):
+        """Test EVMWrapper.pool_history method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_pool_history") as mock_pool_history:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_pool_history.return_value = [{"volume": 1000.0}]
+                mock_convert.return_value = ["ohlc"]
+
+                result = await api.evm.pool_history(
+                    pool="0xpool", interval=Interval.FOUR_HOURS, days=3, limit=18, network="avalanche"
+                )
+
+                assert result == ["ohlc"]
+                mock_pool_history.assert_called_with(
+                    pool="0xpool", interval=Interval.FOUR_HOURS, days=3, limit=18, network="avalanche"
+                )
+
+    @pytest.mark.anyio
+    async def test_evm_wrapper_token_holders(self):
+        """Test EVMWrapper.token_holders method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_token_holders") as mock_token_holders:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_token_holders.return_value = [{"address": "0xholder"}]
+                mock_convert.return_value = ["token_holder"]
+
+                result = await api.evm.token_holders(contract="0xtoken", limit=50, network="bsc")
+
+                assert result == ["token_holder"]
+                mock_token_holders.assert_called_with(contract="0xtoken", limit=50, network="bsc")
+
+
+class TestSVMWrapperMissingMethods:
+    """Test SVMWrapper methods not covered by existing tests."""
+
+    @pytest.mark.anyio
+    async def test_svm_wrapper_transfers(self):
+        """Test SVMWrapper.transfers method."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_svm_transfers") as mock_transfers:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
+                mock_transfers.return_value = [{"signature": "sig123"}]
+                mock_convert.return_value = ["solana_transfer"]
+
+                result = await api.svm.transfers(
+                    signature="sig123",
+                    program_id=SolanaPrograms.TOKEN,
+                    mint="So11111111111111111111111111111111111111112",
+                    authority="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+                    source="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",
+                    destination="5dt8br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v360B",
+                    limit=25,
+                    network="solana",
+                )
+
+                assert result == ["solana_transfer"]
+                mock_transfers.assert_called_with(
+                    signature="sig123",
+                    program_id=SolanaPrograms.TOKEN,
+                    mint="So11111111111111111111111111111111111111112",
+                    authority="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+                    source="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",
+                    destination="5dt8br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v360B",
+                    limit=25,
+                    network="solana",
+                )
