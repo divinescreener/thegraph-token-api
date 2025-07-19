@@ -511,20 +511,16 @@ class TokenAPI:
             )
             return self._extract_data(response)
 
-<<<<<<< HEAD
     async def _evm_nft_item(
         self, contract: str, token_id: str, network: NetworkId | str | None = None
-    ) -> dict | None:
-=======
-    async def _evm_nft_item(self, contract: str, token_id: str, network: NetworkId | str | None = None) -> dict | None:
->>>>>>> 1f02e38 (feat: Update dependency to divine-typed-requests)
+    ) -> list[dict[Any, Any]]:
         """Internal EVM NFT item implementation."""
         net = str(network) if network else self._default_network
         async with self._api.evm(net) as client:
             response = await client.get_nft_item(contract=contract, token_id=token_id)
             return self._extract_data(response)
 
-    async def _evm_nft_holders(self, contract: str, network: NetworkId | str | None = None) -> dict | None:
+    async def _evm_nft_holders(self, contract: str, network: NetworkId | str | None = None) -> list[dict[Any, Any]]:
         """Internal EVM NFT holders implementation."""
         net = str(network) if network else self._default_network
         async with self._api.evm(net) as client:
@@ -537,7 +533,7 @@ class TokenAPI:
         token_id: str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> dict | None:
+    ) -> list[dict[Any, Any]]:
         """Internal EVM NFT sales implementation."""
         net = str(network) if network else self._default_network
         async with self._api.evm(net) as client:
@@ -551,7 +547,7 @@ class TokenAPI:
         interval: Interval | str = Interval.ONE_HOUR,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> dict | None:
+    ) -> list[dict[Any, Any]]:
         """Internal EVM historical balances implementation."""
         net = str(network) if network else self._default_network
         async with self._api.evm(net) as client:
@@ -690,12 +686,12 @@ class TokenAPI:
 
     # ===== Utility Methods =====
 
-    async def version(self) -> dict[str, Any]:
+    async def version(self) -> list[dict[Any, Any]]:
         """Get API version information."""
         response = await self._api.get_version()
         return self._extract_data(response)
 
-    async def networks(self) -> dict[str, Any]:
+    async def networks(self) -> list[dict[Any, Any]]:
         """Get supported networks."""
         response = await self._api.get_networks()
         return self._extract_data(response)
