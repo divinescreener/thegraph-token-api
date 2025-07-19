@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 """Token Information Example - Get token metadata and holder data."""
 
-import os
-import sys
-
 import anyio
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 from thegraph_token_api import TokenAPI
 
 

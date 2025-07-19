@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """Price History Example - Get OHLC price data."""
 
-import os
-import sys
 from datetime import datetime
 
 import anyio
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 from thegraph_token_api import Interval, TokenAPI
 
 
@@ -21,7 +18,9 @@ async def main():
         # Get LINK token price history
         print("\nLINK Price History (7 days):")
         price_data = await api.evm.price_history(
-            token="0x514910771AF9Ca656af840dff83E8264EcF986CA", interval=Interval.ONE_DAY, days=7
+            token="0x514910771AF9Ca656af840dff83E8264EcF986CA",  # pragma: allowlist secret
+            interval=Interval.ONE_DAY,
+            days=7,
         )
 
         for candle in price_data[:5]:

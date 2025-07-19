@@ -65,11 +65,11 @@ To run the same tests locally:
 pip install -e ".[dev]"
 
 # Run tests with coverage
-pytest -v --cov=thegraph_thegraph_token_api --cov-report=term-missing
+pytest -v --cov=thegraph_token_api --cov-report=term-missing
 
 # Run linting
 pip install ruff mypy
 ruff check .
 ruff format --check .
-mypy src/thegraph_thegraph_token_api --ignore-missing-imports
+mypy src/thegraph_token_api --ignore-missing-imports
 ```

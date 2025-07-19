@@ -8,7 +8,7 @@ for robust runtime type validation.
 Usage:
     ```python
     import anyio
-    from token_api import TokenAPI, SwapPrograms, Protocol
+    from thegraph_token_api import TokenAPI, SwapPrograms, Protocol
 
     async def main():
         api = TokenAPI()  # Auto-loads from .env
@@ -93,7 +93,7 @@ from .types import (
     VersionResponse,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.1.22"
 __all__ = [
     "TokenAPI",  # Main interface
     # Export all types

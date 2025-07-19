@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """Solana DEX Swaps Example - Get swap transactions from Raydium, Jupiter, and Pump.fun."""
 
-import os
-import sys
 from datetime import datetime
 
 import anyio
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 from thegraph_token_api import SwapPrograms, TokenAPI
 
 
@@ -53,8 +50,8 @@ async def main():
         print("\nSOL/USDC Swaps:")
         sol_usdc = await api.svm.swaps(
             program_id=SwapPrograms.RAYDIUM,
-            input_mint="So11111111111111111111111111111111111111112",
-            output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            input_mint="So11111111111111111111111111111111111111112",  # pragma: allowlist secret
+            output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
             limit=2,
         )
 

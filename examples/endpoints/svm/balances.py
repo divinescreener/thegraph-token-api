@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 """Solana SPL Token Balances Example - Get SPL token balances."""
 
-import os
-import sys
-
 import anyio
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 from thegraph_token_api import SolanaPrograms, TokenAPI
 
 

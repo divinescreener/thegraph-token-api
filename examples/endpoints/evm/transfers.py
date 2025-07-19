@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """Token Transfers Example - Get token transfer events."""
 
-import os
-import sys
 from datetime import datetime
 
 import anyio
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 from thegraph_token_api import TokenAPI
 
 

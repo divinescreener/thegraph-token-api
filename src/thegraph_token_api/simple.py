@@ -8,7 +8,7 @@ This module provides a clean, separated interface for EVM and SVM chains:
 - Separated EVM and SVM methods
 
 Usage:
-    from token_api import TokenAPI
+    from thegraph_token_api import TokenAPI
 
     api = TokenAPI()  # Auto-loads from .env
     eth_balances = await api.evm.balances("0x...")  # EVM chains
@@ -88,6 +88,27 @@ class NFTWrapper:
         )
         return convert_list_to_models(data, NFTActivity)
 
+    async def item(self, contract: str, token_id: str, network: NetworkId | str | None = None) -> list[dict[str, Any]]:
+        """Get specific NFT item metadata by contract and token ID."""
+        data = await self._api._evm_nft_item(contract=contract, token_id=token_id, network=network)
+        return data.get("items", []) if data else []
+
+    async def holders(self, contract: str, network: NetworkId | str | None = None) -> list[dict[str, Any]]:
+        """Get NFT holders for a contract."""
+        data = await self._api._evm_nft_holders(contract=contract, network=network)
+        return data.get("holders", []) if data else []
+
+    async def sales(
+        self,
+        contract: str,
+        token_id: str | None = None,
+        limit: int = 10,
+        network: NetworkId | str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get NFT marketplace sales."""
+        data = await self._api._evm_nft_sales(contract=contract, token_id=token_id, limit=limit, network=network)
+        return data.get("sales", []) if data else []
+
 
 class EVMWrapper:
     """EVM-specific methods wrapper."""
@@ -104,6 +125,20 @@ class EVMWrapper:
         """Get EVM token balances for an address."""
         data = await self._api._evm_balances(address=address, contract=contract, limit=limit, network=network)
         return convert_list_to_models(data, Balance)
+
+    async def historical_balances(
+        self,
+        address: str,
+        contracts: list[str] | None = None,
+        interval: Interval | str = Interval.ONE_HOUR,
+        limit: int = 10,
+        network: NetworkId | str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get historical balance data for EVM addresses."""
+        data = await self._api._evm_historical_balances(
+            address=address, contracts=contracts, interval=interval, limit=limit, network=network
+        )
+        return data.get("balances", []) if data else []
 
     async def token_info(self, contract: str, network: NetworkId | str | None = None) -> Token | None:
         """Get EVM token contract information."""
@@ -300,7 +335,7 @@ class TokenAPI:
 
     Example:
         ```python
-        from token_api import TokenAPI, SwapPrograms, Protocol
+        from thegraph_token_api import TokenAPI, SwapPrograms, Protocol
 
         api = TokenAPI()  # Auto-loads API key from .env
 
@@ -476,6 +511,51 @@ class TokenAPI:
             )
             return self._extract_data(response)
 
+    async def _evm_nft_item(
+        self, contract: str, token_id: str, network: NetworkId | str | None = None
+    ) -> dict | None:
+        """Internal EVM NFT item implementation."""
+        net = str(network) if network else self._default_network
+        async with self._api.evm(net) as client:
+            response = await client.get_nft_item(contract=contract, token_id=token_id)
+            return self._extract_data(response)
+
+    async def _evm_nft_holders(self, contract: str, network: NetworkId | str | None = None) -> dict | None:
+        """Internal EVM NFT holders implementation."""
+        net = str(network) if network else self._default_network
+        async with self._api.evm(net) as client:
+            response = await client.get_nft_holders(contract=contract)
+            return self._extract_data(response)
+
+    async def _evm_nft_sales(
+        self,
+        contract: str,
+        token_id: str | None = None,
+        limit: int = 10,
+        network: NetworkId | str | None = None,
+    ) -> dict | None:
+        """Internal EVM NFT sales implementation."""
+        net = str(network) if network else self._default_network
+        async with self._api.evm(net) as client:
+            response = await client.get_nft_sales(contract=contract, token_id=token_id, limit=limit)
+            return self._extract_data(response)
+
+    async def _evm_historical_balances(
+        self,
+        address: str,
+        contracts: list[str] | None = None,
+        interval: Interval | str = Interval.ONE_HOUR,
+        limit: int = 10,
+        network: NetworkId | str | None = None,
+    ) -> dict | None:
+        """Internal EVM historical balances implementation."""
+        net = str(network) if network else self._default_network
+        async with self._api.evm(net) as client:
+            response = await client.get_historical_balances(
+                address=address, contracts=contracts, interval=interval, limit=limit
+            )
+            return self._extract_data(response)
+
     async def _evm_pools(
         self,
         pool: str | None = None,
@@ -605,6 +685,16 @@ class TokenAPI:
             return self._extract_data(response)
 
     # ===== Utility Methods =====
+
+    async def version(self) -> dict[str, Any]:
+        """Get API version information."""
+        response = await self._api.get_version()
+        return self._extract_data(response)
+
+    async def networks(self) -> dict[str, Any]:
+        """Get supported networks."""
+        response = await self._api.get_networks()
+        return self._extract_data(response)
 
     async def health(self) -> str:
         """Check API health status."""

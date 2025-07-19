@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """Solana SPL Token Transfers Example - Get SPL token transfer events."""
 
-import os
-import sys
 from datetime import datetime
 
 import anyio
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 from thegraph_token_api import SolanaPrograms, TokenAPI
 
 
@@ -35,7 +32,10 @@ async def main():
 
         # Get USDC transfers
         print("\nUSDC Transfers:")
-        usdc_transfers = await api.svm.transfers(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", limit=3)
+        usdc_transfers = await api.svm.transfers(
+            mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
+            limit=3,
+        )
 
         for i, transfer in enumerate(usdc_transfers, 1):
             amount = transfer.amount

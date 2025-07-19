@@ -27,7 +27,7 @@ Complete technical documentation for The Graph Token API client with EVM and SVM
 ### Installation
 
 ```bash
-pip install token-api
+pip install divine-thegraph-token-api
 ```
 
 ### Basic Setup
@@ -698,11 +698,11 @@ Get Solana SPL token balances.
 balances = await api.svm.balances(limit=20)
 
 # Get balances for specific mint (USDC)
-usdc_balances = await api.svm.balances(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+usdc_balances = await api.svm.balances(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v  # pragma: allowlist secret")
 
 # Get Token 2022 program balances
 token_2022_balances = await api.svm.balances(
-    program_id="TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # or SolanaPrograms.TOKEN_2022
+    program_id="TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb  # pragma: allowlist secret"  # or SolanaPrograms.TOKEN_2022
 )
 ```
 
@@ -714,9 +714,9 @@ token_2022_balances = await api.svm.balances(
             "block_num": 150000000.0,
             "datetime": "2023-11-01T12:00:00Z",
             "timestamp": 1698768000.0,
-            "program_id": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+            "program_id": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA  # pragma: allowlist secret",
             "token_account": "4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",
-            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v  # pragma: allowlist secret",
             "amount": "1000000",
             "value": 1.0,
             "decimals": 6.0,
@@ -764,7 +764,7 @@ transfers = await api.svm.transfers(limit=10)
 
 # Get transfers for USDC
 usdc_transfers = await api.svm.transfers(
-    mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+    mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v  # pragma: allowlist secret"
 )
 
 # Get transfers by authority
@@ -774,7 +774,7 @@ authority_transfers = await api.svm.transfers(
 
 # Get Token Program transfers
 token_transfers = await api.svm.transfers(
-    program_id="TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # or SolanaPrograms.TOKEN
+    program_id="TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA  # pragma: allowlist secret"  # or SolanaPrograms.TOKEN
 )
 ```
 
@@ -809,19 +809,19 @@ Get Solana DEX swap transactions with time filtering support.
 ```python
 # Get Raydium swaps
 raydium_swaps = await api.svm.swaps(
-    program_id="675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",  # or SwapPrograms.RAYDIUM
+    program_id="675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8  # pragma: allowlist secret",  # or SwapPrograms.RAYDIUM
     limit=10
 )
 
 # Get Orca swaps
 orca_swaps = await api.svm.swaps(
-    program_id="6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",  # or SwapPrograms.ORCA
+    program_id="6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P  # pragma: allowlist secret",  # or SwapPrograms.ORCA
     limit=5
 )
 
 # Get Jupiter V6 swaps
 jupiter_swaps = await api.svm.swaps(
-    program_id="JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"  # or SwapPrograms.JUPITER_V6
+    program_id="JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4  # pragma: allowlist secret"  # or SwapPrograms.JUPITER_V6
 )
 
 # Get swaps for specific pool with time filtering
@@ -830,7 +830,7 @@ end_time = int(datetime.now().timestamp())
 start_time = int((datetime.now() - timedelta(minutes=30)).timestamp())
 
 recent_swaps = await api.svm.swaps(
-    program_id="675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",  # or SwapPrograms.RAYDIUM
+    program_id="675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8  # pragma: allowlist secret",  # or SwapPrograms.RAYDIUM
     amm_pool="H7zh7kBJY8cGHcbHgKpJgRC9vmQGf3Bk4m8fdbNdy3hL",
     start_time=start_time,
     end_time=end_time,
@@ -839,9 +839,9 @@ recent_swaps = await api.svm.swaps(
 
 # Get SOL/USDC swaps
 sol_usdc_swaps = await api.svm.swaps(
-    program_id="675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",  # or SwapPrograms.RAYDIUM
-    input_mint="So11111111111111111111111111111111111111112",  # SOL
-    output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # USDC
+    program_id="675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8  # pragma: allowlist secret",  # or SwapPrograms.RAYDIUM
+    input_mint="So11111111111111111111111111111111111111112  # pragma: allowlist secret",  # SOL
+    output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v  # pragma: allowlist secret"  # USDC
 )
 ```
 
@@ -856,20 +856,20 @@ sol_usdc_swaps = await api.svm.swaps(
             "transaction_index": 1,
             "instruction_index": 0,
             "signature": "5J8oyTo6W1tBKhEDE7RyT5RqPZkY8q1YWZXMFfPsxQktqxqX",
-            "program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+            "program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8  # pragma: allowlist secret",
             "program_name": "Raydium",
             "user": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
             "amm": "EYTBKuQnvjGx7LSDKPBQJbKb8Jw5YWPfMTtdqXRpK7zx",
             "amm_name": "Raydium AMM",
             "amm_pool": "H7zh7kBJY8cGHcbHgKpJgRC9vmQGf3Bk4m8fdbNdy3hL",
             "input_mint": {
-                "address": "So11111111111111111111111111111111111111112",
+                "address": "So11111111111111111111111111111111111111112  # pragma: allowlist secret",
                 "symbol": "SOL",
                 "decimals": 9.0
             },
             "input_amount": 1.5,
             "output_mint": {
-                "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v  # pragma: allowlist secret",
                 "symbol": "USDC",
                 "decimals": 6.0
             },
@@ -1030,15 +1030,15 @@ Protocol.UNISWAP_V3  # Uniswap V3
 
 ```python
 # SPL Token Program IDs (use strings as they appear in API)
-"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # SPL Token Program
-"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # SPL Token 2022 Program
+"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA  # pragma: allowlist secret"  # SPL Token Program
+"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb  # pragma: allowlist secret"  # SPL Token 2022 Program
 
 # DEX Program IDs
-"675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"  # Raydium
-"6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"   # Orca
-"JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB"  # Jupiter V4
-"JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"  # Jupiter V6
-"pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"  # Pump.fun
+"675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8  # pragma: allowlist secret"  # Raydium
+"6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P  # pragma: allowlist secret"   # Orca
+"JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB  # pragma: allowlist secret"  # Jupiter V4
+"JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4  # pragma: allowlist secret"  # Jupiter V6
+"pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA  # pragma: allowlist secret"  # Pump.fun
 
 # Or use enums for type safety
 from thegraph_token_api import SolanaPrograms, SwapPrograms
