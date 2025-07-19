@@ -29,6 +29,7 @@ keywords = ["blockchain", "ethereum", "solana", "defi", "nft", "api", "thegraph"
 dependencies = [
     "divine-requests>=0.1.1",
     "divine-type-enforcer>=0.1.1",
+    "anyio>=4.0.0",
 ]
 
 [project.optional-dependencies]
@@ -36,6 +37,8 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=4.0",
     "pytest-asyncio>=0.21",
+    "pytest-anyio>=0.8.0",
+    "trio>=0.20.0",
     "python-dotenv>=1.0.0",
     "pre-commit>=3.5.0",
     "ruff>=0.8.0",
@@ -53,6 +56,7 @@ where = ["src"]
 pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "--cov=thegraph_token_api --cov-report term-missing"
+anyio_backends = ["asyncio", "trio"]
 
 [tool.coverage.run]
 source = ["src/thegraph_token_api"]
