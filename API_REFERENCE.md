@@ -39,7 +39,7 @@ from token_api import TokenAPI, SwapPrograms, Protocol
 async def main():
     # Auto-loads from .env file
     api = TokenAPI()
-    
+
     # Or provide API key directly
     api = TokenAPI(api_key="your_api_key_here")
 
@@ -646,7 +646,7 @@ polygon_history = await api.evm.historical_balances(
         },
         {
             "block_num": 18496400.0,
-            "datetime": "2023-11-01T11:00:00Z", 
+            "datetime": "2023-11-01T11:00:00Z",
             "timestamp": 1698764400.0,
             "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
             "contract": "0x0000000000000000000000000000000000000000",
@@ -959,7 +959,7 @@ for network in networks.networks:
         {
             "id": "mainnet",
             "fullName": "Ethereum Mainnet",
-            "shortName": "Ethereum", 
+            "shortName": "Ethereum",
             "caip2Id": "eip155:1",
             "networkType": "mainnet",
             "icon": {
@@ -1106,7 +1106,7 @@ except Exception as e:
 
 **Common Error Scenarios:**
 - Invalid API key → `ValueError`
-- Invalid address format → `ValueError`  
+- Invalid address format → `ValueError`
 - Network timeout → `Exception`
 - Rate limiting → `Exception`
 - Invalid network ID → `ValueError`

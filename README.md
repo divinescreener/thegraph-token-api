@@ -20,16 +20,16 @@ from token_api import TokenAPI, SwapPrograms, Protocol
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env
-    
+
     # EVM chains (Ethereum, Polygon, BSC, etc.)
     eth_balances = await api.evm.balances("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
     eth_nfts = await api.evm.nfts.ownerships("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
     eth_swaps = await api.evm.swaps(protocol=Protocol.UNISWAP_V3, limit=10)
-    
+
     # SVM (Solana)
     sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
     sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=10)
-    
+
     # Utility
     health = await api.health()
 
@@ -48,7 +48,7 @@ Get your free API key at: [thegraph.market](https://thegraph.market) (click "Get
 ## Features
 
 - 🏗️ **Clean Architecture**: Separated EVM and SVM interfaces
-- 🎨 **Nested Organization**: `api.evm.nfts.ownerships()` for better structure  
+- 🎨 **Nested Organization**: `api.evm.nfts.ownerships()` for better structure
 - ⚡ **Multi-Chain**: Ethereum, Polygon, BSC, Arbitrum, Optimism, Base, Solana
 - 🔧 **Time Filtering**: Get trades from specific time ranges
 - 📦 **Type Safety**: Full type hints and runtime validation
@@ -62,7 +62,7 @@ Get your free API key at: [thegraph.market](https://thegraph.market) (click "Get
 # Token Balances
 balances = await api.evm.balances(address)
 
-# NFT Operations  
+# NFT Operations
 nfts = await api.evm.nfts.ownerships(address)
 collection = await api.evm.nfts.collection(contract)
 activities = await api.evm.nfts.activities(contract)
@@ -105,7 +105,7 @@ swaps = await api.svm.swaps(
 
 ## Supported Networks
 
-**EVM**: Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, Base, Unichain  
+**EVM**: Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, Base, Unichain
 **SVM**: Solana
 
 **DEX Protocols**: Uniswap V2/V3, Raydium, Orca, Jupiter, Pump.fun
@@ -120,7 +120,7 @@ python examples/endpoints/evm/health.py      # API connectivity
 python examples/endpoints/evm/balances.py    # Token balances
 python examples/endpoints/evm/nfts.py        # NFT ownership
 
-# SVM examples  
+# SVM examples
 python examples/endpoints/svm/balances.py    # SPL balances
 python examples/endpoints/svm/swaps.py       # Solana DEX swaps
 ```
@@ -133,7 +133,7 @@ python examples/endpoints/svm/swaps.py       # Solana DEX swaps
 
 The API reference includes:
 - All function signatures and parameters
-- Response schemas and examples  
+- Response schemas and examples
 - Error handling guidelines
 - Type definitions and enums
 - Advanced usage patterns

@@ -13,11 +13,11 @@ Get a free API key at: [thegraph.market](https://thegraph.market)
 **Run examples:**
 ```bash
 # EVM examples
-python examples/endpoints/evm/health.py     # API connectivity 
+python examples/endpoints/evm/health.py     # API connectivity
 python examples/endpoints/evm/balances.py   # Token balances
 python examples/endpoints/evm/nfts.py       # NFT ownership
 
-# SVM examples  
+# SVM examples
 python examples/endpoints/svm/balances.py   # SPL balances
 python examples/endpoints/svm/swaps.py      # Solana DEX swaps
 ```
@@ -31,19 +31,19 @@ Supports Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, Base, and other 
 
 - `health.py` - API connectivity and health checks
 - `balances.py` - Token balance queries with real wallets
-- `tokens.py` - Token information and holder analysis  
+- `tokens.py` - Token information and holder analysis
 - `transfers.py` - Token transfer event tracking
 - `swaps.py` - DEX swap transaction analysis
 - `nfts.py` - Complete NFT analysis (ownerships, collections, activities)
 - `prices.py` - Price history and OHLC data
 
-### ⚡ SVM (Solana Virtual Machine)  
+### ⚡ SVM (Solana Virtual Machine)
 **Location**: [`endpoints/svm/`](endpoints/svm/)
 
 Supports Solana mainnet with SPL tokens and Solana DEXs.
 
 - `balances.py` - Solana SPL token balances
-- `transfers.py` - SPL token transfer tracking  
+- `transfers.py` - SPL token transfer tracking
 - `swaps.py` - Cross-DEX analysis (Raydium, Jupiter, Pump.fun)
 
 ## 🎯 API Interface
@@ -55,20 +55,20 @@ from token_api import TokenAPI, SwapPrograms, Protocol
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env
-    
+
     # EVM methods (Ethereum, Polygon, BSC, etc.)
     balances = await api.evm.balances("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
     nfts = await api.evm.nfts.ownerships("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
     swaps = await api.evm.swaps(protocol=Protocol.UNISWAP_V3)
-    
+
     # SVM methods (Solana)
     sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
     sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM)
-    
+
     # Clean structured data access
     for balance in balances:
         print(f"{balance.symbol}: {balance.value:.2f}")
-    
+
     for swap in swaps:
         print(f"{swap.token0.symbol} → {swap.token1.symbol}")
 ```
@@ -77,7 +77,7 @@ async def main():
 
 ### 📊 **Traders & Investors**
 - `evm/balances.py` - Portfolio tracking across wallets
-- `evm/swaps.py` - Market activity and volume analysis  
+- `evm/swaps.py` - Market activity and volume analysis
 - `evm/prices.py` - Price history and trend analysis
 - `svm/swaps.py` - Solana DEX arbitrage opportunities
 
@@ -94,7 +94,7 @@ async def main():
 
 ### 🔍 **Researchers**
 - Cross-chain ecosystem analysis
-- Market microstructure studies  
+- Market microstructure studies
 - Multi-protocol volume analysis
 
 ## 🔧 Technical Features
@@ -103,7 +103,7 @@ async def main():
 Examples demonstrate clean attribute access instead of dictionary lookups:
 ```python
 # Clean structured access
-balance.symbol          # vs balance.get('symbol', '?')  
+balance.symbol          # vs balance.get('symbol', '?')
 swap.token0.symbol      # vs swap.get('token0', {}).get('symbol', '?')
 nft.token_standard      # vs nft.get('token_standard', 'unknown')
 ```
@@ -114,7 +114,7 @@ All examples use modern `anyio` for:
 - Proper resource management
 - High-performance networking
 
-### **Error Handling** 
+### **Error Handling**
 - Comprehensive try/catch blocks
 - Graceful API error recovery
 - User-friendly error messages
@@ -159,7 +159,7 @@ Vitalik's Portfolio:
 Examples are designed to be easily customized:
 
 1. **Change addresses** - Replace wallet/contract addresses with your own
-2. **Adjust time windows** - Modify time ranges for different periods  
+2. **Adjust time windows** - Modify time ranges for different periods
 3. **Add new networks** - Include additional EVM networks
 4. **Filter data** - Add specific token or NFT filters
 
@@ -180,7 +180,7 @@ balances = await api.evm.balances(your_wallet, limit=10)
 **Network Errors:**
 ```
 ❌ Error occurred: NetworkingError
-```  
+```
 *Solution: Check internet connection and API key validity*
 
 **Timeout Issues:**

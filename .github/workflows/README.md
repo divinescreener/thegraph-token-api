@@ -46,7 +46,7 @@ This directory contains the continuous integration and deployment workflows for 
 
 ## Setup Requirements
 
-1. **PyPI Publishing**: 
+1. **PyPI Publishing**:
    - Configure PyPI trusted publishing in your PyPI project settings
    - Add the `pypi` environment in GitHub repository settings
 

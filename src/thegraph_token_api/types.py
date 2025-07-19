@@ -5,57 +5,63 @@ This module contains all TypedDict and enum definitions based on the OpenAPI 3.1
 All types are designed for use with divine-type-enforcer for runtime validation.
 """
 
-from typing import TypedDict, List, Optional, Union, Literal
 from enum import Enum
-
+from typing import TypedDict
 
 # ===== Common Types =====
 
+
 class BaseResponse(TypedDict, total=False):
     """Base response structure for all API endpoints."""
-    data: List[dict]
-    results: Optional[int]  # Number of results returned
-    statistics: Optional[dict]
-    duration_ms: Optional[float]
-    pagination: Optional[dict]
-    request_time: Optional[str]
-    total_results: Optional[int]
+
+    data: list[dict]
+    results: int | None  # Number of results returned
+    statistics: dict | None
+    duration_ms: float | None
+    pagination: dict | None
+    request_time: str | None
+    total_results: int | None
+
 
 class NetworkId(str, Enum):
     """Supported EVM network IDs."""
+
     ARBITRUM_ONE = "arbitrum-one"
-    AVALANCHE = "avalanche" 
+    AVALANCHE = "avalanche"
     BASE = "base"
     BSC = "bsc"
     MAINNET = "mainnet"
     MATIC = "matic"
     OPTIMISM = "optimism"
     UNICHAIN = "unichain"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class SolanaNetworkId(str, Enum):
     """Supported SVM network IDs."""
+
     SOLANA = "solana"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class TokenStandard(str, Enum):
     """NFT token standards."""
+
     EMPTY = ""
     ERC721 = "ERC721"
     ERC1155 = "ERC1155"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class ActivityType(str, Enum):
     """NFT activity types."""
+
     TRANSFER = "TRANSFER"
     MINT = "MINT"
     BURN = "BURN"
@@ -63,67 +69,75 @@ class ActivityType(str, Enum):
 
 class OrderDirection(str, Enum):
     """Order direction for sorting."""
+
     ASC = "asc"
     DESC = "desc"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class OrderBy(str, Enum):
     """Order by field."""
+
     TIMESTAMP = "timestamp"
     VALUE = "value"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class Interval(str, Enum):
     """Time intervals for OHLC data."""
+
     ONE_HOUR = "1h"
     FOUR_HOURS = "4h"
     ONE_DAY = "1d"
     ONE_WEEK = "1w"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class Protocol(str, Enum):
     """DEX protocols."""
+
     UNISWAP_V2 = "uniswap_v2"
     UNISWAP_V3 = "uniswap_v3"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class SolanaPrograms(str, Enum):
     """Solana program IDs."""
+
     TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
     TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 class SwapPrograms(str, Enum):
     """Solana swap program IDs."""
+
     RAYDIUM = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"  # Raydium Liquidity Pool V4
     PUMP_FUN_CORE = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"  # Pump.fun
     PUMP_FUN_AMM = "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"  # Pump.fun AMM
     JUPITER_V4 = "JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB"  # Jupiter Aggregator v4
     JUPITER_V6 = "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"  # Jupiter Aggregator v6
-    
+
     def __str__(self) -> str:
         return self.value
 
 
 # ===== Common Response Structure =====
 
+
 class Statistics(TypedDict, total=False):
     """API response statistics."""
+
     elapsed: float
     rows_read: float
     bytes_read: float
@@ -134,34 +148,39 @@ class Statistics(TypedDict, total=False):
 
 # ===== NFT Types =====
 
+
 class NFTAttribute(TypedDict):
     """NFT attribute/trait."""
+
     trait_type: str
     value: str
-    display_type: Optional[str]
+    display_type: str | None
 
 
 class NFTOwnership(TypedDict):
     """NFT ownership record."""
+
     token_id: str
     token_standard: TokenStandard
     contract: str
     owner: str
     network_id: str  # API returns string format
-    symbol: Optional[str]
-    uri: Optional[str]
-    name: Optional[str]
-    image: Optional[str]
-    description: Optional[str]
+    symbol: str | None
+    uri: str | None
+    name: str | None
+    image: str | None
+    description: str | None
 
 
 class NFTOwnershipsResponse(BaseResponse):
     """Response for NFT ownerships endpoint."""
-    data: List[NFTOwnership]
+
+    data: list[NFTOwnership]
 
 
 class NFTCollection(TypedDict, total=False):
     """NFT collection metadata."""
+
     contract: str
     contract_creation: str
     contract_creator: str
@@ -172,58 +191,67 @@ class NFTCollection(TypedDict, total=False):
     total_unique_supply: float
     total_transfers: float
     network_id: str  # API returns string format
-    token_standard: Optional[str]  # API may include this field
+    token_standard: str | None  # API may include this field
 
 
 class NFTCollectionsResponse(BaseResponse):
     """Response for NFT collections endpoint."""
-    data: List[NFTCollection]
+
+    data: list[NFTCollection]
 
 
 class NFTItem(TypedDict):
     """NFT item/token details."""
+
     token_id: str
     token_standard: TokenStandard
     contract: str
     owner: str
     network_id: str  # API returns string format
-    uri: Optional[str]
-    name: Optional[str]
-    image: Optional[str]
-    description: Optional[str]
-    attributes: Optional[List[NFTAttribute]]
+    uri: str | None
+    name: str | None
+    image: str | None
+    description: str | None
+    attributes: list[NFTAttribute] | None
 
 
 class NFTItemsResponse(BaseResponse):
     """Response for NFT items endpoint."""
-    data: List[NFTItem]
+
+    data: list[NFTItem]
 
 
-NFTActivity = TypedDict('NFTActivity', {
-    '@type': str,  # API uses @type field
-    'block_num': float,
-    'block_hash': str,
-    'timestamp': str,
-    'tx_hash': str,
-    'contract': str,
-    'symbol': Optional[str],
-    'name': Optional[str],
-    'from': str,  # API uses 'from' field
-    'to': str,
-    'token_id': str,
-    'amount': float,
-    'transfer_type': Optional[str],
-    'token_standard': Optional[str],
-}, total=False)
+NFTActivity = TypedDict(
+    "NFTActivity",
+    {
+        "@type": str,  # API uses @type field
+        "block_num": float,
+        "block_hash": str,
+        "timestamp": str,
+        "tx_hash": str,
+        "contract": str,
+        "symbol": str | None,
+        "name": str | None,
+        "from": str,  # API uses 'from' field
+        "to": str,
+        "token_id": str,
+        "amount": float,
+        "transfer_type": str | None,
+        "token_standard": str | None,
+    },
+    total=False,
+)
 
 
 class NFTActivitiesResponse(BaseResponse):
     """Response for NFT activities endpoint."""
-    data: List[NFTActivity]
+
+    data: list[NFTActivity]
 
 
 class NFTHolder(TypedDict):
     """NFT holder information."""
+
     token_standard: str
     address: str
     quantity: float
@@ -234,12 +262,14 @@ class NFTHolder(TypedDict):
 
 class NFTHoldersResponse(TypedDict):
     """Response for NFT holders endpoint."""
-    data: List[NFTHolder]
-    statistics: Optional[Statistics]
+
+    data: list[NFTHolder]
+    statistics: Statistics | None
 
 
 class NFTSale(TypedDict):
     """NFT sale record."""
+
     timestamp: str
     block_num: float
     tx_hash: str
@@ -255,34 +285,39 @@ class NFTSale(TypedDict):
 
 class NFTSalesResponse(TypedDict):
     """Response for NFT sales endpoint."""
-    data: List[NFTSale]
-    statistics: Optional[Statistics]
+
+    data: list[NFTSale]
+    statistics: Statistics | None
 
 
 # ===== Balance Types =====
 
+
 class Balance(TypedDict):
     """Token balance record."""
+
     block_num: float
     datetime: str
     contract: str
     amount: str
     value: float
     network_id: str  # API returns string format
-    symbol: Optional[str]
-    decimals: Optional[float]
-    price_usd: Optional[float]
-    value_usd: Optional[float]
-    low_liquidity: Optional[bool]
+    symbol: str | None
+    decimals: float | None
+    price_usd: float | None
+    value_usd: float | None
+    low_liquidity: bool | None
 
 
 class BalancesResponse(BaseResponse):
     """Response for balances endpoint."""
-    data: List[Balance]
+
+    data: list[Balance]
 
 
 class SolanaBalance(TypedDict):
     """Solana token balance record."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -297,32 +332,39 @@ class SolanaBalance(TypedDict):
 
 class SolanaBalancesResponse(BaseResponse):
     """Response for Solana balances endpoint."""
-    data: List[SolanaBalance]
+
+    data: list[SolanaBalance]
 
 
 # ===== Transfer Types =====
 
-Transfer = TypedDict('Transfer', {
-    'block_num': float,
-    'datetime': str,
-    'timestamp': float,
-    'transaction_id': str,
-    'contract': str,
-    'from': str,  # API uses 'from' field
-    'to': str,
-    'value': float,  # API uses 'value' not 'amount'
-    'symbol': Optional[str],
-    'decimals': Optional[float],
-}, total=False)
+Transfer = TypedDict(
+    "Transfer",
+    {
+        "block_num": float,
+        "datetime": str,
+        "timestamp": float,
+        "transaction_id": str,
+        "contract": str,
+        "from": str,  # API uses 'from' field
+        "to": str,
+        "value": float,  # API uses 'value' not 'amount'
+        "symbol": str | None,
+        "decimals": float | None,
+    },
+    total=False,
+)
 
 
 class TransfersResponse(BaseResponse):
     """Response for transfers endpoint."""
-    data: List[Transfer]
+
+    data: list[Transfer]
 
 
 class SolanaTransfer(TypedDict):
     """Solana token transfer record."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -334,69 +376,78 @@ class SolanaTransfer(TypedDict):
     destination: str
     amount: str
     value: float
-    decimals: Optional[float]
+    decimals: float | None
     network_id: str  # API returns string format
 
 
 class SolanaTransfersResponse(BaseResponse):
     """Response for Solana transfers endpoint."""
-    data: List[SolanaTransfer]
+
+    data: list[SolanaTransfer]
 
 
 # ===== Token Types =====
 
+
 class TokenIcon(TypedDict):
     """Token icon information."""
+
     web3icon: str
 
 
 class Token(TypedDict, total=False):
     """Token metadata."""
+
     block_num: float
     datetime: str
     contract: str
-    circulating_supply: Union[str, float]  # API can return either
+    circulating_supply: str | float  # API can return either
     holders: float
     network_id: str  # API returns string format
-    icon: Optional[TokenIcon]
-    symbol: Optional[str]
-    name: Optional[str]
-    decimals: Optional[float]
-    price_usd: Optional[float]
-    market_cap: Optional[float]
-    low_liquidity: Optional[bool]
+    icon: TokenIcon | None
+    symbol: str | None
+    name: str | None
+    decimals: float | None
+    price_usd: float | None
+    market_cap: float | None
+    low_liquidity: bool | None
 
 
 class TokensResponse(BaseResponse):
     """Response for tokens endpoint."""
-    data: List[Token]
+
+    data: list[Token]
 
 
 class TokenHolder(TypedDict):
     """Token holder information."""
+
     block_num: float
     datetime: str
     address: str
     amount: str
     value: float
     network_id: str  # API returns string format
-    symbol: Optional[str]
-    decimals: Optional[float]
-    price_usd: Optional[float]
-    value_usd: Optional[float]
-    low_liquidity: Optional[bool]
+    symbol: str | None
+    decimals: float | None
+    price_usd: float | None
+    value_usd: float | None
+    low_liquidity: bool | None
 
 
 class TokenHoldersResponse(TypedDict):
     """Response for token holders endpoint."""
-    data: List[TokenHolder]
-    statistics: Optional[Statistics]
+
+    data: list[TokenHolder]
+    statistics: Statistics | None
 
 
 # ===== Swap Types =====
 
+
 class SwapToken(TypedDict):
     """Token information in swap."""
+
     address: str
     symbol: str
     decimals: float
@@ -404,6 +455,7 @@ class SwapToken(TypedDict):
 
 class Swap(TypedDict, total=False):
     """DEX swap record."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -411,7 +463,7 @@ class Swap(TypedDict, total=False):
     transaction_id: str
     caller: str
     sender: str
-    recipient: Optional[str]
+    recipient: str | None
     factory: str
     pool: str
     token0: SwapToken
@@ -422,17 +474,19 @@ class Swap(TypedDict, total=False):
     price1: float
     value0: float
     value1: float
-    fee: Optional[str]
+    fee: str | None
     protocol: str
 
 
 class SwapsResponse(BaseResponse):
     """Response for swaps endpoint."""
-    data: List[Swap]
+
+    data: list[Swap]
 
 
 class SolanaMint(TypedDict):
     """Solana mint information."""
+
     address: str
     symbol: str
     decimals: float
@@ -440,34 +494,38 @@ class SolanaMint(TypedDict):
 
 class SolanaSwap(TypedDict, total=False):
     """Solana swap record."""
+
     block_num: float
     datetime: str
     timestamp: float
-    transaction_index: Optional[float]
-    instruction_index: Optional[float]
+    transaction_index: float | None
+    instruction_index: float | None
     signature: str
     program_id: str
     program_name: str
     user: str
     amm: str
     amm_name: str
-    amm_pool: Optional[str]
-    input_mint: Union[SolanaMint, str]  # API can return either dict or string
+    amm_pool: str | None
+    input_mint: SolanaMint | str  # API can return either dict or string
     input_amount: float
-    output_mint: Union[SolanaMint, str]  # API can return either dict or string
+    output_mint: SolanaMint | str  # API can return either dict or string
     output_amount: float
     network_id: str  # API returns string format
 
 
 class SolanaSwapsResponse(BaseResponse):
     """Response for Solana swaps endpoint."""
-    data: List[SolanaSwap]
+
+    data: list[SolanaSwap]
 
 
 # ===== Pool Types =====
 
+
 class Pool(TypedDict):
     """Liquidity pool information."""
+
     block_num: float
     datetime: str
     network_id: str  # API returns string format
@@ -482,13 +540,16 @@ class Pool(TypedDict):
 
 class PoolsResponse(BaseResponse):
     """Response for pools endpoint."""
-    data: List[Pool]
+
+    data: list[Pool]
 
 
 # ===== OHLC Types =====
 
+
 class OHLC(TypedDict):
     """OHLC price data."""
+
     datetime: str
     ticker: str
     open: float
@@ -502,13 +563,16 @@ class OHLC(TypedDict):
 
 class OHLCResponse(BaseResponse):
     """Response for OHLC endpoints."""
-    data: List[OHLC]
+
+    data: list[OHLC]
 
 
 # ===== Historical Types =====
 
+
 class HistoricalBalance(TypedDict):
     """Historical balance data."""
+
     datetime: str
     contract: str
     name: str
@@ -522,14 +586,17 @@ class HistoricalBalance(TypedDict):
 
 class HistoricalBalancesResponse(TypedDict):
     """Response for historical balances endpoint."""
-    data: List[HistoricalBalance]
-    statistics: Optional[Statistics]
+
+    data: list[HistoricalBalance]
+    statistics: Statistics | None
 
 
 # ===== Monitoring Types =====
 
+
 class ErrorResponse(TypedDict):
     """Error response structure."""
+
     status: int
     code: str
     message: str
@@ -537,6 +604,7 @@ class ErrorResponse(TypedDict):
 
 class VersionResponse(TypedDict):
     """Version information response."""
+
     version: str
     date: str
     commit: str
@@ -544,23 +612,26 @@ class VersionResponse(TypedDict):
 
 class NetworkIcon(TypedDict):
     """Network icon information."""
+
     web3Icons: dict
 
 
 class Network(TypedDict):
     """Network information."""
+
     id: str
     fullName: str
     shortName: str
     caip2Id: str
     networkType: str
     icon: NetworkIcon
-    alias: List[str]
+    alias: list[str]
 
 
 class NetworksResponse(TypedDict):
     """Response for networks endpoint."""
-    networks: List[Network]
+
+    networks: list[Network]
 
 
 # ===== Export All Types =====
@@ -568,7 +639,7 @@ class NetworksResponse(TypedDict):
 __all__ = [
     # Enums
     "NetworkId",
-    "SolanaNetworkId", 
+    "SolanaNetworkId",
     "TokenStandard",
     "ActivityType",
     "OrderDirection",
@@ -577,12 +648,10 @@ __all__ = [
     "Protocol",
     "SolanaPrograms",
     "SwapPrograms",
-    
     # Common
     "Statistics",
     "BaseResponse",
     "ErrorResponse",
-    
     # NFT
     "NFTAttribute",
     "NFTOwnership",
@@ -597,26 +666,22 @@ __all__ = [
     "NFTHoldersResponse",
     "NFTSale",
     "NFTSalesResponse",
-    
     # Balances
     "Balance",
     "BalancesResponse",
     "SolanaBalance",
     "SolanaBalancesResponse",
-    
     # Transfers
     "Transfer",
     "TransfersResponse",
     "SolanaTransfer",
     "SolanaTransfersResponse",
-    
     # Tokens
     "TokenIcon",
     "Token",
     "TokensResponse",
     "TokenHolder",
     "TokenHoldersResponse",
-    
     # Swaps
     "SwapToken",
     "Swap",
@@ -624,19 +689,15 @@ __all__ = [
     "SolanaMint",
     "SolanaSwap",
     "SolanaSwapsResponse",
-    
     # Pools
     "Pool",
     "PoolsResponse",
-    
     # OHLC
     "OHLC",
     "OHLCResponse",
-    
     # Historical
     "HistoricalBalance",
     "HistoricalBalancesResponse",
-    
     # Monitoring
     "VersionResponse",
     "Network",

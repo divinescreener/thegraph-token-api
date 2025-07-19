@@ -8,7 +8,7 @@ This directory contains focused examples for Solana Virtual Machine (SVM) endpoi
 - **[`balances.py`](balances.py)** - Get SPL token balances for Solana wallet addresses
 - **[`transfers.py`](transfers.py)** - Track SPL token transfer events and movements
 
-### 🔄 Solana DEX Data  
+### 🔄 Solana DEX Data
 - **[`swaps.py`](swaps.py)** - Get DEX swap transactions from Raydium, Orca, Jupiter, and other Solana DEXs
 
 ## Quick Start
@@ -40,10 +40,10 @@ from token_api import TokenAPI, SwapPrograms, SolanaPrograms
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env
-    
+
     # Get Solana data (clean list returned)
     data = await api.svm_method_name(parameters)
-    
+
     # Process data
     for item in data:
         print(item)
@@ -61,7 +61,7 @@ Use enum constants for better code:
 SolanaPrograms.TOKEN        # Token Program
 SolanaPrograms.TOKEN_2022   # Token-2022 Program
 
-# DEX Programs  
+# DEX Programs
 SwapPrograms.RAYDIUM       # Raydium DEX
 SwapPrograms.ORCA          # Orca DEX
 SwapPrograms.JUPITER_V4    # Jupiter V4

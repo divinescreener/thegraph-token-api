@@ -4,28 +4,32 @@ SVM-specific client for The Graph Token API.
 Provides access to Solana blockchain data including SPL tokens, balances, transfers, and DEX swaps.
 """
 
-from typing import Optional, Union
 from .base import BaseTokenAPI
 from .types import (
-    # Enums
-    SolanaNetworkId, OrderDirection, OrderBy, SolanaPrograms, SwapPrograms,
-    
+    OrderBy,
+    OrderDirection,
     # Response types
-    SolanaBalancesResponse, SolanaTransfersResponse, SolanaSwapsResponse
+    SolanaBalancesResponse,
+    # Enums
+    SolanaNetworkId,
+    SolanaPrograms,
+    SolanaSwapsResponse,
+    SolanaTransfersResponse,
+    SwapPrograms,
 )
 
 
 class SVMTokenAPI(BaseTokenAPI):
     """
     SVM-specific client for The Graph Token API.
-    
+
     Provides access to Solana blockchain data with network-specific configuration.
-    
+
     Example:
         ```python
         import anyio
         from thegraph_client import SVMTokenAPI, SolanaNetworkId, SwapPrograms
-        
+
         async def main():
             # Create SVM client for Solana
             async with SVMTokenAPI(
@@ -36,26 +40,26 @@ class SVMTokenAPI(BaseTokenAPI):
                 balances = await svm_api.get_balances(
                     token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"
                 )
-                
+
                 # Get swap transactions
                 swaps = await svm_api.get_swaps(
                     program_id=SwapPrograms.RAYDIUM,
                     user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
                 )
-        
+
         anyio.run(main)
         ```
     """
-    
+
     def __init__(
         self,
-        network: Union[SolanaNetworkId, str] = SolanaNetworkId.SOLANA,
-        api_key: Optional[str] = None,
-        base_url: Optional[str] = None
+        network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
+        api_key: str | None = None,
+        base_url: str | None = None,
     ):
         """
         Initialize SVM Token API client.
-        
+
         Args:
             network: SVM network to use (default: SolanaNetworkId.SOLANA)
             api_key: Bearer token for API authentication
@@ -63,71 +67,64 @@ class SVMTokenAPI(BaseTokenAPI):
         """
         super().__init__(api_key, base_url)
         self.network = str(network)
-    
+
     # ===== Balance Methods =====
-    
+
     async def get_balances(
         self,
-        token_account: Optional[str] = None,
-        mint: Optional[str] = None,
-        program_id: Optional[Union[SolanaPrograms, str]] = None,
+        token_account: str | None = None,
+        mint: str | None = None,
+        program_id: SolanaPrograms | str | None = None,
         limit: int = 10,
-        page: int = 1
+        page: int = 1,
     ) -> SolanaBalancesResponse:
         """
         Get Solana SPL token balances.
-        
+
         Args:
             token_account: Filter by token account address
             mint: Filter by mint address
             program_id: Filter by program ID
             limit: Maximum number of results
             page: Page number
-            
+
         Returns:
             SolanaBalancesResponse with validated data
         """
         self._validate_pagination(limit, page)
-        params = {
-            "network_id": self.network,
-            "limit": limit,
-            "page": page
-        }
+        params = {"network_id": self.network, "limit": limit, "page": page}
         if token_account:
             params["token_account"] = token_account
         if mint:
             params["mint"] = mint
         if program_id:
             params["program_id"] = str(program_id)
-        
+
         response = await self.manager.get(
-            f"{self.base_url}/balances/svm",
-            headers=self._headers,
-            params=params,
-            expected_type=SolanaBalancesResponse
+            f"{self.base_url}/balances/svm", headers=self._headers, params=params, expected_type=SolanaBalancesResponse
         )
         return response
-    
+
     # ===== Transfer Methods =====
-    
+
     async def get_transfers(
         self,
-        signature: Optional[str] = None,
-        program_id: Optional[Union[SolanaPrograms, str]] = None,
-        mint: Optional[str] = None,
-        authority: Optional[str] = None,
-        source: Optional[str] = None,
-        destination: Optional[str] = None,
-        start_time: Optional[int] = None,
-        end_time: Optional[int] = None,
-        order_by: Union[OrderBy, str] = OrderBy.TIMESTAMP,
-        order_direction: Union[OrderDirection, str] = OrderDirection.DESC,
+        signature: str | None = None,
+        program_id: SolanaPrograms | str | None = None,
+        mint: str | None = None,
+        authority: str | None = None,
+        source: str | None = None,
+        destination: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        order_by: OrderBy | str = OrderBy.TIMESTAMP,
+        order_direction: OrderDirection | str = OrderDirection.DESC,
         limit: int = 10,
-        page: int = 1
+        page: int = 1,
     ) -> SolanaTransfersResponse:
         """
         Get Solana SPL token transfer events.
-        
+
         Args:
             signature: Filter by transaction signature
             program_id: Filter by program ID
@@ -141,7 +138,7 @@ class SVMTokenAPI(BaseTokenAPI):
             order_direction: Order direction (asc/desc)
             limit: Maximum number of results
             page: Page number
-            
+
         Returns:
             SolanaTransfersResponse with validated data
         """
@@ -151,9 +148,9 @@ class SVMTokenAPI(BaseTokenAPI):
             "orderBy": str(order_by),
             "orderDirection": str(order_direction),
             "limit": limit,
-            "page": page
+            "page": page,
         }
-        
+
         if signature:
             params["signature"] = signature
         if program_id:
@@ -170,36 +167,36 @@ class SVMTokenAPI(BaseTokenAPI):
             params["startTime"] = start_time
         if end_time:
             params["endTime"] = end_time
-        
+
         response = await self.manager.get(
             f"{self.base_url}/transfers/svm",
             headers=self._headers,
             params=params,
-            expected_type=SolanaTransfersResponse
+            expected_type=SolanaTransfersResponse,
         )
         return response
-    
+
     # ===== Swap Methods =====
-    
+
     async def get_swaps(
         self,
-        program_id: Union[SwapPrograms, str],
-        amm: Optional[str] = None,
-        amm_pool: Optional[str] = None,
-        user: Optional[str] = None,
-        input_mint: Optional[str] = None,
-        output_mint: Optional[str] = None,
-        signature: Optional[str] = None,
-        start_time: Optional[int] = None,
-        end_time: Optional[int] = None,
-        order_by: Union[OrderBy, str] = OrderBy.TIMESTAMP,
-        order_direction: Union[OrderDirection, str] = OrderDirection.DESC,
+        program_id: SwapPrograms | str,
+        amm: str | None = None,
+        amm_pool: str | None = None,
+        user: str | None = None,
+        input_mint: str | None = None,
+        output_mint: str | None = None,
+        signature: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        order_by: OrderBy | str = OrderBy.TIMESTAMP,
+        order_direction: OrderDirection | str = OrderDirection.DESC,
         limit: int = 10,
-        page: int = 1
+        page: int = 1,
     ) -> SolanaSwapsResponse:
         """
         Get Solana DEX swap transactions.
-        
+
         Args:
             program_id: Filter by swap program ID (required)
             amm: Filter by AMM address
@@ -214,7 +211,7 @@ class SVMTokenAPI(BaseTokenAPI):
             order_direction: Order direction (asc/desc)
             limit: Maximum number of results
             page: Page number
-            
+
         Returns:
             SolanaSwapsResponse with validated data
         """
@@ -225,9 +222,9 @@ class SVMTokenAPI(BaseTokenAPI):
             "orderBy": str(order_by),
             "orderDirection": str(order_direction),
             "limit": limit,
-            "page": page
+            "page": page,
         }
-        
+
         if amm:
             params["amm"] = amm
         if amm_pool:
@@ -244,11 +241,8 @@ class SVMTokenAPI(BaseTokenAPI):
             params["startTime"] = start_time
         if end_time:
             params["endTime"] = end_time
-        
+
         response = await self.manager.get(
-            f"{self.base_url}/swaps/svm",
-            headers=self._headers,
-            params=params,
-            expected_type=SolanaSwapsResponse
+            f"{self.base_url}/swaps/svm", headers=self._headers, params=params, expected_type=SolanaSwapsResponse
         )
         return response

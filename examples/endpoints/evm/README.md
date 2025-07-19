@@ -6,7 +6,7 @@ This directory contains focused examples for Ethereum Virtual Machine (EVM) endp
 
 ### 📊 Core Token Data
 - **[`balances.py`](balances.py)** - Get ERC-20 and native token balances for any wallet
-- **[`tokens.py`](tokens.py)** - Get token contract metadata and holder information  
+- **[`tokens.py`](tokens.py)** - Get token contract metadata and holder information
 - **[`transfers.py`](transfers.py)** - Track token transfer events and movements
 
 ### 🎨 NFT Data
@@ -48,10 +48,10 @@ from token_api import TokenAPI
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env
-    
+
     # Get data (clean list/dict returned)
     data = await api.method_name(parameters)
-    
+
     # Process data
     for item in data:
         print(item)

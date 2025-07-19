@@ -7,19 +7,17 @@ both attribute access (obj.symbol) and dictionary access (obj['symbol'])
 for backward compatibility.
 """
 
-from typing import Optional, List, Union
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 
 
 @dataclass
 class BaseModel:
     """Base model with dict-like access for backward compatibility."""
-    
+
     def __getitem__(self, key):
         """Support dictionary-style access for backward compatibility."""
         return getattr(self, key, None)
-    
+
     def get(self, key, default=None):
         """Support .get() method for backward compatibility."""
         return getattr(self, key, default)
@@ -28,22 +26,24 @@ class BaseModel:
 @dataclass
 class Balance(BaseModel):
     """Token balance with clean attribute access."""
+
     block_num: float
     datetime: str
     contract: str
     amount: str
     value: float
     network_id: str
-    symbol: Optional[str] = None
-    decimals: Optional[float] = None
-    price_usd: Optional[float] = None
-    value_usd: Optional[float] = None
-    low_liquidity: Optional[bool] = None
+    symbol: str | None = None
+    decimals: float | None = None
+    price_usd: float | None = None
+    value_usd: float | None = None
+    low_liquidity: bool | None = None
 
 
 @dataclass
 class SolanaBalance(BaseModel):
     """Solana token balance with clean attribute access."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -59,6 +59,7 @@ class SolanaBalance(BaseModel):
 @dataclass
 class SwapToken(BaseModel):
     """Token information in swap."""
+
     address: str
     symbol: str
     decimals: float
@@ -67,6 +68,7 @@ class SwapToken(BaseModel):
 @dataclass
 class Swap(BaseModel):
     """EVM swap with clean attribute access."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -85,13 +87,14 @@ class Swap(BaseModel):
     value0: float
     value1: float
     protocol: str
-    recipient: Optional[str] = None
-    fee: Optional[str] = None
+    recipient: str | None = None
+    fee: str | None = None
 
 
 @dataclass
 class SolanaMint(BaseModel):
     """Solana mint information."""
+
     address: str
     symbol: str
     decimals: float
@@ -100,6 +103,7 @@ class SolanaMint(BaseModel):
 @dataclass
 class SolanaSwap(BaseModel):
     """Solana swap with clean attribute access."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -109,19 +113,20 @@ class SolanaSwap(BaseModel):
     user: str
     amm: str
     amm_name: str
-    input_mint: Union[SolanaMint, str]
+    input_mint: SolanaMint | str
     input_amount: float
-    output_mint: Union[SolanaMint, str]
+    output_mint: SolanaMint | str
     output_amount: float
     network_id: str
-    transaction_index: Optional[float] = None
-    instruction_index: Optional[float] = None
-    amm_pool: Optional[str] = None
+    transaction_index: float | None = None
+    instruction_index: float | None = None
+    amm_pool: str | None = None
 
 
 @dataclass
 class Transfer(BaseModel):
     """EVM transfer with clean attribute access."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -130,18 +135,18 @@ class Transfer(BaseModel):
     from_address: str  # Using from_address instead of 'from' to avoid keyword conflict
     to: str
     value: float
-    symbol: Optional[str] = None
-    decimals: Optional[float] = None
-    
+    symbol: str | None = None
+    decimals: float | None = None
+
     def __getitem__(self, key):
         """Support dictionary-style access with 'from' key mapping."""
-        if key == 'from':
+        if key == "from":
             return self.from_address
         return super().__getitem__(key)
-    
+
     def get(self, key, default=None):
         """Support .get() method with 'from' key mapping."""
-        if key == 'from':
+        if key == "from":
             return self.from_address
         return super().get(key, default)
 
@@ -149,6 +154,7 @@ class Transfer(BaseModel):
 @dataclass
 class SolanaTransfer(BaseModel):
     """Solana transfer with clean attribute access."""
+
     block_num: float
     datetime: str
     timestamp: float
@@ -161,43 +167,46 @@ class SolanaTransfer(BaseModel):
     amount: str
     value: float
     network_id: str
-    decimals: Optional[float] = None
+    decimals: float | None = None
 
 
 @dataclass
 class NFTOwnership(BaseModel):
     """NFT ownership with clean attribute access."""
+
     token_id: str
     token_standard: str
     contract: str
     owner: str
     network_id: str
-    symbol: Optional[str] = None
-    uri: Optional[str] = None
-    name: Optional[str] = None
-    image: Optional[str] = None
-    description: Optional[str] = None
+    symbol: str | None = None
+    uri: str | None = None
+    name: str | None = None
+    image: str | None = None
+    description: str | None = None
 
 
 @dataclass
 class NFTCollection(BaseModel):
     """NFT collection with clean attribute access."""
+
     contract: str
     name: str
     symbol: str
     owners: float
     total_supply: float
     network_id: str
-    contract_creation: Optional[str] = None
-    contract_creator: Optional[str] = None
-    total_unique_supply: Optional[float] = None
-    total_transfers: Optional[float] = None
-    token_standard: Optional[str] = None
+    contract_creation: str | None = None
+    contract_creator: str | None = None
+    total_unique_supply: float | None = None
+    total_transfers: float | None = None
+    token_standard: str | None = None
 
 
 @dataclass
 class NFTActivity(BaseModel):
     """NFT activity with clean attribute access."""
+
     activity_type: str  # Using activity_type instead of '@type'
     block_num: float
     block_hash: str
@@ -208,24 +217,24 @@ class NFTActivity(BaseModel):
     to: str
     token_id: str
     amount: float
-    symbol: Optional[str] = None
-    name: Optional[str] = None
-    transfer_type: Optional[str] = None
-    token_standard: Optional[str] = None
-    
+    symbol: str | None = None
+    name: str | None = None
+    transfer_type: str | None = None
+    token_standard: str | None = None
+
     def __getitem__(self, key):
         """Support dictionary-style access with special key mappings."""
-        if key == '@type':
+        if key == "@type":
             return self.activity_type
-        elif key == 'from':
+        elif key == "from":
             return self.from_address
         return super().__getitem__(key)
-    
+
     def get(self, key, default=None):
         """Support .get() method with special key mappings."""
-        if key == '@type':
+        if key == "@type":
             return self.activity_type
-        elif key == 'from':
+        elif key == "from":
             return self.from_address
         return super().get(key, default)
 
@@ -233,39 +242,42 @@ class NFTActivity(BaseModel):
 @dataclass
 class Token(BaseModel):
     """Token metadata with clean attribute access."""
+
     block_num: float
     datetime: str
     contract: str
-    circulating_supply: Union[str, float]
+    circulating_supply: str | float
     holders: float
     network_id: str
-    symbol: Optional[str] = None
-    name: Optional[str] = None
-    decimals: Optional[float] = None
-    price_usd: Optional[float] = None
-    market_cap: Optional[float] = None
-    low_liquidity: Optional[bool] = None
+    symbol: str | None = None
+    name: str | None = None
+    decimals: float | None = None
+    price_usd: float | None = None
+    market_cap: float | None = None
+    low_liquidity: bool | None = None
 
 
 @dataclass
 class TokenHolder(BaseModel):
     """Token holder with clean attribute access."""
+
     block_num: float
     datetime: str
     address: str
     amount: str
     value: float
     network_id: str
-    symbol: Optional[str] = None
-    decimals: Optional[float] = None
-    price_usd: Optional[float] = None
-    value_usd: Optional[float] = None
-    low_liquidity: Optional[bool] = None
+    symbol: str | None = None
+    decimals: float | None = None
+    price_usd: float | None = None
+    value_usd: float | None = None
+    low_liquidity: bool | None = None
 
 
 @dataclass
 class Pool(BaseModel):
     """Liquidity pool with clean attribute access."""
+
     block_num: float
     datetime: str
     network_id: str
@@ -281,6 +293,7 @@ class Pool(BaseModel):
 @dataclass
 class OHLC(BaseModel):
     """OHLC price data with clean attribute access."""
+
     datetime: str
     ticker: str
     open: float
@@ -296,45 +309,46 @@ def convert_to_model(data: dict, model_class) -> BaseModel:
     """Convert dictionary data to structured model."""
     if not data:
         return None
-    
+
     # Handle special field mappings
     converted_data = {}
     for key, value in data.items():
-        if key == 'from':
-            converted_data['from_address'] = value
-        elif key == '@type':
-            converted_data['activity_type'] = value
+        if key == "from":
+            converted_data["from_address"] = value
+        elif key == "@type":
+            converted_data["activity_type"] = value
         else:
             converted_data[key] = value
-    
+
     # Handle nested objects
-    if model_class == Swap and 'token0' in converted_data:
-        if isinstance(converted_data['token0'], dict):
-            converted_data['token0'] = SwapToken(**converted_data['token0'])
-        if isinstance(converted_data['token1'], dict):
-            converted_data['token1'] = SwapToken(**converted_data['token1'])
-    
+    if model_class == Swap and "token0" in converted_data:
+        if isinstance(converted_data["token0"], dict):
+            converted_data["token0"] = SwapToken(**converted_data["token0"])
+        if isinstance(converted_data["token1"], dict):
+            converted_data["token1"] = SwapToken(**converted_data["token1"])
+
     elif model_class == SolanaSwap:
-        if 'input_mint' in converted_data and isinstance(converted_data['input_mint'], dict):
-            converted_data['input_mint'] = SolanaMint(**converted_data['input_mint'])
-        if 'output_mint' in converted_data and isinstance(converted_data['output_mint'], dict):
-            converted_data['output_mint'] = SolanaMint(**converted_data['output_mint'])
-    
+        if "input_mint" in converted_data and isinstance(converted_data["input_mint"], dict):
+            converted_data["input_mint"] = SolanaMint(**converted_data["input_mint"])
+        if "output_mint" in converted_data and isinstance(converted_data["output_mint"], dict):
+            converted_data["output_mint"] = SolanaMint(**converted_data["output_mint"])
+
     elif model_class == Pool:
-        if isinstance(converted_data.get('token0'), dict):
-            converted_data['token0'] = SwapToken(**converted_data['token0'])
-        if isinstance(converted_data.get('token1'), dict):
-            converted_data['token1'] = SwapToken(**converted_data['token1'])
-    
+        if isinstance(converted_data.get("token0"), dict):
+            converted_data["token0"] = SwapToken(**converted_data["token0"])
+        if isinstance(converted_data.get("token1"), dict):
+            converted_data["token1"] = SwapToken(**converted_data["token1"])
+
     # Filter only fields that exist in the dataclass
     import inspect
+
     signature = inspect.signature(model_class)
     valid_fields = set(signature.parameters.keys())
     filtered_data = {k: v for k, v in converted_data.items() if k in valid_fields}
-    
+
     try:
         return model_class(**filtered_data)
-    except TypeError as e:
+    except TypeError:
         # Fallback: create with only the fields that match
         working_data = {}
         for field_name in valid_fields:
@@ -343,6 +357,6 @@ def convert_to_model(data: dict, model_class) -> BaseModel:
         return model_class(**working_data)
 
 
-def convert_list_to_models(data_list: List[dict], model_class) -> List[BaseModel]:
+def convert_list_to_models(data_list: list[dict], model_class) -> list[BaseModel]:
     """Convert list of dictionaries to list of structured models."""
     return [convert_to_model(item, model_class) for item in data_list if item]
