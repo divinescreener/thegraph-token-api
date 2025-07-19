@@ -26,7 +26,7 @@ classifiers = [
 ]
 keywords = ["blockchain", "ethereum", "solana", "defi", "nft", "api", "thegraph", "web3", "crypto"]
 dependencies = [
-    "divine-requests==0.1.22",
+    "divine-typed-requests==0.1.10",
     "divine-type-enforcer==0.1.8",
     "anyio>=4.0.0",
 ]

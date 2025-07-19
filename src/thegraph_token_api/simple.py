@@ -511,9 +511,13 @@ class TokenAPI:
             )
             return self._extract_data(response)
 
+<<<<<<< HEAD
     async def _evm_nft_item(
         self, contract: str, token_id: str, network: NetworkId | str | None = None
     ) -> dict | None:
+=======
+    async def _evm_nft_item(self, contract: str, token_id: str, network: NetworkId | str | None = None) -> dict | None:
+>>>>>>> 1f02e38 (feat: Update dependency to divine-typed-requests)
         """Internal EVM NFT item implementation."""
         net = str(network) if network else self._default_network
         async with self._api.evm(net) as client:

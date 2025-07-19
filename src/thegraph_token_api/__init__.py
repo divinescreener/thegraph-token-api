@@ -2,7 +2,7 @@
 The Graph Token API Client.
 
 A clean, separated Python client for The Graph Token API with EVM and SVM support.
-Built with divine-requests for reliable HTTP handling and divine-type-enforcer
+Built with divine-typed-requests for reliable HTTP handling and divine-type-enforcer
 for robust runtime type validation.
 
 Usage:
