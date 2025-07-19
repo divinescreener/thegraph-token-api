@@ -23,19 +23,19 @@ class TestEVMTokenAPIInitialization:
 
     def test_initialization_with_string_network(self):
         """Test EVMTokenAPI initialization with string network (line 66)."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
         assert client.network == "mainnet"
         assert client.api_key == "test_key"
 
     def test_initialization_with_enum_network(self):
         """Test EVMTokenAPI initialization with enum network."""
-        client = EVMTokenAPI(network=NetworkId.MATIC, api_key="test_key")
+        client = EVMTokenAPI(network=NetworkId.MATIC, api_key="test_key")  # pragma: allowlist secret
         assert client.network == "matic"  # Enum value
         assert client.api_key == "test_key"
 
     def test_initialization_with_custom_base_url(self):
         """Test EVMTokenAPI initialization with custom base URL."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key", base_url="https://custom.api.com")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key", base_url="https://custom.api.com")  # pragma: allowlist secret
         assert client.network == "mainnet"
         assert client.api_key == "test_key"
         assert client.base_url == "https://custom.api.com"
@@ -47,7 +47,7 @@ class TestEVMNFTMethods:
     @pytest.mark.anyio
     async def test_get_nft_ownerships_minimal(self):
         """Test get_nft_ownerships with minimal parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -60,12 +60,12 @@ class TestEVMNFTMethods:
             call_args = mock_manager.get.call_args
             assert "nft/ownerships/evm/0xtest" in call_args[0][0]
             assert call_args[1]["params"]["network_id"] == "mainnet"
-            assert result.data == []
+            assert result == []
 
     @pytest.mark.anyio
     async def test_get_nft_ownerships_full_parameters(self):
         """Test get_nft_ownerships with all parameters."""
-        client = EVMTokenAPI(network="polygon", api_key="test_key")
+        client = EVMTokenAPI(network="polygon", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -84,7 +84,7 @@ class TestEVMNFTMethods:
     @pytest.mark.anyio
     async def test_get_nft_collection(self):
         """Test get_nft_collection method."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -101,7 +101,7 @@ class TestEVMNFTMethods:
     @pytest.mark.anyio
     async def test_get_nft_item(self):
         """Test get_nft_item method."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -117,7 +117,7 @@ class TestEVMNFTMethods:
     @pytest.mark.anyio
     async def test_get_nft_activities_full_parameters(self):
         """Test get_nft_activities with all parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -151,7 +151,7 @@ class TestEVMNFTMethods:
     @pytest.mark.anyio
     async def test_get_nft_holders(self):
         """Test get_nft_holders method."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -167,7 +167,7 @@ class TestEVMNFTMethods:
     @pytest.mark.anyio
     async def test_get_nft_sales_full_parameters(self):
         """Test get_nft_sales with all parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -202,7 +202,7 @@ class TestEVMTokenMethods:
     @pytest.mark.anyio
     async def test_get_balances_minimal(self):
         """Test get_balances with minimal parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -219,7 +219,7 @@ class TestEVMTokenMethods:
     @pytest.mark.anyio
     async def test_get_balances_with_contract_filter(self):
         """Test get_balances with contract filter."""
-        client = EVMTokenAPI(network="polygon", api_key="test_key")
+        client = EVMTokenAPI(network="polygon", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -237,7 +237,7 @@ class TestEVMTokenMethods:
     @pytest.mark.anyio
     async def test_get_token(self):
         """Test get_token method."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -253,7 +253,7 @@ class TestEVMTokenMethods:
     @pytest.mark.anyio
     async def test_get_token_holders_with_ordering(self):
         """Test get_token_holders with ordering parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -278,7 +278,7 @@ class TestEVMTradingMethods:
     @pytest.mark.anyio
     async def test_get_transfers_full_parameters(self):
         """Test get_transfers with all parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -310,7 +310,7 @@ class TestEVMTradingMethods:
     @pytest.mark.anyio
     async def test_get_swaps_full_parameters(self):
         """Test get_swaps with all parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -342,7 +342,7 @@ class TestEVMTradingMethods:
     @pytest.mark.anyio
     async def test_get_pools_with_filters(self):
         """Test get_pools with various filters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -374,7 +374,7 @@ class TestEVMPricingMethods:
     @pytest.mark.anyio
     async def test_get_ohlc_pools_full_parameters(self):
         """Test get_ohlc_pools with all parameters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -395,7 +395,7 @@ class TestEVMPricingMethods:
     @pytest.mark.anyio
     async def test_get_ohlc_prices_different_intervals(self):
         """Test get_ohlc_prices with different intervals."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -420,7 +420,7 @@ class TestEVMPricingMethods:
     @pytest.mark.anyio
     async def test_get_historical_balances_with_contracts(self):
         """Test get_historical_balances with contract filters."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -450,7 +450,7 @@ class TestEVMMethodCombinations:
     @pytest.mark.anyio
     async def test_multiple_conditional_parameters(self):
         """Test methods with multiple conditional parameters set."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -490,7 +490,7 @@ class TestEVMMethodCombinations:
     @pytest.mark.anyio
     async def test_pagination_validation_integration(self):
         """Test that pagination validation works with EVM methods."""
-        client = EVMTokenAPI(network="mainnet", api_key="test_key")
+        client = EVMTokenAPI(network="mainnet", api_key="test_key")  # pragma: allowlist secret
 
         # These should raise ValueError due to invalid pagination
         with pytest.raises(ValueError):

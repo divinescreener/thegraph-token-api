@@ -20,7 +20,7 @@ class TestSVMTokenAPIInitialization:
 
     def test_initialization_with_string_network(self):
         """Test SVMTokenAPI initialization with string network."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
         assert client.network == "solana"
         assert client.api_key == "test_key"
 
@@ -44,7 +44,7 @@ class TestSVMBalancesMethods:
     @pytest.mark.anyio
     async def test_get_balances_minimal_parameters(self):
         """Test get_balances with minimal parameters."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -57,19 +57,19 @@ class TestSVMBalancesMethods:
             call_args = mock_manager.get.call_args
             assert "balances/svm" in call_args[0][0]
             assert call_args[1]["params"]["network_id"] == "solana"
-            assert result.data == []
+            assert result == []
 
     @pytest.mark.anyio
     async def test_get_balances_with_token_account(self):
         """Test get_balances with token_account parameter."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            await client.get_balances(token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A")
+            await client.get_balances(token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A")  # pragma: allowlist secret
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
@@ -78,7 +78,7 @@ class TestSVMBalancesMethods:
     @pytest.mark.anyio
     async def test_get_balances_full_parameters(self):
         """Test get_balances with all parameters."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -104,7 +104,7 @@ class TestSVMBalancesMethods:
     @pytest.mark.anyio
     async def test_get_balances_with_token_2022_program(self):
         """Test get_balances with TOKEN_2022 program."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -127,7 +127,7 @@ class TestSVMTransfersMethods:
     @pytest.mark.anyio
     async def test_get_transfers_minimal_parameters(self):
         """Test get_transfers with minimal parameters."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -140,19 +140,19 @@ class TestSVMTransfersMethods:
             call_args = mock_manager.get.call_args
             assert "transfers/svm" in call_args[0][0]
             assert call_args[1]["params"]["network_id"] == "solana"
-            assert result.data == []
+            assert result == []
 
     @pytest.mark.anyio
     async def test_get_transfers_with_signature(self):
         """Test get_transfers with signature parameter."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            await client.get_transfers(signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M")
+            await client.get_transfers(signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M")  # pragma: allowlist secret
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
@@ -161,7 +161,7 @@ class TestSVMTransfersMethods:
     @pytest.mark.anyio
     async def test_get_transfers_full_parameters(self):
         """Test get_transfers with all parameters."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -172,9 +172,9 @@ class TestSVMTransfersMethods:
                 signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M",
                 program_id=SolanaPrograms.TOKEN,
                 mint="So11111111111111111111111111111111111111112",
-                authority="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
-                source="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",
-                destination="5dt8br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v360B",
+                authority="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",  # pragma: allowlist secret
+                source="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",  # pragma: allowlist secret
+                destination="5dt8br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v360B",  # pragma: allowlist secret
                 start_time=1640995200,
                 end_time=1640995300,
                 limit=35,
@@ -196,7 +196,7 @@ class TestSVMTransfersMethods:
     @pytest.mark.anyio
     async def test_get_transfers_with_time_range(self):
         """Test get_transfers with time range filtering."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -224,7 +224,7 @@ class TestSVMSwapsMethods:
     @pytest.mark.anyio
     async def test_get_swaps_minimal_parameters(self):
         """Test get_swaps with minimal required parameters."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -243,7 +243,7 @@ class TestSVMSwapsMethods:
     @pytest.mark.anyio
     async def test_get_swaps_with_raydium_parameters(self):
         """Test get_swaps with Raydium-specific parameters."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -269,7 +269,7 @@ class TestSVMSwapsMethods:
     @pytest.mark.anyio
     async def test_get_swaps_full_parameters(self):
         """Test get_swaps with all parameters."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -304,7 +304,7 @@ class TestSVMSwapsMethods:
     @pytest.mark.anyio
     async def test_get_swaps_with_jupiter_v6(self):
         """Test get_swaps with Jupiter V6 program."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -326,7 +326,7 @@ class TestSVMSwapsMethods:
     @pytest.mark.anyio
     async def test_get_swaps_with_pump_fun_programs(self):
         """Test get_swaps with Pump.fun programs."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -356,7 +356,7 @@ class TestSVMMethodCombinations:
     @pytest.mark.anyio
     async def test_sol_usdc_trading_pattern(self):
         """Test common SOL/USDC trading pattern."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -383,7 +383,7 @@ class TestSVMMethodCombinations:
     @pytest.mark.anyio
     async def test_different_swap_programs(self):
         """Test swaps across different DEX programs."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         programs_to_test = [
             SwapPrograms.RAYDIUM,
@@ -406,7 +406,7 @@ class TestSVMMethodCombinations:
     @pytest.mark.anyio
     async def test_pagination_validation_integration(self):
         """Test that pagination validation works with SVM methods."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         # These should raise ValueError due to invalid pagination
         with pytest.raises(ValueError):
@@ -421,7 +421,7 @@ class TestSVMMethodCombinations:
     @pytest.mark.anyio
     async def test_string_vs_enum_program_ids(self):
         """Test that string and enum program IDs work equivalently."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
@@ -446,7 +446,7 @@ class TestSVMMethodCombinations:
     @pytest.mark.anyio
     async def test_time_filtering_patterns(self):
         """Test various time filtering patterns."""
-        client = SVMTokenAPI(network="solana", api_key="test_key")
+        client = SVMTokenAPI(network="solana", api_key="test_key")  # pragma: allowlist secret
 
         with patch.object(client, "manager") as mock_manager:
             mock_response = MagicMock()
