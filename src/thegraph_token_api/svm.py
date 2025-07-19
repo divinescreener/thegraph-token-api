@@ -33,18 +33,18 @@ class SVMTokenAPI(BaseTokenAPI):
         async def main():
             # Create SVM client for Solana
             async with SVMTokenAPI(
-                api_key="your_bearer_token",
+                api_key="your_bearer_token",  # pragma: allowlist secret
                 network=SolanaNetworkId.SOLANA
             ) as svm_api:
                 # Get SPL token balances
                 balances = await svm_api.get_balances(
-                    token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"
+                    token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A"  # pragma: allowlist secret
                 )
 
                 # Get swap transactions
                 swaps = await svm_api.get_swaps(
                     program_id=SwapPrograms.RAYDIUM,
-                    user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+                    user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"  # pragma: allowlist secret
                 )
 
         anyio.run(main)
@@ -103,7 +103,7 @@ class SVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/balances/svm", headers=self._headers, params=params, expected_type=SolanaBalancesResponse
         )
-        return response
+        return response.data
 
     # ===== Transfer Methods =====
 
@@ -174,7 +174,7 @@ class SVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=SolanaTransfersResponse,
         )
-        return response
+        return response.data
 
     # ===== Swap Methods =====
 
@@ -245,4 +245,4 @@ class SVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/swaps/svm", headers=self._headers, params=params, expected_type=SolanaSwapsResponse
         )
-        return response
+        return response.data
