@@ -1120,16 +1120,6 @@ except Exception as e:
 
 ---
 
-## Rate Limits
-
-- **Free tier**: 100 requests per day
-- **Paid tier**: Higher limits based on plan
-- **Burst limit**: 10 requests per second
-
-Monitor your usage and implement appropriate rate limiting in your application.
-
----
-
 ## Support
 
 - **Documentation**: [API Reference](API_REFERENCE.md)
