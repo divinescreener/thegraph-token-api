@@ -7,9 +7,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from thegraph_token_api.models import *
 from thegraph_token_api.simple import EVMWrapper, NFTWrapper, SVMWrapper, TokenAPI
-from thegraph_token_api.types import *
+from thegraph_token_api.types import (
+    Interval,
+    OrderBy,
+    OrderDirection,
+    Protocol,
+    SolanaPrograms,
+    SwapPrograms,
+    TokenStandard,
+)
 
 
 class TestTokenAPIInitialization:

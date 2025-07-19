@@ -8,7 +8,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from thegraph_token_api.evm import EVMTokenAPI
-from thegraph_token_api.types import *
+from thegraph_token_api.types import (
+    Interval,
+    NetworkId,
+    OrderBy,
+    OrderDirection,
+    Protocol,
+    TokenStandard,
+)
 
 
 class TestEVMTokenAPIInitialization:
@@ -65,9 +72,7 @@ class TestEVMNFTMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_nft_ownerships(
-                address="0xtest", token_standard=TokenStandard.ERC721, limit=20, page=2
-            )
+            await client.get_nft_ownerships(address="0xtest", token_standard=TokenStandard.ERC721, limit=20, page=2)
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
@@ -86,7 +91,7 @@ class TestEVMNFTMethods:
             mock_response.data = {"name": "Test Collection"}
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_nft_collection(contract="0xtest")
+            await client.get_nft_collection(contract="0xtest")
 
             mock_manager.get.assert_called_once()
             call_args = mock_manager.get.call_args
@@ -103,7 +108,7 @@ class TestEVMNFTMethods:
             mock_response.data = {"token_id": "123"}
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_nft_item(contract="0xtest", token_id="123")
+            await client.get_nft_item(contract="0xtest", token_id="123")
 
             mock_manager.get.assert_called_once()
             call_args = mock_manager.get.call_args
@@ -119,7 +124,7 @@ class TestEVMNFTMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_nft_activities(
+            await client.get_nft_activities(
                 contract="0xtest",
                 any_address="0xany",
                 from_address="0xfrom",
@@ -153,7 +158,7 @@ class TestEVMNFTMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_nft_holders(contract="0xtest")
+            await client.get_nft_holders(contract="0xtest")
 
             mock_manager.get.assert_called_once()
             call_args = mock_manager.get.call_args
@@ -169,7 +174,7 @@ class TestEVMNFTMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_nft_sales(
+            await client.get_nft_sales(
                 contract="0xtest",
                 token_id="123",
                 any_address="0xany",
@@ -204,7 +209,7 @@ class TestEVMTokenMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_balances(address="0xtest")
+            await client.get_balances(address="0xtest")
 
             mock_manager.get.assert_called_once()
             call_args = mock_manager.get.call_args
@@ -221,7 +226,7 @@ class TestEVMTokenMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_balances(address="0xtest", contract="0xtoken", limit=50, page=2)
+            await client.get_balances(address="0xtest", contract="0xtoken", limit=50, page=2)
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
@@ -239,7 +244,7 @@ class TestEVMTokenMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_token(contract="0xtoken")
+            await client.get_token(contract="0xtoken")
 
             mock_manager.get.assert_called_once()
             call_args = mock_manager.get.call_args
@@ -255,7 +260,7 @@ class TestEVMTokenMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_token_holders(
+            await client.get_token_holders(
                 contract="0xtoken", order_by=OrderBy.VALUE, order_direction=OrderDirection.ASC, limit=100, page=3
             )
 
@@ -280,7 +285,7 @@ class TestEVMTradingMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_transfers(
+            await client.get_transfers(
                 from_address="0xfrom",
                 to_address="0xto",
                 contract="0xtoken",
@@ -312,7 +317,7 @@ class TestEVMTradingMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_swaps(
+            await client.get_swaps(
                 pool="0xpool",
                 caller="0xcaller",
                 sender="0xsender",
@@ -344,7 +349,7 @@ class TestEVMTradingMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_pools(
+            await client.get_pools(
                 pool="0xpool",
                 factory="0xfactory",
                 token="0xtoken",
@@ -376,7 +381,7 @@ class TestEVMPricingMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_ohlc_pools(
+            await client.get_ohlc_pools(
                 pool="0xpool", interval=Interval.ONE_HOUR, start_time=1640995200, end_time=1640995300, limit=24, page=1
             )
 
@@ -398,7 +403,7 @@ class TestEVMPricingMethods:
             mock_manager.get = AsyncMock(return_value=mock_response)
 
             # Test with FOUR_HOURS interval
-            result = await client.get_ohlc_prices(
+            await client.get_ohlc_prices(
                 token="0xtoken",
                 interval=Interval.FOUR_HOURS,
                 start_time=1640995200,
@@ -422,7 +427,7 @@ class TestEVMPricingMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_historical_balances(
+            await client.get_historical_balances(
                 address="0xtest",
                 contracts=["0xtoken1", "0xtoken2"],
                 interval=Interval.ONE_DAY,

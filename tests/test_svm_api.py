@@ -8,7 +8,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from thegraph_token_api.svm import SVMTokenAPI
-from thegraph_token_api.types import *
+from thegraph_token_api.types import (
+    SolanaNetworkId,
+    SolanaPrograms,
+    SwapPrograms,
+)
 
 
 class TestSVMTokenAPIInitialization:
@@ -65,7 +69,7 @@ class TestSVMBalancesMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_balances(token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A")
+            await client.get_balances(token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A")
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
@@ -81,7 +85,7 @@ class TestSVMBalancesMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_balances(
+            await client.get_balances(
                 token_account="4ct7br2vTPzfdmY3S5HLtTxcGSBfn6pnw98hsS6v359A",
                 mint="So11111111111111111111111111111111111111112",
                 program_id=SolanaPrograms.TOKEN,
@@ -107,7 +111,7 @@ class TestSVMBalancesMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_balances(
+            await client.get_balances(
                 mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", program_id=SolanaPrograms.TOKEN_2022, limit=50
             )
 
@@ -148,7 +152,7 @@ class TestSVMTransfersMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_transfers(signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M")
+            await client.get_transfers(signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M")
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
@@ -164,7 +168,7 @@ class TestSVMTransfersMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_transfers(
+            await client.get_transfers(
                 signature="5j7s8Kd9WK1n2M4c3R6Q8F7X9Y2Z1A5B4C7D6E9G8H3I2J1K4L7M",
                 program_id=SolanaPrograms.TOKEN,
                 mint="So11111111111111111111111111111111111111112",
@@ -199,7 +203,7 @@ class TestSVMTransfersMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_transfers(
+            await client.get_transfers(
                 mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
                 start_time=1640995200,
                 end_time=1640995300,
@@ -227,7 +231,7 @@ class TestSVMSwapsMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_swaps(program_id=SwapPrograms.RAYDIUM)
+            await client.get_swaps(program_id=SwapPrograms.RAYDIUM)
 
             mock_manager.get.assert_called_once()
             call_args = mock_manager.get.call_args
@@ -246,7 +250,7 @@ class TestSVMSwapsMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_swaps(
+            await client.get_swaps(
                 program_id=SwapPrograms.RAYDIUM,
                 amm="AMM123",
                 amm_pool="POOL123",
@@ -272,7 +276,7 @@ class TestSVMSwapsMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_swaps(
+            await client.get_swaps(
                 program_id=SwapPrograms.RAYDIUM,
                 amm="AMM123",
                 amm_pool="POOL123",
@@ -307,7 +311,7 @@ class TestSVMSwapsMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            result = await client.get_swaps(
+            await client.get_swaps(
                 program_id=SwapPrograms.JUPITER_V6,
                 user="9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
                 input_mint="So11111111111111111111111111111111111111112",
