@@ -34,7 +34,7 @@ pip install token-api
 
 ```python
 import anyio
-from token_api import TokenAPI, SwapPrograms, Protocol
+from thegraph_token_api import TokenAPI, SwapPrograms, Protocol
 
 async def main():
     # Auto-loads from .env file
@@ -992,7 +992,7 @@ for network in networks.networks:
 "unichain"     # Unichain
 
 # Or use the NetworkId enum for type safety
-from token_api import NetworkId
+from thegraph_token_api import NetworkId
 NetworkId.MAINNET      # Ethereum
 NetworkId.MATIC        # Polygon
 NetworkId.BSC          # Binance Smart Chain
@@ -1009,7 +1009,7 @@ NetworkId.UNICHAIN     # Unichain
 "solana"       # Solana mainnet
 
 # Or use the enum for type safety
-from token_api import SolanaNetworkId
+from thegraph_token_api import SolanaNetworkId
 SolanaNetworkId.SOLANA  # Solana mainnet
 ```
 
@@ -1021,7 +1021,7 @@ SolanaNetworkId.SOLANA  # Solana mainnet
 "uniswap_v3"  # Uniswap V3
 
 # Or use the enum for type safety
-from token_api import Protocol
+from thegraph_token_api import Protocol
 Protocol.UNISWAP_V2  # Uniswap V2
 Protocol.UNISWAP_V3  # Uniswap V3
 ```
@@ -1041,7 +1041,7 @@ Protocol.UNISWAP_V3  # Uniswap V3
 "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"  # Pump.fun
 
 # Or use enums for type safety
-from token_api import SolanaPrograms, SwapPrograms
+from thegraph_token_api import SolanaPrograms, SwapPrograms
 
 # SPL Token Programs
 SolanaPrograms.TOKEN      # SPL Token Program
@@ -1058,7 +1058,7 @@ SwapPrograms.PUMP_FUN    # Pump.fun
 ### Time Intervals
 
 ```python
-from token_api import Interval
+from thegraph_token_api import Interval
 
 Interval.ONE_HOUR    # 1h
 Interval.FOUR_HOURS  # 4h
@@ -1069,7 +1069,7 @@ Interval.ONE_WEEK    # 1w
 ### Token Standards
 
 ```python
-from token_api import TokenStandard
+from thegraph_token_api import TokenStandard
 
 TokenStandard.ERC721   # ERC-721 NFTs
 TokenStandard.ERC1155  # ERC-1155 NFTs
@@ -1078,7 +1078,7 @@ TokenStandard.ERC1155  # ERC-1155 NFTs
 ### Ordering
 
 ```python
-from token_api import OrderBy, OrderDirection
+from thegraph_token_api import OrderBy, OrderDirection
 
 # Order by field
 OrderBy.TIMESTAMP  # Order by timestamp

@@ -16,7 +16,7 @@ pip install divine-thegraph-token-api
 
 ```python
 import anyio
-from token_api import TokenAPI, SwapPrograms, Protocol
+from thegraph_token_api import TokenAPI, SwapPrograms, Protocol
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env

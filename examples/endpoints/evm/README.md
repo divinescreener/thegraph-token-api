@@ -44,7 +44,7 @@ python3 examples/endpoints/evm/swaps.py
 All examples follow the same simple pattern:
 
 ```python
-from token_api import TokenAPI
+from thegraph_token_api import TokenAPI
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env

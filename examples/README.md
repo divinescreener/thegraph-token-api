@@ -51,7 +51,7 @@ Supports Solana mainnet with SPL tokens and Solana DEXs.
 All examples use the clean, separated `TokenAPI` interface:
 
 ```python
-from token_api import TokenAPI, SwapPrograms, Protocol
+from thegraph_token_api import TokenAPI, SwapPrograms, Protocol
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env
@@ -208,7 +208,7 @@ balances = await api.evm.balances(your_wallet, limit=10)
 
 - [Token API Documentation](../README.md)
 - [API Reference](../API_REFERENCE.md)
-- [Type Definitions](../src/token_api/types.py)
+- [Type Definitions](../src/thegraph_token_api/types.py)
 - [The Graph Token API](https://thegraph.market)
 
 ---

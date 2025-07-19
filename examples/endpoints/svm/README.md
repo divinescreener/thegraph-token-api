@@ -36,7 +36,7 @@ python3 examples/endpoints/svm/swaps.py
 All SVM examples follow the same simple pattern:
 
 ```python
-from token_api import TokenAPI, SwapPrograms, SolanaPrograms
+from thegraph_token_api import TokenAPI, SwapPrograms, SolanaPrograms
 
 async def main():
     api = TokenAPI()  # Auto-loads from .env
