@@ -101,7 +101,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTOwnershipsResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_nft_collection(self, contract: str) -> NFTCollectionsResponse:
         """
@@ -121,7 +121,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTCollectionsResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_nft_item(self, contract: str, token_id: str) -> NFTItemsResponse:
         """
@@ -142,7 +142,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTItemsResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_nft_activities(
         self,
@@ -202,7 +202,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTActivitiesResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_nft_holders(self, contract: str) -> NFTHoldersResponse:
         """
@@ -222,7 +222,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=NFTHoldersResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_nft_sales(
         self,
@@ -283,7 +283,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/nft/sales/evm", headers=self._headers, params=params, expected_type=NFTSalesResponse
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Balance Methods =====
 
@@ -313,7 +313,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=BalancesResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Transfer Methods =====
 
@@ -373,7 +373,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/transfers/evm", headers=self._headers, params=params, expected_type=TransfersResponse
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Token Methods =====
 
@@ -393,7 +393,7 @@ class EVMTokenAPI(BaseTokenAPI):
             f"{self.base_url}/tokens/evm/{contract}", headers=self._headers, params=params, expected_type=TokensResponse
         )
         # Return the full response object
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_token_holders(
         self,
@@ -431,7 +431,7 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=TokenHoldersResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Swap Methods =====
 
@@ -500,7 +500,7 @@ class EVMTokenAPI(BaseTokenAPI):
             f"{self.base_url}/swaps/evm", headers=self._headers, params=params, expected_type=SwapsResponse
         )
         # Return the full response object, since response is already the validated dict
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Pool Methods =====
 
@@ -546,7 +546,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/pools/evm", headers=self._headers, params=params, expected_type=PoolsResponse
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== OHLC Methods =====
 
@@ -584,7 +584,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/ohlc/pools/evm/{pool}", headers=self._headers, params=params, expected_type=OHLCResponse
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     async def get_ohlc_prices(
         self,
@@ -620,7 +620,7 @@ class EVMTokenAPI(BaseTokenAPI):
         response = await self.manager.get(
             f"{self.base_url}/ohlc/prices/evm/{token}", headers=self._headers, params=params, expected_type=OHLCResponse
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Historical Methods =====
 
@@ -665,4 +665,4 @@ class EVMTokenAPI(BaseTokenAPI):
             params=params,
             expected_type=HistoricalBalancesResponse,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
