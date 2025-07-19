@@ -8,7 +8,7 @@ from datetime import datetime
 import anyio
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
-from token_api import SolanaPrograms, TokenAPI
+from thegraph_token_api import SolanaPrograms, TokenAPI
 
 
 async def main():

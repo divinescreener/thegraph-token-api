@@ -3,7 +3,7 @@ Core Models Testing - Comprehensive coverage for models.py
 Tests model conversion, error handling, and dictionary access methods.
 """
 
-from token_api.models import (
+from thegraph_token_api.models import (
     Balance,
     NFTActivity,
     Pool,
@@ -302,7 +302,7 @@ class TestModelErrorHandling:
         }
 
         try:
-            result = convert_to_model(invalid_swap_data, Swap)
+            convert_to_model(invalid_swap_data, Swap)
             # Should handle error gracefully
         except (TypeError, AttributeError):
             # Expected for invalid data

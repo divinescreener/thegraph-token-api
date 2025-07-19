@@ -6,9 +6,10 @@ Tests the user-facing TokenAPI wrapper with all internal methods and wrapper cla
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from token_api.models import *
-from token_api.simple import EVMWrapper, NFTWrapper, SVMWrapper, TokenAPI
-from token_api.types import *
+
+from thegraph_token_api.models import *
+from thegraph_token_api.simple import EVMWrapper, NFTWrapper, SVMWrapper, TokenAPI
+from thegraph_token_api.types import *
 
 
 class TestTokenAPIInitialization:
@@ -42,7 +43,7 @@ class TestTokenAPIInitialization:
 
     def test_initialization_auto_load_env(self):
         """Test auto-loading .env file."""
-        with patch("token_api.simple.load_dotenv") as mock_load_dotenv:
+        with patch("thegraph_token_api.simple.load_dotenv") as mock_load_dotenv:
             with patch.dict("os.environ", {"THEGRAPH_API_KEY": "env_key"}):
                 TokenAPI(auto_load_env=True)
                 mock_load_dotenv.assert_called_once()
@@ -525,7 +526,7 @@ class TestWrapperClasses:
         api = TokenAPI(api_key="test_key", auto_load_env=False)
 
         with patch.object(api, "_evm_nfts") as mock_evm_nfts:
-            with patch("token_api.simple.convert_list_to_models") as mock_convert:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
                 mock_evm_nfts.return_value = [{"token_id": "123"}]
                 mock_convert.return_value = ["nft_ownership"]
 
@@ -544,7 +545,7 @@ class TestWrapperClasses:
         api = TokenAPI(api_key="test_key", auto_load_env=False)
 
         with patch.object(api, "_evm_nft_collection") as mock_collection:
-            with patch("token_api.simple.convert_to_model") as mock_convert:
+            with patch("thegraph_token_api.simple.convert_to_model") as mock_convert:
                 mock_collection.return_value = {"name": "Collection"}
                 mock_convert.return_value = "nft_collection"
 
@@ -571,7 +572,7 @@ class TestWrapperClasses:
         api = TokenAPI(api_key="test_key", auto_load_env=False)
 
         with patch.object(api, "_evm_nft_activities") as mock_activities:
-            with patch("token_api.simple.convert_list_to_models") as mock_convert:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
                 mock_activities.return_value = [{"activity_type": "transfer"}]
                 mock_convert.return_value = ["nft_activity"]
 
@@ -587,7 +588,7 @@ class TestWrapperClasses:
         api = TokenAPI(api_key="test_key", auto_load_env=False)
 
         with patch.object(api, "_evm_balances") as mock_balances:
-            with patch("token_api.simple.convert_list_to_models") as mock_convert:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
                 mock_balances.return_value = [{"symbol": "ETH"}]
                 mock_convert.return_value = ["balance"]
 
@@ -601,7 +602,7 @@ class TestWrapperClasses:
         api = TokenAPI(api_key="test_key", auto_load_env=False)
 
         with patch.object(api, "_evm_token_info") as mock_token_info:
-            with patch("token_api.simple.convert_to_model") as mock_convert:
+            with patch("thegraph_token_api.simple.convert_to_model") as mock_convert:
                 mock_token_info.return_value = {"symbol": "TEST"}
                 mock_convert.return_value = "token"
 
@@ -627,7 +628,7 @@ class TestWrapperClasses:
         api = TokenAPI(api_key="test_key", auto_load_env=False)
 
         with patch.object(api, "_svm_balances") as mock_balances:
-            with patch("token_api.simple.convert_list_to_models") as mock_convert:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
                 mock_balances.return_value = [{"mint": "So11111111111111111111111111111111111111112"}]
                 mock_convert.return_value = ["solana_balance"]
 
@@ -647,7 +648,7 @@ class TestWrapperClasses:
         api = TokenAPI(api_key="test_key", auto_load_env=False)
 
         with patch.object(api, "_svm_swaps") as mock_swaps:
-            with patch("token_api.simple.convert_list_to_models") as mock_convert:
+            with patch("thegraph_token_api.simple.convert_list_to_models") as mock_convert:
                 mock_swaps.return_value = [{"program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"}]
                 mock_convert.return_value = ["solana_swap"]
 

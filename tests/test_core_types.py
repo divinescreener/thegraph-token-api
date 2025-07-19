@@ -3,7 +3,19 @@ Core Types Testing - Comprehensive coverage for types.py
 Tests all enum string conversions and type definitions.
 """
 
-from token_api.types import *
+from thegraph_token_api.types import (
+    ActivityType,
+    BaseResponse,
+    Interval,
+    NetworkId,
+    OrderBy,
+    OrderDirection,
+    Protocol,
+    SolanaNetworkId,
+    SolanaPrograms,
+    SwapPrograms,
+    TokenStandard,
+)
 
 
 class TestEnumStringConversions:

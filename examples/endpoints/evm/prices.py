@@ -8,7 +8,7 @@ from datetime import datetime
 import anyio
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
-from token_api import Interval, TokenAPI
+from thegraph_token_api import Interval, TokenAPI
 
 
 async def main():
@@ -32,7 +32,7 @@ async def main():
             try:
                 dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
                 date_str = dt.strftime("%m/%d")
-            except:
+            except (ValueError, AttributeError):
                 date_str = "?"
 
             change = ((close_price - open_price) / open_price * 100) if open_price > 0 else 0
@@ -52,7 +52,7 @@ async def main():
             try:
                 dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
                 time_str = dt.strftime("%H:%M")
-            except:
+            except (ValueError, AttributeError):
                 time_str = "?"
 
             print(f"  {time_str}: {open_price:.6f} → {close_price:.6f}")

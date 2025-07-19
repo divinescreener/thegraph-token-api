@@ -6,8 +6,9 @@ Tests all SVM (Solana) API methods with various parameter combinations.
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from token_api.svm import SVMTokenAPI
-from token_api.types import *
+
+from thegraph_token_api.svm import SVMTokenAPI
+from thegraph_token_api.types import *
 
 
 class TestSVMTokenAPIInitialization:

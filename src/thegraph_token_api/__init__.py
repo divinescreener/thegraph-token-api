@@ -30,8 +30,68 @@ Usage:
     ```
 """
 
+# Explicit imports from models module
+from .models import (
+    NFTActivity,
+    Transfer,
+)
 from .simple import TokenAPI  # Main simplified interface
-from .types import *
+
+# Explicit imports from types module
+from .types import (
+    OHLC,
+    ActivityType,
+    Balance,
+    BalancesResponse,
+    BaseResponse,
+    ErrorResponse,
+    HistoricalBalance,
+    HistoricalBalancesResponse,
+    Interval,
+    Network,
+    NetworkId,
+    NetworksResponse,
+    NFTActivitiesResponse,
+    NFTAttribute,
+    NFTCollection,
+    NFTCollectionsResponse,
+    NFTHolder,
+    NFTHoldersResponse,
+    NFTItem,
+    NFTItemsResponse,
+    NFTOwnership,
+    NFTOwnershipsResponse,
+    NFTSale,
+    NFTSalesResponse,
+    OHLCResponse,
+    OrderBy,
+    OrderDirection,
+    Pool,
+    PoolsResponse,
+    Protocol,
+    SolanaBalance,
+    SolanaBalancesResponse,
+    SolanaMint,
+    SolanaNetworkId,
+    SolanaPrograms,
+    SolanaSwap,
+    SolanaSwapsResponse,
+    SolanaTransfer,
+    SolanaTransfersResponse,
+    Statistics,
+    Swap,
+    SwapPrograms,
+    SwapsResponse,
+    SwapToken,
+    Token,
+    TokenHolder,
+    TokenHoldersResponse,
+    TokenIcon,
+    TokensResponse,
+    TokenStandard,
+    TransfersResponse,
+    VersionResponse,
+)
 
 __version__ = "0.1.0"
 __all__ = [

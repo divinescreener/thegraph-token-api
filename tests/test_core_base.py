@@ -6,7 +6,8 @@ Tests BaseTokenAPI initialization, validation, and async functionality.
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from token_api.base import BaseTokenAPI
+
+from thegraph_token_api.base import BaseTokenAPI
 
 
 class TestBaseTokenAPIInitialization:

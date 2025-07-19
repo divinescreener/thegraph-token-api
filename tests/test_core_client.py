@@ -3,10 +3,10 @@ Core Client Testing - Comprehensive coverage for client.py
 Tests TheGraphTokenAPI factory methods and client creation.
 """
 
-from token_api.client import TheGraphTokenAPI
-from token_api.evm import EVMTokenAPI
-from token_api.svm import SVMTokenAPI
-from token_api.types import NetworkId, SolanaNetworkId
+from thegraph_token_api.client import TheGraphTokenAPI
+from thegraph_token_api.evm import EVMTokenAPI
+from thegraph_token_api.svm import SVMTokenAPI
+from thegraph_token_api.types import NetworkId, SolanaNetworkId
 
 
 class TestTheGraphTokenAPIInitialization:
@@ -195,8 +195,8 @@ class TestFactoryMethodsIntegration:
         svm_class = TheGraphTokenAPI.create_svm_client("solana", "test_key", "https://custom.com")
 
         # Should be equivalent
-        assert type(evm_instance) == type(evm_class)
-        assert type(svm_instance) == type(svm_class)
+        assert isinstance(evm_instance, type(evm_class))
+        assert isinstance(svm_instance, type(svm_class))
         assert evm_instance.network == evm_class.network
         assert svm_instance.network == svm_class.network
         assert evm_instance.api_key == evm_class.api_key

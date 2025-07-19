@@ -7,7 +7,7 @@ import sys
 import anyio
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
-from token_api import TokenAPI
+from thegraph_token_api import TokenAPI
 
 
 async def main():
@@ -30,7 +30,7 @@ async def main():
 
             print(f"  {name} ({symbol})")
             print(f"  Decimals: {decimals}")
-            print(f"  Holders: {holders:,}" if isinstance(holders, (int, float)) else f"  Holders: {holders}")
+            print(f"  Holders: {holders:,}" if isinstance(holders, int | float) else f"  Holders: {holders}")
             if price:
                 print(f"  Price: ${price:.4f}")
 
