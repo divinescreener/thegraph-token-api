@@ -11,11 +11,10 @@ authors = [
 description = "Clean Python client for The Graph Token API with elegant EVM/SVM separation and 98% test coverage"
 readme = "README.md"
 requires-python = ">=3.13"
-license = {text = "MIT"}
+license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
