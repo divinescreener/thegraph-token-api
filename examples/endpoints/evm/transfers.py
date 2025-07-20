@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Token Transfers Example - Get token transfer events."""
+"""Token Transfers Example - Track token movements on-chain."""
 
 from datetime import datetime
 
@@ -8,42 +8,51 @@ import anyio
 from thegraph_token_api import TokenAPI
 
 
+def format_time(timestamp):
+    """Format timestamp to readable time."""
+    try:
+        return datetime.fromtimestamp(timestamp).strftime("%H:%M")
+    except (ValueError, OSError, OverflowError):
+        return "??:??"
+
+
 async def main():
-    print("Token Transfers Example")
-    print("=" * 23)
+    print("🔄 Token Transfers")
+    print("=" * 18)
 
     api = TokenAPI()
-    vitalik = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+    wallet = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"  # Vitalik's wallet
+    imagine_token = "0x6A1B2AE3a55B5661b40d86c2bF805f7DAdB16978"  # nosec B105
 
     try:
-        # Get recent transfers for specific token
-        print("\nRecent Imagine Token transfers:")
-        transfers = await api.evm.transfers(contract="0x6A1B2AE3a55B5661b40d86c2bF805f7DAdB16978", limit=4)
+        # Token-specific transfers
+        print("📦 Recent Token Transfers:")
+        transfers = await api.evm.transfers(contract=imagine_token, limit=3)
 
         for i, transfer in enumerate(transfers, 1):
-            value = transfer.value
-            from_addr = transfer.from_address[:8] + "..."
-            to_addr = transfer.to[:8] + "..."
+            amount = transfer.value
+            from_addr = transfer.from_address[:6] + "..."
+            to_addr = transfer.to[:6] + "..."
+            time = format_time(transfer.timestamp)
 
-            time_str = datetime.fromtimestamp(transfer.timestamp).strftime("%H:%M") if transfer.timestamp else "?"
+            print(f"  {i}. {amount:.2f} | {from_addr} → {to_addr} | {time}")
 
-            print(f"  {i}. {value:.2f} | {from_addr} → {to_addr} | {time_str}")
+        # Wallet outgoing transfers
+        print(f"\n📤 Outgoing from {wallet[:8]}...:")
+        outgoing = await api.evm.transfers(from_address=wallet, limit=3)
 
-        # Get transfers from specific address
-        print(f"\nTransfers FROM {vitalik[:10]}...:")
-        from_transfers = await api.evm.transfers(from_address=vitalik, limit=3)
+        for i, transfer in enumerate(outgoing, 1):
+            amount = transfer.value
+            symbol = transfer.symbol or "TOKEN"
+            to_addr = transfer.to[:6] + "..."
 
-        for i, transfer in enumerate(from_transfers, 1):
-            value = transfer.value
-            symbol = transfer.symbol or "?"
-            to_addr = transfer.to[:8] + "..."
+            print(f"  {i}. {amount:.2f} {symbol} → {to_addr}")
 
-            print(f"  {i}. {value:.2f} {symbol} → {to_addr}")
-
-        print("\n✅ Transfer data retrieved successfully!")
+        print("\n✅ Transfer data loaded!")
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ Failed to load transfers: {e}")
+        print("💡 Transfer queries cover recent blockchain activity")
 
 
 if __name__ == "__main__":

@@ -1,57 +1,61 @@
 #!/usr/bin/env python3
-"""NFT Example - Get NFT ownership, collection info, and activities."""
+"""NFT Example - Explore NFT collections and ownership."""
 
 import anyio
 
 from thegraph_token_api import TokenAPI
 
 
+def shorten_id(token_id):
+    """Shorten long token IDs for display."""
+    id_str = str(token_id)
+    return id_str if len(id_str) <= 6 else id_str[:6] + "..."
+
+
 async def main():
-    print("NFT Example")
-    print("=" * 11)
+    print("🎨 NFT Explorer")
+    print("=" * 15)
 
     api = TokenAPI()
-    vitalik = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+    wallet = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"  # Vitalik's wallet
+    cryptopunks = "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
 
     try:
-        # Get NFT ownership
-        print(f"\nNFTs owned by {vitalik[:10]}...:")
-        nfts = await api.evm.nfts.ownerships(vitalik, limit=5)
+        # Show owned NFTs
+        print(f"🖼️  NFTs owned by {wallet[:8]}...")
+        nfts = await api.evm.nfts.ownerships(wallet, limit=3)
 
         for i, nft in enumerate(nfts, 1):
-            name = (nft.name or "Unnamed")[:20]
-            token_id = str(nft.token_id)
-            if len(token_id) > 6:
-                token_id = token_id[:6] + "..."
-
+            name = (nft.name or "Unknown NFT")[:25]
+            token_id = shorten_id(nft.token_id)
             print(f"  {i}. {name} #{token_id}")
 
-        # Get collection info
-        print("\nCryptoPunks Collection:")
-        collection = await api.evm.nfts.collection("0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb")
+        # Show collection stats
+        print("\n📊 CryptoPunks Collection:")
+        collection = await api.evm.nfts.collection(cryptopunks)
 
         if collection:
-            name = collection.name
-            supply = collection.total_supply
-            owners = collection.owners
-            print(f"  {name}: {supply} items, {owners} owners")
+            print(f"  📈 {collection.name}")
+            print(f"  🎯 {collection.total_supply:,} total items")
+            print(f"  👥 {collection.owners:,} unique owners")
 
-        # Get recent activities
-        print("\nRecent Activities:")
-        activities = await api.evm.nfts.activities("0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb", limit=3)
+        # Show recent activity
+        print("\n⚡ Recent Activity:")
+        activities = await api.evm.nfts.activities(cryptopunks, limit=3)
 
         for i, activity in enumerate(activities, 1):
-            activity_type = activity.activity_type
-            token_id = activity.token_id
-            from_addr = activity.from_address[:8] + "..."
-            to_addr = activity.to[:8] + "..."
+            action = activity.activity_type
+            token_id = shorten_id(activity.token_id)
+            from_addr = activity.from_address[:6] + "..."
+            to_addr = activity.to[:6] + "..."
 
-            print(f"  {i}. {activity_type} #{token_id}: {from_addr} → {to_addr}")
+            print(f"  {i}. {action} #{token_id}: {from_addr} → {to_addr}")
 
-        print("\n✅ NFT data retrieved successfully!")
+        print("\n✅ NFT data loaded!")
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ Failed to load NFT data: {e}")
+        print("💡 NFT queries can be slow - this is normal!")
 
 
 if __name__ == "__main__":

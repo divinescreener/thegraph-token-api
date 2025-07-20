@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Solana DEX Swaps Example - Get swap transactions from Raydium, Jupiter, and Pump.fun."""
+"""Solana DEX Swaps Example - Track Solana trading activity."""
 
 from datetime import datetime
 
@@ -8,64 +8,75 @@ import anyio
 from thegraph_token_api import SwapPrograms, TokenAPI
 
 
+def get_symbol(mint_obj):
+    """Get token symbol or shortened mint address."""
+    if hasattr(mint_obj, "symbol") and mint_obj.symbol:
+        return mint_obj.symbol
+    return str(mint_obj)[:6] + "..."
+
+
+def format_time(timestamp):
+    """Format timestamp to readable time."""
+    try:
+        return datetime.fromtimestamp(timestamp).strftime("%H:%M")
+    except (ValueError, OSError, OverflowError):
+        return "??:??"
+
+
 async def main():
-    print("Solana DEX Swaps Example")
-    print("=" * 24)
+    print("⚡ Solana DEX Tracker")
+    print("=" * 20)
 
     api = TokenAPI()
 
     try:
-        # Get Raydium swaps
-        print("\nRaydium Swaps:")
-        raydium_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=4)
+        # Raydium swaps
+        print("🌊 Raydium DEX:")
+        raydium = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=3)
 
-        for i, swap in enumerate(raydium_swaps, 1):
-            input_symbol = swap.input_mint.symbol if hasattr(swap.input_mint, "symbol") else str(swap.input_mint)[:8]
-            output_symbol = (
-                swap.output_mint.symbol if hasattr(swap.output_mint, "symbol") else str(swap.output_mint)[:8]
-            )
+        for i, swap in enumerate(raydium, 1):
+            input_sym = get_symbol(swap.input_mint)
+            output_sym = get_symbol(swap.output_mint)
+            user = swap.user[:8] + "..."
+            time = format_time(swap.timestamp)
 
-            user = swap.user[:10] + "..."
-            time_str = datetime.fromtimestamp(swap.timestamp).strftime("%H:%M") if swap.timestamp else "?"
+            print(f"  {i}. {input_sym} → {output_sym} | {user} | {time}")
 
-            print(f"  {i}. {input_symbol} → {output_symbol} | {user} | {time_str}")
+        # Jupiter swaps
+        print("\n🪐 Jupiter DEX:")
+        jupiter = await api.svm.swaps(program_id=SwapPrograms.JUPITER_V6, limit=3)
 
-        # Get Jupiter swaps
-        print("\nJupiter V6 Swaps:")
-        jupiter_swaps = await api.svm.swaps(program_id=SwapPrograms.JUPITER_V6, limit=3)
+        for i, swap in enumerate(jupiter, 1):
+            input_sym = get_symbol(swap.input_mint)
+            output_sym = get_symbol(swap.output_mint)
+            input_amt = swap.input_amount
+            output_amt = swap.output_amount
 
-        for i, swap in enumerate(jupiter_swaps, 1):
-            input_symbol = swap.input_mint.symbol if hasattr(swap.input_mint, "symbol") else str(swap.input_mint)[:8]
-            output_symbol = (
-                swap.output_mint.symbol if hasattr(swap.output_mint, "symbol") else str(swap.output_mint)[:8]
-            )
+            print(f"  {i}. {input_sym} → {output_sym}")
+            print(f"     {input_amt:.2f} → {output_amt:.2f}")
 
-            input_amount = swap.input_amount
-            output_amount = swap.output_amount
-
-            print(f"  {i}. {input_symbol} → {output_symbol}")
-            print(f"     {input_amount:.2f} → {output_amount:.2f}")
-
-        # Get SOL/USDC swaps
-        print("\nSOL/USDC Swaps:")
+        # SOL/USDC price discovery
+        print("\n💰 SOL/USDC Trading:")
         sol_usdc = await api.svm.swaps(
             program_id=SwapPrograms.RAYDIUM,
-            input_mint="So11111111111111111111111111111111111111112",  # pragma: allowlist secret
-            output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
+            input_mint="So11111111111111111111111111111111111111112",  # SOL
+            output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # USDC  # pragma: allowlist secret
             limit=2,
         )
 
         for i, swap in enumerate(sol_usdc, 1):
-            input_amount = swap.input_amount
-            output_amount = swap.output_amount
-            price = output_amount / input_amount if input_amount > 0 else 0
+            sol_amount = swap.input_amount
+            usdc_amount = swap.output_amount
+            price = usdc_amount / sol_amount if sol_amount > 0 else 0
 
-            print(f"  {i}. {input_amount:.2f} SOL → {output_amount:.2f} USDC (${price:.2f}/SOL)")
+            print(f"  {i}. {sol_amount:.2f} SOL → {usdc_amount:.2f} USDC")
+            print(f"     Rate: ${price:.2f} per SOL")
 
-        print("\n✅ Solana swap data retrieved successfully!")
+        print("\n✅ Solana trading data loaded!")
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ Failed to load Solana data: {e}")
+        print("💡 Solana queries can take a moment...")
 
 
 if __name__ == "__main__":

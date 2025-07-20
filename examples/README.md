@@ -1,26 +1,40 @@
 # Token API Examples
 
-Comprehensive examples demonstrating real-world usage of the Token API Client with live blockchain data. All examples use actual addresses, contracts, and market data to showcase API capabilities.
+Optimized, user-friendly examples demonstrating The Graph Token API with real blockchain data. All examples feature clean output, helpful error messages, and professional formatting.
 
 ## 🚀 Quick Start
 
-**Set your API key:**
+**1. Set your API key:**
 ```bash
-export THEGRAPH_API_KEY="your_api_key_here"
+export THEGRAPH_API_KEY="your_api_key_here"  # pragma: allowlist secret
 ```
 Get a free API key at: [thegraph.market](https://thegraph.market)
 
-**Run examples:**
+**2. Try the quick start:**
+```bash
+python examples/quickstart.py              # Everything in one script!
+```
+
+**3. Explore specific examples:**
 ```bash
 # EVM examples
-python examples/endpoints/evm/health.py     # API connectivity
-python examples/endpoints/evm/balances.py   # Token balances
-python examples/endpoints/evm/nfts.py       # NFT ownership
+python examples/endpoints/evm/health.py     # 🏥 API connectivity
+python examples/endpoints/evm/balances.py   # 💰 Token portfolios
+python examples/endpoints/evm/nfts.py       # 🎨 NFT collections
 
 # SVM examples
-python examples/endpoints/svm/balances.py   # SPL balances
-python examples/endpoints/svm/swaps.py      # Solana DEX swaps
+python examples/endpoints/svm/balances.py   # ⚡ SPL token balances
+python examples/endpoints/svm/swaps.py      # 🌊 Solana DEX trading
 ```
+
+## ✨ **NEW: Optimized for Simplicity**
+
+All examples now feature:
+- 🎨 **Visual output** with emojis and clear formatting
+- 💡 **Smart error messages** with troubleshooting tips
+- 📊 **Professional displays** with K/M number formatting
+- 🚀 **Faster execution** with streamlined code
+- 🛠️ **Helper functions** for consistent, maintainable code
 
 ## 📁 Examples Structure
 

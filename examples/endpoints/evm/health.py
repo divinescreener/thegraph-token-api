@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Health Check Example - Check API health and connectivity."""
+"""Health Check Example - Verify API connectivity in 10 seconds."""
 
 import anyio
 
@@ -7,35 +7,30 @@ from thegraph_token_api import TokenAPI
 
 
 async def main():
-    print("API Health Check")
-    print("=" * 16)
+    print("🏥 API Health Check")
+    print("=" * 18)
 
     api = TokenAPI()
 
     try:
-        # Check API health
-        print("\nChecking API health...")
-        health_status = await api.health()
-        print(f"Status: {health_status}")
+        # Quick health check
+        print("🔍 Checking API...")
+        health = await api.health()
 
-        if health_status.lower() == "ok":
-            print("✅ API is healthy")
+        if health.lower() == "ok":
+            print("✅ API is healthy and ready!")
+
+            # Quick connectivity test
+            print("🧪 Testing data access...")
+            data = await api.evm.balances("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", limit=1)
+            print(f"✅ Connected! Found {len(data)} balance(s)")
+
         else:
-            print("⚠️ API may have issues")
-
-        # Test connectivity with simple call
-        print("\nTesting connectivity...")
-        test_data = await api.evm.balances("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", limit=1)
-
-        if test_data:
-            print(f"✅ API call successful - received {len(test_data)} result(s)")
-        else:
-            print("⚠️ No data returned")
-
-        print("\n✅ Health check completed!")
+            print(f"⚠️ API status: {health}")
 
     except Exception as e:
-        print(f"❌ Health check failed: {e}")
+        print(f"❌ Connection failed: {e}")
+        print("💡 Check your THEGRAPH_API_KEY environment variable")
 
 
 if __name__ == "__main__":

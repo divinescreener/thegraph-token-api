@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Price History Example - Get OHLC price data."""
+"""Price History Example - Track token prices over time."""
 
 from datetime import datetime
 
@@ -8,58 +8,67 @@ import anyio
 from thegraph_token_api import Interval, TokenAPI
 
 
+def parse_datetime(datetime_str):
+    """Parse ISO datetime string safely."""
+    try:
+        return datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
+    except (ValueError, AttributeError):
+        return None
+
+
+def format_price_change(open_price, close_price):
+    """Calculate and format price change percentage."""
+    if not open_price or open_price == 0:
+        return "±0.0%"
+    change = ((close_price - open_price) / open_price) * 100
+    return f"{change:+.1f}%"
+
+
 async def main():
-    print("Price History Example")
-    print("=" * 21)
+    print("📈 Price History")
+    print("=" * 16)
 
     api = TokenAPI()
+    link_token = "0x514910771AF9Ca656af840dff83E8264EcF986CA"  # nosec B105
+    uniswap_pool = "0x3E456E2A71adafb6fe0AF8098334ee41ef53A7C6"
 
     try:
-        # Get LINK token price history
-        print("\nLINK Price History (7 days):")
-        price_data = await api.evm.price_history(
-            token="0x514910771AF9Ca656af840dff83E8264EcF986CA",  # pragma: allowlist secret
+        # Token price history
+        print("🔗 LINK Token (7 days):")
+        prices = await api.evm.price_history(
+            token=link_token,
             interval=Interval.ONE_DAY,
             days=7,
         )
 
-        for candle in price_data[:5]:
-            timestamp = candle.datetime
+        for candle in prices[:5]:
+            dt = parse_datetime(candle.datetime)
+            date_str = dt.strftime("%m/%d") if dt else "??/??"
+
             open_price = candle.open
             close_price = candle.close
+            change = format_price_change(open_price, close_price)
 
-            try:
-                dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                date_str = dt.strftime("%m/%d")
-            except (ValueError, AttributeError):
-                date_str = "?"
+            print(f"  {date_str}: ${open_price:.2f} → ${close_price:.2f} ({change})")
 
-            change = ((close_price - open_price) / open_price * 100) if open_price > 0 else 0
-            print(f"  {date_str}: ${open_price:.2f} → ${close_price:.2f} ({change:+.1f}%)")
+        # Pool price tracking
+        print("\n🏊 Pool Prices (24h):")
+        pool_prices = await api.evm.pool_history(pool=uniswap_pool, interval=Interval.ONE_HOUR, days=1)
 
-        # Get pool price history
-        print("\nPool Price History (24h):")
-        pool_data = await api.evm.pool_history(
-            pool="0x3E456E2A71adafb6fe0AF8098334ee41ef53A7C6", interval=Interval.ONE_HOUR, days=1
-        )
+        for candle in pool_prices[:3]:
+            dt = parse_datetime(candle.datetime)
+            time_str = dt.strftime("%H:%M") if dt else "??:??"
 
-        for candle in pool_data[:3]:
-            timestamp = candle.datetime
             open_price = candle.open
             close_price = candle.close
-
-            try:
-                dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                time_str = dt.strftime("%H:%M")
-            except (ValueError, AttributeError):
-                time_str = "?"
 
             print(f"  {time_str}: {open_price:.6f} → {close_price:.6f}")
 
-        print("\n✅ Price data retrieved successfully!")
+        print("\n✅ Price data loaded!")
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ Failed to load price data: {e}")
+        print("💡 Price queries can take longer for historical data")
 
 
 if __name__ == "__main__":

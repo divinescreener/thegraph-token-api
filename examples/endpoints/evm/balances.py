@@ -1,52 +1,52 @@
 #!/usr/bin/env python3
-"""Token Balances Example - Get ERC-20 token balances."""
+"""Token Balances Example - See your crypto portfolio instantly."""
 
 import anyio
 
 from thegraph_token_api import TokenAPI
 
 
+def format_amount(value):
+    """Format large numbers with K/M suffixes."""
+    if value >= 1_000_000:
+        return f"{value / 1_000_000:.1f}M"
+    if value >= 1_000:
+        return f"{value / 1_000:.1f}K"
+    return f"{value:.2f}"
+
+
 async def main():
-    print("Token Balances Example")
-    print("=" * 22)
+    print("💰 Token Balances")
+    print("=" * 17)
 
     api = TokenAPI()
-    vitalik = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+    wallet = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"  # Vitalik's wallet
 
     try:
-        # Get top token balances
-        print(f"\nTop balances for {vitalik[:10]}...:")
-        balances = await api.evm.balances(vitalik, limit=7)
+        print(f"📊 Portfolio for {wallet[:8]}...")
+        balances = await api.evm.balances(wallet, limit=5)
 
+        print("\n🏆 Top Holdings:")
         for i, balance in enumerate(balances, 1):
-            symbol = balance.symbol or "?"
-            value = balance.value
+            symbol = balance.symbol or "UNKNOWN"
+            amount = format_amount(balance.value)
+            print(f"  {i}. {symbol}: {amount}")
 
-            # Simple number formatting
-            if value > 1_000_000:
-                formatted = f"{value / 1_000_000:.1f}M"
-            elif value > 1_000:
-                formatted = f"{value / 1_000:.1f}K"
-            else:
-                formatted = f"{value:.2f}"
+        # Show specific token
+        print("\n🎯 Specific Token:")
+        imagine = await api.evm.balances(wallet, contract="0x6A1B2AE3a55B5661b40d86c2bF805f7DAdB16978", limit=1)
 
-            print(f"  {i}. {symbol}: {formatted}")
-
-        # Get specific token balance
-        print("\nSpecific token balance:")
-        specific = await api.evm.balances(vitalik, contract="0x6A1B2AE3a55B5661b40d86c2bF805f7DAdB16978", limit=1)
-
-        if specific:
-            symbol = specific[0].symbol or "?"
-            value = specific[0].value
-            print(f"  {symbol}: {value}")
+        if imagine:
+            token = imagine[0]
+            print(f"  {token.symbol or 'TOKEN'}: {format_amount(token.value)}")
         else:
-            print("  No balance found")
+            print("  No balance found for this token")
 
-        print("\n✅ Balances retrieved successfully!")
+        print("\n✅ Portfolio loaded!")
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ Failed to load portfolio: {e}")
+        print("💡 Make sure your API key is set: export THEGRAPH_API_KEY='your_key'")  # pragma: allowlist secret
 
 
 if __name__ == "__main__":
