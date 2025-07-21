@@ -97,8 +97,8 @@ class Protocol(StringEnum):
 class SolanaPrograms(StringEnum):
     """Solana program IDs."""
 
-    TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # nosec B105  # noqa: S105
-    TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # nosec B105  # noqa: S105
+    TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # nosec B105  # noqa: S105  # pragma: allowlist secret
+    TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # nosec B105  # noqa: S105  # pragma: allowlist secret
 
 
 class SwapPrograms(StringEnum):
