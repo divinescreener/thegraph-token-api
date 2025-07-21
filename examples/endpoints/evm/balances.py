@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 """Token Balances Example - See your crypto portfolio instantly."""
 
+# Import shared helper functions
+import sys
+from pathlib import Path
+
 import anyio
 
 from thegraph_token_api import TokenAPI
 
-
-def format_amount(value):
-    """Format large numbers with K/M suffixes."""
-    if value >= 1_000_000:
-        return f"{value / 1_000_000:.1f}M"
-    if value >= 1_000:
-        return f"{value / 1_000:.1f}K"
-    return f"{value:.2f}"
+sys.path.append(str(Path(__file__).parent.parent.parent))
+from _helpers import format_amount
 
 
 async def main():

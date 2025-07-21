@@ -5,6 +5,7 @@ Provides shared functionality for authentication, networking, and monitoring end
 """
 
 import os
+from typing import Any
 
 # Import divine-typed-requests (should be installed as a package)
 from typed_requests import NetworkingManager  # type: ignore[attr-defined]
@@ -48,6 +49,23 @@ class BaseTokenAPI:
             raise ValueError("limit must be between 1 and 1000")
         if page < 1:
             raise ValueError("page must be 1 or greater")
+
+    def _build_base_params(self, network: str, limit: int = 10, page: int = 1) -> dict[str, str | int]:
+        """Build base parameters common to most API calls."""
+        self._validate_pagination(limit, page)
+        return {
+            "network_id": network,
+            "limit": limit,
+            "page": page,
+        }
+
+    def _add_optional_params(self, params: dict, **kwargs: Any) -> dict:
+        """Add optional parameters to params dict, excluding None values."""
+        for key, value in kwargs.items():
+            if value is not None:
+                # Convert enum values to strings
+                params[key] = str(value) if hasattr(value, "value") else value
+        return params
 
     async def __aenter__(self):
         """Async context manager entry."""

@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 """Token Transfers Example - Track token movements on-chain."""
 
-from datetime import datetime
+# Import shared helper functions
+import sys
+from pathlib import Path
 
 import anyio
 
 from thegraph_token_api import TokenAPI
 
-
-def format_time(timestamp):
-    """Format timestamp to readable time."""
-    try:
-        return datetime.fromtimestamp(timestamp).strftime("%H:%M")
-    except (ValueError, OSError, OverflowError):
-        return "??:??"
+sys.path.append(str(Path(__file__).parent.parent.parent))
+from _helpers import format_time
 
 
 async def main():

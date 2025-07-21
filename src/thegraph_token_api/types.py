@@ -11,6 +11,13 @@ from typing import TypedDict
 # ===== Common Types =====
 
 
+class StringEnum(str, Enum):
+    """Base enum class that returns the value as string."""
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+
 class BaseResponse(TypedDict, total=False):
     """Base response structure for all API endpoints."""
 
@@ -22,7 +29,7 @@ class BaseResponse(TypedDict, total=False):
     total_results: int | None
 
 
-class NetworkId(str, Enum):
+class NetworkId(StringEnum):
     """Supported EVM network IDs."""
 
     ARBITRUM_ONE = "arbitrum-one"
@@ -34,28 +41,19 @@ class NetworkId(str, Enum):
     OPTIMISM = "optimism"
     UNICHAIN = "unichain"
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class SolanaNetworkId(str, Enum):
+class SolanaNetworkId(StringEnum):
     """Supported SVM network IDs."""
 
     SOLANA = "solana"
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class TokenStandard(str, Enum):
+class TokenStandard(StringEnum):
     """NFT token standards."""
 
     EMPTY = ""
     ERC721 = "ERC721"
     ERC1155 = "ERC1155"
-
-    def __str__(self) -> str:
-        return self.value
 
 
 class ActivityType(str, Enum):
@@ -66,27 +64,21 @@ class ActivityType(str, Enum):
     BURN = "BURN"
 
 
-class OrderDirection(str, Enum):
+class OrderDirection(StringEnum):
     """Order direction for sorting."""
 
     ASC = "asc"
     DESC = "desc"
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class OrderBy(str, Enum):
+class OrderBy(StringEnum):
     """Order by field."""
 
     TIMESTAMP = "timestamp"
     VALUE = "value"
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class Interval(str, Enum):
+class Interval(StringEnum):
     """Time intervals for OHLC data."""
 
     ONE_HOUR = "1h"
@@ -94,31 +86,22 @@ class Interval(str, Enum):
     ONE_DAY = "1d"
     ONE_WEEK = "1w"
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class Protocol(str, Enum):
+class Protocol(StringEnum):
     """DEX protocols."""
 
     UNISWAP_V2 = "uniswap_v2"
     UNISWAP_V3 = "uniswap_v3"
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class SolanaPrograms(str, Enum):
+class SolanaPrograms(StringEnum):
     """Solana program IDs."""
 
     TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # nosec B105  # pragma: allowlist secret
     TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # nosec B105  # pragma: allowlist secret
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class SwapPrograms(str, Enum):
+class SwapPrograms(StringEnum):
     """Solana swap program IDs."""
 
     RAYDIUM = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"  # Raydium Liquidity Pool V4  # pragma: allowlist secret
@@ -126,9 +109,6 @@ class SwapPrograms(str, Enum):
     PUMP_FUN_AMM = "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"  # Pump.fun AMM  # pragma: allowlist secret
     JUPITER_V4 = "JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB"  # Jupiter Aggregator v4  # pragma: allowlist secret
     JUPITER_V6 = "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"  # Jupiter Aggregator v6  # pragma: allowlist secret
-
-    def __str__(self) -> str:
-        return self.value
 
 
 # ===== Common Response Structure =====

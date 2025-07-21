@@ -90,10 +90,8 @@ class EVMTokenAPI(BaseTokenAPI):
         Returns:
             NFTOwnershipsResponse with validated data
         """
-        self._validate_pagination(limit, page)
-        params = {"network_id": self.network, "limit": limit, "page": page}
-        if token_standard:
-            params["token_standard"] = str(token_standard)
+        params = self._build_base_params(self.network, limit, page)
+        self._add_optional_params(params, token_standard=token_standard)
 
         response = await self.manager.get(
             f"{self.base_url}/nft/ownerships/evm/{address}",

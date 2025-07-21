@@ -127,14 +127,8 @@ class SVMTokenAPI(BaseTokenAPI):
         Returns:
             SolanaBalancesResponse with validated data
         """
-        self._validate_pagination(limit, page)
-        params = {"network_id": self.network, "limit": limit, "page": page}
-        if token_account:
-            params["token_account"] = token_account
-        if mint:
-            params["mint"] = mint
-        if program_id:
-            params["program_id"] = str(program_id)
+        params = self._build_base_params(self.network, limit, page)
+        self._add_optional_params(params, token_account=token_account, mint=mint, program_id=program_id)
 
         response = await self.manager.get(
             f"{self.base_url}/balances/svm", headers=self._headers, params=params, expected_type=SolanaBalancesResponse
@@ -424,12 +418,3 @@ class SVMTokenAPI(BaseTokenAPI):
         """Check if the pair is SOL/USDC."""
         mints = {mint1, mint2}
         return mints == {_SOL_MINT, _USDC_MINT}
-
-
-# Export constants for backward compatibility
-SOL_MINT = _SOL_MINT
-USDC_MINT = _USDC_MINT
-JUPITER_PROGRAM_ID = _JUPITER_V6
-
-# Legacy cached price class for tests
-CachedPrice = _PriceData

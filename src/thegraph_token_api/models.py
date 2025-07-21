@@ -13,15 +13,7 @@ from dataclasses import dataclass
 
 @dataclass
 class BaseModel:
-    """Base model with dict-like access for backward compatibility."""
-
-    def __getitem__(self, key):
-        """Support dictionary-style access for backward compatibility."""
-        return getattr(self, key, None)
-
-    def get(self, key, default=None):
-        """Support .get() method for backward compatibility."""
-        return getattr(self, key, default)
+    """Base model class."""
 
 
 @dataclass
@@ -139,18 +131,6 @@ class Transfer(BaseModel):
     symbol: str | None = None
     decimals: float | None = None
 
-    def __getitem__(self, key):
-        """Support dictionary-style access with 'from' key mapping."""
-        if key == "from":
-            return self.from_address
-        return super().__getitem__(key)
-
-    def get(self, key, default=None):
-        """Support .get() method with 'from' key mapping."""
-        if key == "from":
-            return self.from_address
-        return super().get(key, default)
-
 
 @dataclass
 class SolanaTransfer(BaseModel):
@@ -222,22 +202,6 @@ class NFTActivity(BaseModel):
     name: str | None = None
     transfer_type: str | None = None
     token_standard: str | None = None
-
-    def __getitem__(self, key):
-        """Support dictionary-style access with special key mappings."""
-        if key == "@type":
-            return self.activity_type
-        if key == "from":
-            return self.from_address
-        return super().__getitem__(key)
-
-    def get(self, key, default=None):
-        """Support .get() method with special key mappings."""
-        if key == "@type":
-            return self.activity_type
-        if key == "from":
-            return self.from_address
-        return super().get(key, default)
 
 
 @dataclass

@@ -83,13 +83,13 @@ class TestModelConversion:
             "signature": "sig123",
             "program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
             "program_name": "Raydium",
-            "user": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+            "user": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",  # pragma: allowlist secret
             "amm": "AMM123",
             "amm_name": "Raydium AMM",
             "network_id": "solana",
             "input_mint": {"address": "So11111111111111111111111111111111111111112", "symbol": "SOL", "decimals": 9.0},
             "output_mint": {
-                "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # pragma: allowlist secret
                 "symbol": "USDC",
                 "decimals": 6.0,
             },
@@ -186,79 +186,6 @@ class TestModelConversion:
         assert all(isinstance(item, Balance) for item in result)
         assert result[0].value == 1000.0
         assert result[1].value == 2000.0
-
-
-class TestModelDictionaryAccess:
-    """Test dictionary-style access methods on model instances."""
-
-    def test_base_model_dict_access(self):
-        """Test BaseModel __getitem__ and get methods (lines 21, 25)."""
-        balance = Balance(
-            block_num=18500000.0,
-            datetime="2023-11-01T12:00:00Z",
-            contract="0xToken",
-            amount="1000000000000000000",
-            value=1000.0,
-            network_id="mainnet",
-            symbol="USDC",
-        )
-
-        # Test __getitem__ method (line 21)
-        assert balance["symbol"] == "USDC"
-        assert balance["nonexistent"] is None
-
-        # Test get method (line 25)
-        assert balance.get("symbol") == "USDC"
-        assert balance.get("nonexistent") is None
-        assert balance.get("nonexistent", "default") == "default"
-
-    def test_transfer_dict_access_with_from_mapping(self):
-        """Test Transfer __getitem__ and get methods with 'from' key mapping (lines 138-140, 144-146)."""
-        transfer = Transfer(
-            block_num=18500000.0,
-            datetime="2023-11-01T12:00:00Z",
-            timestamp=1698840000.0,
-            transaction_id="0xhash",
-            contract="0xToken",
-            from_address="0xFrom",
-            to="0xTo",
-            value=1000.0,
-        )
-
-        # Test __getitem__ method with 'from' key mapping (lines 138-140)
-        assert transfer["from"] == "0xFrom"
-        assert transfer["to"] == "0xTo"
-
-        # Test get method with 'from' key mapping (lines 144-146)
-        assert transfer.get("from") == "0xFrom"
-        assert transfer.get("to") == "0xTo"
-        assert transfer.get("nonexistent") is None
-
-    def test_nft_activity_dict_access_with_special_mappings(self):
-        """Test NFTActivity __getitem__ and get methods with special mappings (lines 218-222, 226-230)."""
-        activity = NFTActivity(
-            activity_type="transfer",
-            block_num=18500000.0,
-            block_hash="0xblock",
-            timestamp="2023-11-01T12:00:00Z",
-            tx_hash="0xhash",
-            contract="0xNFT",
-            from_address="0xFrom",
-            to="0xTo",
-            token_id="123",
-            amount=1.0,
-        )
-
-        # Test __getitem__ method with special mappings (lines 218-222)
-        assert activity["@type"] == "transfer"
-        assert activity["from"] == "0xFrom"
-        assert activity["to"] == "0xTo"
-
-        # Test get method with special mappings (lines 226-230)
-        assert activity.get("@type") == "transfer"
-        assert activity.get("from") == "0xFrom"
-        assert activity.get("to") == "0xTo"
-        assert activity.get("nonexistent") is None
 
 
 class TestModelErrorHandling:

@@ -80,6 +80,7 @@ from .types import (
     SolanaTransfer,
     SolanaTransfersResponse,
     Statistics,
+    StringEnum,
     Swap,
     SwapPrograms,
     SwapsResponse,
@@ -98,6 +99,7 @@ __version__ = "0.1.22"
 __all__ = [
     "TokenAPI",  # Main interface
     # Export all types
+    "StringEnum",
     "NetworkId",
     "SolanaNetworkId",
     "TokenStandard",

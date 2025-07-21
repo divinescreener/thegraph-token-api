@@ -428,16 +428,47 @@ class TokenAPI:
             return data if isinstance(data, list) else []
         return []
 
+    async def _call_evm_method(
+        self, method_name: str, network: NetworkId | str | None = None, **kwargs: Any
+    ) -> list[dict]:
+        """Generic EVM method delegation helper."""
+        net = str(network) if network else self._default_network
+        async with self._api.evm(net) as client:
+            method = getattr(client, method_name)
+            response = await method(**kwargs)
+            return self._extract_data(response)
+
+    async def _call_evm_method_single(
+        self, method_name: str, network: NetworkId | str | None = None, **kwargs: Any
+    ) -> dict | None:
+        """Generic EVM method delegation helper that returns single result."""
+        data = await self._call_evm_method(method_name, network, **kwargs)
+        return data[0] if data else None
+
+    async def _call_svm_method(
+        self, method_name: str, network: SolanaNetworkId | str = SolanaNetworkId.SOLANA, **kwargs: Any
+    ) -> list[dict]:
+        """Generic SVM method delegation helper."""
+        async with self._api.svm(str(network)) as client:
+            method = getattr(client, method_name)
+            response = await method(**kwargs)
+            return self._extract_data(response)
+
+    async def _call_svm_method_direct(
+        self, method_name: str, network: SolanaNetworkId | str = SolanaNetworkId.SOLANA, **kwargs: Any
+    ) -> Any:
+        """Generic SVM method delegation helper that returns response directly."""
+        async with self._api.svm(str(network)) as client:
+            method = getattr(client, method_name)
+            return await method(**kwargs)
+
     # ===== EVM Internal Methods =====
 
     async def _evm_balances(
         self, address: str, contract: str | None = None, limit: int = 10, network: NetworkId | str | None = None
     ) -> list[dict]:
         """Internal EVM balances implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_balances(address=address, contract=contract, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method("get_balances", network, address=address, contract=contract, limit=limit)
 
     async def _evm_nfts(
         self,
@@ -447,18 +478,13 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM NFTs implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_nft_ownerships(address=address, token_standard=token_standard, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method(
+            "get_nft_ownerships", network, address=address, token_standard=token_standard, limit=limit
+        )
 
     async def _evm_token_info(self, contract: str, network: NetworkId | str | None = None) -> dict | None:
         """Internal EVM token info implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_token(contract=contract)
-            data = self._extract_data(response)
-            return data[0] if data else None
+        return await self._call_evm_method_single("get_token", network, contract=contract)
 
     async def _evm_transfers(
         self,
@@ -469,12 +495,9 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM transfers implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_transfers(
-                from_address=from_address, to_address=to_address, contract=contract, limit=limit
-            )
-            return self._extract_data(response)
+        return await self._call_evm_method(
+            "get_transfers", network, from_address=from_address, to_address=to_address, contract=contract, limit=limit
+        )
 
     async def _evm_swaps(
         self,
@@ -484,10 +507,7 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM swaps implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_swaps(pool=pool, protocol=protocol, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method("get_swaps", network, pool=pool, protocol=protocol, limit=limit)
 
     async def _evm_swaps_advanced(
         self,
@@ -505,30 +525,25 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM advanced swaps implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_swaps(
-                pool=pool,
-                caller=caller,
-                sender=sender,
-                recipient=recipient,
-                protocol=protocol,
-                transaction_id=transaction_id,
-                start_time=start_time,
-                end_time=end_time,
-                order_by=order_by,
-                order_direction=order_direction,
-                limit=limit,
-            )
-            return self._extract_data(response)
+        return await self._call_evm_method(
+            "get_swaps",
+            network,
+            pool=pool,
+            caller=caller,
+            sender=sender,
+            recipient=recipient,
+            protocol=protocol,
+            transaction_id=transaction_id,
+            start_time=start_time,
+            end_time=end_time,
+            order_by=order_by,
+            order_direction=order_direction,
+            limit=limit,
+        )
 
     async def _evm_nft_collection(self, contract: str, network: NetworkId | str | None = None) -> dict | None:
         """Internal EVM NFT collection implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_nft_collection(contract=contract)
-            data = self._extract_data(response)
-            return data[0] if data else None
+        return await self._call_evm_method_single("get_nft_collection", network, contract=contract)
 
     async def _evm_nft_activities(
         self,
@@ -539,28 +554,24 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM NFT activities implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_nft_activities(
-                contract=contract, from_address=from_address, to_address=to_address, limit=limit
-            )
-            return self._extract_data(response)
+        return await self._call_evm_method(
+            "get_nft_activities",
+            network,
+            contract=contract,
+            from_address=from_address,
+            to_address=to_address,
+            limit=limit,
+        )
 
     async def _evm_nft_item(
         self, contract: str, token_id: str, network: NetworkId | str | None = None
     ) -> list[dict[Any, Any]]:
         """Internal EVM NFT item implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_nft_item(contract=contract, token_id=token_id)
-            return self._extract_data(response)
+        return await self._call_evm_method("get_nft_item", network, contract=contract, token_id=token_id)
 
     async def _evm_nft_holders(self, contract: str, network: NetworkId | str | None = None) -> list[dict[Any, Any]]:
         """Internal EVM NFT holders implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_nft_holders(contract=contract)
-            return self._extract_data(response)
+        return await self._call_evm_method("get_nft_holders", network, contract=contract)
 
     async def _evm_nft_sales(
         self,
@@ -570,10 +581,7 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict[Any, Any]]:
         """Internal EVM NFT sales implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_nft_sales(contract=contract, token_id=token_id, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method("get_nft_sales", network, contract=contract, token_id=token_id, limit=limit)
 
     async def _evm_historical_balances(
         self,
@@ -584,12 +592,9 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict[Any, Any]]:
         """Internal EVM historical balances implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_historical_balances(
-                address=address, contracts=contracts, interval=interval, limit=limit
-            )
-            return self._extract_data(response)
+        return await self._call_evm_method(
+            "get_historical_balances", network, address=address, contracts=contracts, interval=interval, limit=limit
+        )
 
     async def _evm_pools(
         self,
@@ -600,10 +605,7 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM pools implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_pools(pool=pool, token=token, protocol=protocol, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method("get_pools", network, pool=pool, token=token, protocol=protocol, limit=limit)
 
     async def _evm_price_history(
         self,
@@ -614,13 +616,10 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM price history implementation."""
-        net = str(network) if network else self._default_network
-
         start_time = int((datetime.now() - timedelta(days=days)).timestamp())
-
-        async with self._api.evm(net) as client:
-            response = await client.get_ohlc_prices(token=token, interval=interval, start_time=start_time, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method(
+            "get_ohlc_prices", network, token=token, interval=interval, start_time=start_time, limit=limit
+        )
 
     async def _evm_pool_history(
         self,
@@ -631,22 +630,16 @@ class TokenAPI:
         network: NetworkId | str | None = None,
     ) -> list[dict]:
         """Internal EVM pool history implementation."""
-        net = str(network) if network else self._default_network
-
         start_time = int((datetime.now() - timedelta(days=days)).timestamp())
-
-        async with self._api.evm(net) as client:
-            response = await client.get_ohlc_pools(pool=pool, interval=interval, start_time=start_time, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method(
+            "get_ohlc_pools", network, pool=pool, interval=interval, start_time=start_time, limit=limit
+        )
 
     async def _evm_token_holders(
         self, contract: str, limit: int = 10, network: NetworkId | str | None = None
     ) -> list[dict]:
         """Internal EVM token holders implementation."""
-        net = str(network) if network else self._default_network
-        async with self._api.evm(net) as client:
-            response = await client.get_token_holders(contract=contract, limit=limit)
-            return self._extract_data(response)
+        return await self._call_evm_method("get_token_holders", network, contract=contract, limit=limit)
 
     # ===== SVM Internal Methods =====
 
@@ -659,11 +652,9 @@ class TokenAPI:
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
     ) -> list[dict]:
         """Internal SVM balances implementation."""
-        async with self._api.svm(str(network)) as client:
-            response = await client.get_balances(
-                token_account=token_account, mint=mint, program_id=program_id, limit=limit
-            )
-            return self._extract_data(response)
+        return await self._call_svm_method(
+            "get_balances", network, token_account=token_account, mint=mint, program_id=program_id, limit=limit
+        )
 
     async def _svm_transfers(
         self,
@@ -677,17 +668,17 @@ class TokenAPI:
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
     ) -> list[dict]:
         """Internal SVM transfers implementation."""
-        async with self._api.svm(str(network)) as client:
-            response = await client.get_transfers(
-                signature=signature,
-                program_id=program_id,
-                mint=mint,
-                authority=authority,
-                source=source,
-                destination=destination,
-                limit=limit,
-            )
-            return self._extract_data(response)
+        return await self._call_svm_method(
+            "get_transfers",
+            network,
+            signature=signature,
+            program_id=program_id,
+            mint=mint,
+            authority=authority,
+            source=source,
+            destination=destination,
+            limit=limit,
+        )
 
     async def _svm_swaps(
         self,
@@ -704,20 +695,20 @@ class TokenAPI:
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
     ) -> list[dict]:
         """Internal SVM swaps implementation."""
-        async with self._api.svm(str(network)) as client:
-            response = await client.get_swaps(
-                program_id=program_id,
-                amm=amm,
-                amm_pool=amm_pool,
-                user=user,
-                input_mint=input_mint,
-                output_mint=output_mint,
-                signature=signature,
-                start_time=start_time,
-                end_time=end_time,
-                limit=limit,
-            )
-            return self._extract_data(response)
+        return await self._call_svm_method(
+            "get_swaps",
+            network,
+            program_id=program_id,
+            amm=amm,
+            amm_pool=amm_pool,
+            user=user,
+            input_mint=input_mint,
+            output_mint=output_mint,
+            signature=signature,
+            start_time=start_time,
+            end_time=end_time,
+            limit=limit,
+        )
 
     async def _svm_get_sol_price(
         self,
@@ -725,8 +716,7 @@ class TokenAPI:
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
     ) -> float | dict[str, Any] | None:
         """Internal SVM SOL price implementation."""
-        async with self._api.svm(str(network)) as client:
-            return await client.get_sol_price(include_stats=include_stats)  # type: ignore[no-any-return]
+        return await self._call_svm_method_direct("get_sol_price", network, include_stats=include_stats)  # type: ignore[no-any-return]
 
     # ===== Utility Methods =====
 

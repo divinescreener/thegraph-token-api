@@ -9,8 +9,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from thegraph_token_api.svm import (
-    SOL_MINT,
-    USDC_MINT,
+    _SOL_MINT,
+    _USDC_MINT,
     SVMTokenAPI,
     _PriceData,
 )
@@ -501,21 +501,21 @@ class TestOptimizedSOLPriceCalculation:
         """Create mock swap data for testing."""
         return [
             {
-                "input_mint": {"address": SOL_MINT, "symbol": "SOL", "decimals": 9},
+                "input_mint": {"address": _SOL_MINT, "symbol": "SOL", "decimals": 9},
                 "input_amount": 1_000_000_000,  # 1 SOL
-                "output_mint": {"address": USDC_MINT, "symbol": "USDC", "decimals": 6},
+                "output_mint": {"address": _USDC_MINT, "symbol": "USDC", "decimals": 6},
                 "output_amount": 100_000_000,  # 100 USDC
             },
             {
-                "input_mint": USDC_MINT,  # String format
+                "input_mint": _USDC_MINT,  # String format
                 "input_amount": 50_000_000,  # 50 USDC
-                "output_mint": SOL_MINT,  # String format
+                "output_mint": _SOL_MINT,  # String format
                 "output_amount": 500_000_000,  # 0.5 SOL
             },
             {
-                "input_mint": {"address": SOL_MINT},
+                "input_mint": {"address": _SOL_MINT},
                 "input_amount": 2_000_000_000,  # 2 SOL
-                "output_mint": {"address": USDC_MINT},
+                "output_mint": {"address": _USDC_MINT},
                 "output_amount": 200_000_000,  # 200 USDC
             },
         ]
@@ -610,28 +610,28 @@ class TestOptimizedSOLPriceCalculation:
             [],  # First attempt fails
             [
                 {
-                    "input_mint": SOL_MINT,
-                    "output_mint": USDC_MINT,
+                    "input_mint": _SOL_MINT,
+                    "output_mint": _USDC_MINT,
                     "input_amount": 1_000_000_000,
                     "output_amount": 100_000_000,
                 }
             ],  # Second has minimal data
             [
                 {
-                    "input_mint": SOL_MINT,
-                    "output_mint": USDC_MINT,
+                    "input_mint": _SOL_MINT,
+                    "output_mint": _USDC_MINT,
                     "input_amount": 1_000_000_000,
                     "output_amount": 100_000_000,
                 },
                 {
-                    "input_mint": USDC_MINT,
-                    "output_mint": SOL_MINT,
+                    "input_mint": _USDC_MINT,
+                    "output_mint": _SOL_MINT,
                     "input_amount": 50_000_000,
                     "output_amount": 500_000_000,
                 },
                 {
-                    "input_mint": SOL_MINT,
-                    "output_mint": USDC_MINT,
+                    "input_mint": _SOL_MINT,
+                    "output_mint": _USDC_MINT,
                     "input_amount": 2_000_000_000,
                     "output_amount": 200_000_000,
                 },
@@ -654,26 +654,26 @@ class TestOptimizedSOLPriceCalculation:
         # Create test data with outliers
         test_swaps = [
             {
-                "input_mint": SOL_MINT,
-                "output_mint": USDC_MINT,
+                "input_mint": _SOL_MINT,
+                "output_mint": _USDC_MINT,
                 "input_amount": 1_000_000_000,
                 "output_amount": 100_000_000,
             },  # $100
             {
-                "input_mint": SOL_MINT,
-                "output_mint": USDC_MINT,
+                "input_mint": _SOL_MINT,
+                "output_mint": _USDC_MINT,
                 "input_amount": 1_000_000_000,
                 "output_amount": 101_000_000,
             },  # $101
             {
-                "input_mint": SOL_MINT,
-                "output_mint": USDC_MINT,
+                "input_mint": _SOL_MINT,
+                "output_mint": _USDC_MINT,
                 "input_amount": 1_000_000_000,
                 "output_amount": 99_000_000,
             },  # $99
             {
-                "input_mint": SOL_MINT,
-                "output_mint": USDC_MINT,
+                "input_mint": _SOL_MINT,
+                "output_mint": _USDC_MINT,
                 "input_amount": 1_000_000_000,
                 "output_amount": 5000_000_000,
             },  # $5000 - outlier
@@ -689,11 +689,11 @@ class TestOptimizedSOLPriceCalculation:
         client = SVMTokenAPI(api_key="test_key")
 
         # Test dict format
-        dict_mint = {"address": SOL_MINT, "symbol": "SOL"}
-        assert client._get_mint_address(dict_mint) == SOL_MINT
+        dict_mint = {"address": _SOL_MINT, "symbol": "SOL"}
+        assert client._get_mint_address(dict_mint) == _SOL_MINT
 
         # Test string format
-        assert client._get_mint_address(SOL_MINT) == SOL_MINT
+        assert client._get_mint_address(_SOL_MINT) == _SOL_MINT
 
         # Test None/invalid
         assert client._get_mint_address(None) == ""
@@ -705,9 +705,9 @@ class TestOptimizedSOLPriceCalculation:
         client = SVMTokenAPI(api_key="test_key")
 
         # Valid pairs
-        assert client._is_sol_usdc_pair(SOL_MINT, USDC_MINT) is True
-        assert client._is_sol_usdc_pair(USDC_MINT, SOL_MINT) is True
+        assert client._is_sol_usdc_pair(_SOL_MINT, _USDC_MINT) is True
+        assert client._is_sol_usdc_pair(_USDC_MINT, _SOL_MINT) is True
 
         # Invalid pairs
-        assert client._is_sol_usdc_pair(SOL_MINT, SOL_MINT) is False
-        assert client._is_sol_usdc_pair("other_mint", USDC_MINT) is False
+        assert client._is_sol_usdc_pair(_SOL_MINT, _SOL_MINT) is False
+        assert client._is_sol_usdc_pair("other_mint", _USDC_MINT) is False

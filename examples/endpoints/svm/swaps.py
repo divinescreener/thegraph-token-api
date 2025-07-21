@@ -1,26 +1,16 @@
 #!/usr/bin/env python3
 """Solana DEX Swaps Example - Track Solana trading activity."""
 
-from datetime import datetime
+# Import shared helper functions
+import sys
+from pathlib import Path
 
 import anyio
 
 from thegraph_token_api import SwapPrograms, TokenAPI
 
-
-def get_symbol(mint_obj):
-    """Get token symbol or shortened mint address."""
-    if hasattr(mint_obj, "symbol") and mint_obj.symbol:
-        return mint_obj.symbol
-    return str(mint_obj)[:6] + "..."
-
-
-def format_time(timestamp):
-    """Format timestamp to readable time."""
-    try:
-        return datetime.fromtimestamp(timestamp).strftime("%H:%M")
-    except (ValueError, OSError, OverflowError):
-        return "??:??"
+sys.path.append(str(Path(__file__).parent.parent.parent))
+from _helpers import format_time, get_symbol
 
 
 async def main():

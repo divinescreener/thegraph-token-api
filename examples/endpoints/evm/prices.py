@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 """Price History Example - Track token prices over time."""
 
+# Import shared helper functions
+import sys
 from datetime import datetime
+from pathlib import Path
 
 import anyio
 
 from thegraph_token_api import Interval, TokenAPI
+
+sys.path.append(str(Path(__file__).parent.parent.parent))
+from _helpers import format_price_change
 
 
 def parse_datetime(datetime_str):
@@ -14,14 +20,6 @@ def parse_datetime(datetime_str):
         return datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
     except (ValueError, AttributeError):
         return None
-
-
-def format_price_change(open_price, close_price):
-    """Calculate and format price change percentage."""
-    if not open_price or open_price == 0:
-        return "±0.0%"
-    change = ((close_price - open_price) / open_price) * 100
-    return f"{change:+.1f}%"
 
 
 async def main():
