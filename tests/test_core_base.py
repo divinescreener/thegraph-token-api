@@ -42,7 +42,9 @@ class TestBaseTokenAPIInitialization:
     def test_initialization_with_default_base_url(self):
         """Test BaseTokenAPI initialization with default base URL (line 68)."""
         client = BaseTokenAPI("test_key")
-        assert "thegraph.com" in client.base_url
+        from urllib.parse import urlparse
+        parsed_url = urlparse(client.base_url)
+        assert parsed_url.hostname and parsed_url.hostname.endswith("thegraph.com")
 
 
 class TestBaseTokenAPIPagination:
