@@ -1,75 +1,65 @@
 [build-system]
-requires = ["setuptools>=61.0,<81.0", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "divine-thegraph-token-api"
 version = "0.1.26"
 authors = [
-  { name="DIVINE", email="admin@divine.sh" },
+  { name = "DIVINE", email = "admin@divine.sh" },
 ]
-description = "Clean Python client for The Graph Token API with elegant EVM/SVM separation and 98% test coverage"
+description = "A Python client for The Graph Token API with elegant EVM/SVM separation and excellent test coverage"
 readme = "README.md"
-requires-python = ">=3.13"
 license = "MIT"
+requires-python = ">=3.13"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
-    "Operating System :: OS Independent",
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
-    "Topic :: Office/Business :: Financial",
-    "Topic :: Scientific/Engineering :: Information Analysis",
-    "Typing :: Typed",
-]
-keywords = ["blockchain", "ethereum", "solana", "defi", "nft", "api", "thegraph", "web3", "crypto"]
-dependencies = [
-    "divine-typed-requests==0.1.25",
-    "divine-type-enforcer==0.1.9",
-    "anyio>=4.9.0",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0",
-    "pytest-cov>=4.0",
-    "pytest-asyncio>=0.21",
-    "trio>=0.20.0",
-    "python-dotenv>=1.0.0",
-    "pre-commit>=3.5.0",
-    "ruff>=0.8.0",
-    "mypy>=1.14.0",
-    "bandit[toml]>=1.7.5",
-    "safety>=3.0.0",
-]
+[tool.poetry.dependencies]
+divine-typed-requests = ">=0.1.25"
+divine-type-enforcer = ">=0.1.9"
+httpx = {extras = ["http2"], version = "^0.28.1"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+pytest-cov = "^6.2.1"
+pytest-asyncio = "^1.1.0"
+anyio = "^4.0.0"
+trio = "^0.30.0"
+python-dotenv = "^1.1.1"
+pre-commit = "^4.2.0"
+ruff = "^0.12.4"
+mypy = "^1.17.0"
+bandit = { extras = ["toml"], version = "^1.8.6" }
+filelock = "^3.16.1"
+psutil = "^6.1.1"
+pydantic = "^2.9.2"
+safety = "^3.6.0"
 
 [project.urls]
 Homepage = "https://github.com/divinescreener/thegraph-token-api"
-Issues = "https://github.com/divinescreener/thegraph-token-api/issues"
+Issues   = "https://github.com/divinescreener/thegraph-token-api/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = ["tests"]
-addopts = "--cov=thegraph_token_api --cov-report term-missing -p anyio"
+pythonpath   = ["src"]
+testpaths    = ["tests"]
+addopts      = "--cov=thegraph_token_api --cov-report term-missing"
 asyncio_mode = "auto"
-anyio_backends = ["asyncio", "trio"]
-
-[tool.coverage.run]
-source = ["src/thegraph_token_api"]
-
-[tool.coverage.report]
-fail_under = 90
-show_missing = true
 
 [tool.ruff]
 target-version = "py313"
-line-length = 120
-src = ["src", "tests"]
+line-length    = 120
+src            = ["src", "tests"]
 
 [tool.ruff.lint]
 select = [
@@ -115,7 +105,6 @@ ignore = [
     "ANN204",  # missing return type annotation for special method __init__
     "ANN401",  # dynamically typed expressions (Any) are disallowed
     "S101",    # use of assert detected
-    "S105",    # possible hardcoded password (for API keys/tokens)
     "PLR2004", # magic value used in comparison
     "PLR0913", # too many arguments to function call
     "PLR0911", # too many return statements
@@ -125,12 +114,14 @@ ignore = [
     "EM102",   # exception must not use an f-string literal
     "TRY003",  # avoid specifying long messages outside exception class
     "TRY301",  # abstract raise to an inner function
+    "TRY400",  # prefer exception over error with exc_info
     "ERA001",  # found commented-out code
-    "RET504",  # unnecessary assignment before return
-    "RUF022",  # __all__ is not sorted
-    "SIM105",  # use contextlib.suppress instead of try-except-pass
-    "SIM108",  # use ternary operator instead of if-else block
-    "A005",    # module shadows standard library module
+    "G004",    # logging statement uses f-string
+    "G201",    # logging .exception should be used instead of .error with exc_info
+    "TRY300",  # consider moving to else block
+    "RET503",  # missing explicit return at end of function
+    "RUF009",  # do not perform function call in dataclass defaults
+    "PT011",   # pytest.raises is too broad
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -146,38 +137,35 @@ ignore = [
     "BLE001",  # allow blind except in tests
     "PTH",     # allow os.path usage in tests
     "PT011",   # allow broad pytest.raises in tests
-    "SIM117",  # allow nested with statements in tests
-    "SIM105",  # allow try-except-pass in tests
-]
-"examples/*" = [
-    "S101",    # allow asserts in examples
-    "ANN",     # don't require annotations in examples
-    "T201",    # allow print statements in examples
-    "BLE001",  # allow blind except in examples
-    "PTH",     # allow os.path usage in examples
-    "S105",    # allow hardcoded passwords in examples
-    "S106",    # allow hardcoded passwords in examples
-    "TRY300",  # allow try/except patterns in examples
-    "SIM108",  # allow if-else instead of ternary in examples
-    "PLR0913", # allow many arguments in examples
+    "RET503",  # allow missing return in tests
 ]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
+quote-style               = "double"
+indent-style              = "space"
 skip-magic-trailing-comma = false
-line-ending = "auto"
+line-ending               = "auto"
 
 [tool.mypy]
-python_version = "3.13"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
+python_version         = "3.13"
+warn_unused_configs    = true
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module                = "tests.*"
+disallow_untyped_defs = false
+
+[tool.coverage.run]
+source = ["src/thegraph_token_api"]
+omit   = ["src/thegraph_token_api/__init__.py"]
+
+[tool.coverage.report]
+fail_under   = 90
+show_missing = true
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-skips = ["B101"]  # Skip assert_used test
+skips        = ["B101"]
