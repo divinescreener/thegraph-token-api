@@ -46,8 +46,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/codebydivine/token-api"
-Issues = "https://github.com/codebydivine/token-api/issues"
+Homepage = "https://github.com/divinescreener/thegraph-token-api"
+Issues = "https://github.com/divinescreener/thegraph-token-api/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

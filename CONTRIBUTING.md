@@ -4,7 +4,7 @@
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/codebydivine/token-api.git
+git clone https://github.com/divinescreener/thegraph-token-api.git
 cd token-api
 ```
 
