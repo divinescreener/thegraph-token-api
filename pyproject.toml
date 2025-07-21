@@ -26,9 +26,9 @@ classifiers = [
 ]
 keywords = ["blockchain", "ethereum", "solana", "defi", "nft", "api", "thegraph", "web3", "crypto"]
 dependencies = [
-    "divine-typed-requests==0.1.10",
-    "divine-type-enforcer==0.1.8",
-    "anyio>=4.0.0",
+    "divine-typed-requests==0.1.25",
+    "divine-type-enforcer==0.1.9",
+    "anyio>=4.9.0",
 ]
 
 [project.optional-dependencies]
