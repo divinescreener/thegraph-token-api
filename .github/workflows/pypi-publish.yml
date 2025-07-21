@@ -10,7 +10,10 @@ jobs:
   # Run CI tests first to ensure quality
   test:
     uses: ./.github/workflows/ci.yml
-    secrets: inherit
+    secrets: inherit  # pragma: allowlist secret
+    permissions:
+      contents: read
+      security-events: write
 
   build:
     name: Build distribution
