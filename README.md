@@ -13,7 +13,11 @@ A clean, intuitive Python client for The Graph Token API with elegant EVM/SVM se
 ### Installation
 
 ```bash
+# For end users
 pip install divine-thegraph-token-api
+
+# For development
+poetry install
 ```
 
 ### Basic Usage
