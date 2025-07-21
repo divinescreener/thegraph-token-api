@@ -97,8 +97,8 @@ class Protocol(StringEnum):
 class SolanaPrograms(StringEnum):
     """Solana program IDs."""
 
-    TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # nosec B105  # pragma: allowlist secret
-    TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # nosec B105  # pragma: allowlist secret
+    TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"  # nosec B105  # noqa: S105
+    TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # nosec B105  # noqa: S105
 
 
 class SwapPrograms(StringEnum):
@@ -616,69 +616,58 @@ class NetworksResponse(TypedDict):
 # ===== Export All Types =====
 
 __all__ = [
-    # Enums
-    "NetworkId",
-    "SolanaNetworkId",
-    "TokenStandard",
+    "OHLC",
     "ActivityType",
-    "OrderDirection",
-    "OrderBy",
-    "Interval",
-    "Protocol",
-    "SolanaPrograms",
-    "SwapPrograms",
-    # Common
-    "Statistics",
-    "BaseResponse",
-    "ErrorResponse",
-    # NFT
-    "NFTAttribute",
-    "NFTOwnership",
-    "NFTOwnershipsResponse",
-    "NFTCollection",
-    "NFTCollectionsResponse",
-    "NFTItem",
-    "NFTItemsResponse",
-    "NFTActivity",
-    "NFTActivitiesResponse",
-    "NFTHolder",
-    "NFTHoldersResponse",
-    "NFTSale",
-    "NFTSalesResponse",
-    # Balances
     "Balance",
     "BalancesResponse",
-    "SolanaBalance",
-    "SolanaBalancesResponse",
-    # Transfers
-    "Transfer",
-    "TransfersResponse",
-    "SolanaTransfer",
-    "SolanaTransfersResponse",
-    # Tokens
-    "TokenIcon",
-    "Token",
-    "TokensResponse",
-    "TokenHolder",
-    "TokenHoldersResponse",
-    # Swaps
-    "SwapToken",
-    "Swap",
-    "SwapsResponse",
-    "SolanaMint",
-    "SolanaSwap",
-    "SolanaSwapsResponse",
-    # Pools
-    "Pool",
-    "PoolsResponse",
-    # OHLC
-    "OHLC",
-    "OHLCResponse",
-    # Historical
+    "BaseResponse",
+    "ErrorResponse",
     "HistoricalBalance",
     "HistoricalBalancesResponse",
-    # Monitoring
-    "VersionResponse",
+    "Interval",
+    "NFTActivitiesResponse",
+    "NFTActivity",
+    "NFTAttribute",
+    "NFTCollection",
+    "NFTCollectionsResponse",
+    "NFTHolder",
+    "NFTHoldersResponse",
+    "NFTItem",
+    "NFTItemsResponse",
+    "NFTOwnership",
+    "NFTOwnershipsResponse",
+    "NFTSale",
+    "NFTSalesResponse",
     "Network",
+    "NetworkId",
     "NetworksResponse",
+    "OHLCResponse",
+    "OrderBy",
+    "OrderDirection",
+    "Pool",
+    "PoolsResponse",
+    "Protocol",
+    "SolanaBalance",
+    "SolanaBalancesResponse",
+    "SolanaMint",
+    "SolanaNetworkId",
+    "SolanaPrograms",
+    "SolanaSwap",
+    "SolanaSwapsResponse",
+    "SolanaTransfer",
+    "SolanaTransfersResponse",
+    "Statistics",
+    "Swap",
+    "SwapPrograms",
+    "SwapToken",
+    "SwapsResponse",
+    "Token",
+    "TokenHolder",
+    "TokenHoldersResponse",
+    "TokenIcon",
+    "TokenStandard",
+    "TokensResponse",
+    "Transfer",
+    "TransfersResponse",
+    "VersionResponse",
 ]

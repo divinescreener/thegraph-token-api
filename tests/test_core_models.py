@@ -3,6 +3,8 @@ Core Models Testing - Comprehensive coverage for models.py
 Tests model conversion, error handling, and dictionary access methods.
 """
 
+import contextlib
+
 from thegraph_token_api.models import (
     Balance,
     NFTActivity,
@@ -200,13 +202,9 @@ class TestModelErrorHandling:
             # Missing required fields: block_num, datetime, contract, amount, network_id
         }
 
-        # This should trigger the error handling paths and return None
-        try:
+        with contextlib.suppress(TypeError):
             result = convert_to_model(incomplete_data, Balance)
             assert result is None  # Should be None due to error handling
-        except TypeError:
-            # If it raises TypeError, that's also valid error handling
-            pass
 
     def test_convert_to_model_with_invalid_nested_data(self):
         """Test convert_to_model with invalid nested data."""
@@ -228,9 +226,6 @@ class TestModelErrorHandling:
             "protocol": "uniswap_v3",
         }
 
-        try:
+        with contextlib.suppress(TypeError, AttributeError):
             convert_to_model(invalid_swap_data, Swap)
             # Should handle error gracefully
-        except (TypeError, AttributeError):
-            # Expected for invalid data
-            pass

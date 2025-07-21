@@ -27,14 +27,14 @@ async def main():
     print("=" * 16)
 
     api = TokenAPI()
-    link_token = "0x514910771AF9Ca656af840dff83E8264EcF986CA"  # nosec B105
+    link_address = "0x514910771AF9Ca656af840dff83E8264EcF986CA"  # nosec B105  # not a password, this is a public token address
     uniswap_pool = "0x3E456E2A71adafb6fe0AF8098334ee41ef53A7C6"
 
     try:
         # Token price history
         print("🔗 LINK Token (7 days):")
         prices = await api.evm.price_history(
-            token=link_token,
+            token=link_address,
             interval=Interval.ONE_DAY,
             days=7,
         )
@@ -64,9 +64,9 @@ async def main():
 
         print("\n✅ Price data loaded!")
 
-    except Exception as e:
-        print(f"❌ Failed to load price data: {e}")
-        print("💡 Price queries can take longer for historical data")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Failed to load price data: {e}")
+        print("\ud83d\udca1 Price queries can take longer for historical data")
 
 
 if __name__ == "__main__":

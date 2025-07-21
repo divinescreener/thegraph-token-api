@@ -13,8 +13,10 @@ import os
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+# Use pathlib to resolve the parent directory four levels up
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
 from dotenv import load_dotenv
 
@@ -28,7 +30,7 @@ async def example_simple_usage():
     """Example: Super simple SOL price - just one line!"""
     print("\n=== ✨ Optimized Simple Usage ===")
 
-    api_key = os.getenv("THEGRAPH_API_KEY")
+    api_key = os.environ.get("THEGRAPH_API_KEY")
     if not api_key:
         print("Error: THEGRAPH_API_KEY not found in environment")
         return
@@ -50,7 +52,7 @@ async def example_with_confidence():
     """Example: Get SOL price with confidence and stats."""
     print("\n=== 📊 Price with Intelligence ===")
 
-    api_key = os.getenv("THEGRAPH_API_KEY")
+    api_key = os.environ.get("THEGRAPH_API_KEY")
     if not api_key:
         print("Error: THEGRAPH_API_KEY not found in environment")
         return
@@ -82,7 +84,7 @@ async def example_cached_performance():
     """Example: Show smart caching in action."""
     print("\n=== ⚡ Smart Caching Demo ===")
 
-    api_key = os.getenv("THEGRAPH_API_KEY")
+    api_key = os.environ.get("THEGRAPH_API_KEY")
     if not api_key:
         print("Error: THEGRAPH_API_KEY not found in environment")
         return
@@ -115,7 +117,7 @@ async def example_integration():
     """Example: Show how it integrates seamlessly with other SVM functions."""
     print("\n=== 🔗 Seamless Integration ===")
 
-    api_key = os.getenv("THEGRAPH_API_KEY")
+    api_key = os.environ.get("THEGRAPH_API_KEY")
     if not api_key:
         print("Error: THEGRAPH_API_KEY not found in environment")
         return

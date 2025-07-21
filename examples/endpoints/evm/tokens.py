@@ -41,13 +41,13 @@ async def main():
                 formatted = f"{value:,.0f}" if value > 1000 else f"{value:.2f}"
                 print(f"  {i}. {address} | {formatted}")
 
-        except Exception:
+        except (ValueError, RuntimeError, OSError):
             print("  (Request timeout - common for popular tokens)")
 
         print("\n✅ Token data retrieved successfully!")
 
-    except Exception as e:
-        print(f"❌ Error: {e}")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Error: {e}")
 
 
 if __name__ == "__main__":

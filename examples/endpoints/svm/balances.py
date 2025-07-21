@@ -23,10 +23,7 @@ async def main():
             decimals = balance.decimals
 
             # Simple decimal formatting
-            if decimals > 0:
-                formatted = f"{float(amount) / (10**decimals):.2f}"
-            else:
-                formatted = amount
+            formatted = f"{float(amount) / (10**decimals):.2f}" if decimals > 0 else amount
 
             print(f"  {i}. {mint}: {formatted}")
 
@@ -58,8 +55,8 @@ async def main():
 
         print("\n✅ Solana balances retrieved successfully!")
 
-    except Exception as e:
-        print(f"❌ Error: {e}")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Error: {e}")
 
 
 if __name__ == "__main__":

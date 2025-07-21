@@ -19,12 +19,12 @@ async def main():
 
     api = TokenAPI()
     wallet = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"  # Vitalik's wallet
-    imagine_token = "0x6A1B2AE3a55B5661b40d86c2bF805f7DAdB16978"  # nosec B105
+    imagine_address = "0x6A1B2AE3a55B5661b40d86c2bF805f7DAdB16978"  # nosec B105  # not a password, this is a public token address
 
     try:
         # Token-specific transfers
         print("📦 Recent Token Transfers:")
-        transfers = await api.evm.transfers(contract=imagine_token, limit=3)
+        transfers = await api.evm.transfers(contract=imagine_address, limit=3)
 
         for i, transfer in enumerate(transfers, 1):
             amount = transfer.value
@@ -47,9 +47,9 @@ async def main():
 
         print("\n✅ Transfer data loaded!")
 
-    except Exception as e:
-        print(f"❌ Failed to load transfers: {e}")
-        print("💡 Transfer queries cover recent blockchain activity")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Failed to load transfers: {e}")
+        print("\ud83d\udca1 Transfer queries cover recent blockchain activity")
 
 
 if __name__ == "__main__":

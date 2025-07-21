@@ -42,9 +42,11 @@ async def main():
 
         print("\n✅ Portfolio loaded!")
 
-    except Exception as e:
-        print(f"❌ Failed to load portfolio: {e}")
-        print("💡 Make sure your API key is set: export THEGRAPH_API_KEY='your_key'")  # pragma: allowlist secret
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Failed to load portfolio: {e}")
+        print(
+            "\ud83d\udca1 Make sure your API key is set: export THEGRAPH_API_KEY='your_key'"  # pragma: allowlist secret
+        )
 
 
 if __name__ == "__main__":

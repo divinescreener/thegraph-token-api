@@ -59,8 +59,8 @@ async def main():
 
         print("\n✅ Solana transfer data retrieved successfully!")
 
-    except Exception as e:
-        print(f"❌ Error: {e}")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Error: {e}")
 
 
 if __name__ == "__main__":

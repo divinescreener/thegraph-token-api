@@ -63,7 +63,7 @@ async def main():
         print("\n✅ Quick start completed!")
         print("💡 Check out other examples in the endpoints/ folder")
 
-    except Exception as e:
+    except (ValueError, RuntimeError, OSError) as e:
         print(f"❌ Error: {e}")
         print("\n🔧 Troubleshooting:")
         print("1. Set your API key: export THEGRAPH_API_KEY='your_key'")  # pragma: allowlist secret

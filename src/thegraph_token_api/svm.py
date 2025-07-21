@@ -337,7 +337,7 @@ class SVMTokenAPI(BaseTokenAPI):
             # Cache with smart TTL
             self._sol_price_cache = _PriceData(price=price, stats=stats, cached_at=time.time())
 
-            return stats if include_stats else price  # noqa: TRY300
+            return stats if include_stats else price
 
         except Exception:  # noqa: BLE001
             return None

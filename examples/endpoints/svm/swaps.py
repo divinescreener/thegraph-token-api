@@ -64,9 +64,9 @@ async def main():
 
         print("\n✅ Solana trading data loaded!")
 
-    except Exception as e:
-        print(f"❌ Failed to load Solana data: {e}")
-        print("💡 Solana queries can take a moment...")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Failed to load Solana data: {e}")
+        print("\ud83d\udca1 Solana queries can take a moment...")
 
 
 if __name__ == "__main__":

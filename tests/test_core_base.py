@@ -15,28 +15,31 @@ class TestBaseTokenAPIInitialization:
 
     def test_initialization_without_api_key_raises_error(self):
         """Test BaseTokenAPI initialization fails when no API key and no env var (line 43)."""
-        with patch.dict("os.environ", {}, clear=True):
-            with pytest.raises(ValueError, match="API key is required"):
-                BaseTokenAPI()
+        with patch.dict("os.environ", {}, clear=True), pytest.raises(ValueError, match="API key is required"):
+            BaseTokenAPI()
 
     def test_initialization_with_explicit_api_key(self):
         """Test BaseTokenAPI initialization with explicit API key."""
-        client = BaseTokenAPI("test_key")
-        assert client.api_key == "test_key"
+        client = BaseTokenAPI("test_key")  # pragma: allowlist secret
+        assert client.api_key == "test_key"  # pragma: allowlist secret
 
     def test_initialization_with_env_variables(self):
         """Test BaseTokenAPI initialization with environment variables (lines 56-59)."""
         with patch.dict(
-            "os.environ", {"THEGRAPH_API_KEY": "env_key", "THEGRAPH_API_ENDPOINT": "https://custom.endpoint.com"}
+            "os.environ",
+            {
+                "THEGRAPH_API_KEY": "env_key",  # pragma: allowlist secret
+                "THEGRAPH_API_ENDPOINT": "https://custom.endpoint.com",
+            },  # pragma: allowlist secret
         ):
             client = BaseTokenAPI()
-            assert client.api_key == "env_key"
+            assert client.api_key == "env_key"  # pragma: allowlist secret
             assert client.base_url == "https://custom.endpoint.com"
 
     def test_initialization_with_custom_base_url(self):
         """Test BaseTokenAPI initialization with custom base URL (lines 63-64)."""
-        client = BaseTokenAPI("test_key", base_url="https://custom.api.com")
-        assert client.api_key == "test_key"
+        client = BaseTokenAPI("test_key", base_url="https://custom.api.com")  # pragma: allowlist secret
+        assert client.api_key == "test_key"  # pragma: allowlist secret
         assert client.base_url == "https://custom.api.com"
 
     def test_initialization_with_default_base_url(self):
@@ -161,7 +164,7 @@ class TestBaseTokenAPIProperties:
 
     def test_headers_property_with_none_api_key(self):
         """Test _headers property with None API key."""
-        with patch.dict("os.environ", {"THEGRAPH_API_KEY": "env_key"}):
+        with patch.dict("os.environ", {"THEGRAPH_API_KEY": "env_key"}):  # pragma: allowlist secret
             client = BaseTokenAPI()
             headers = client._headers
 
@@ -174,18 +177,18 @@ class TestBaseTokenAPIIntegration:
     def test_multiple_initialization_patterns(self):
         """Test various initialization patterns work correctly."""
         # Pattern 1: Direct API key
-        client1 = BaseTokenAPI("direct_key")
-        assert client1.api_key == "direct_key"
+        client1 = BaseTokenAPI("direct_key")  # pragma: allowlist secret
+        assert client1.api_key == "direct_key"  # pragma: allowlist secret
 
         # Pattern 2: API key + custom URL
-        client2 = BaseTokenAPI("key2", "https://custom.com")
-        assert client2.api_key == "key2"
+        client2 = BaseTokenAPI("key2", "https://custom.com")  # pragma: allowlist secret
+        assert client2.api_key == "key2"  # pragma: allowlist secret
         assert client2.base_url == "https://custom.com"
 
         # Pattern 3: Environment variable
-        with patch.dict("os.environ", {"THEGRAPH_API_KEY": "env_key"}):
+        with patch.dict("os.environ", {"THEGRAPH_API_KEY": "env_key"}):  # pragma: allowlist secret
             client3 = BaseTokenAPI()
-            assert client3.api_key == "env_key"
+            assert client3.api_key == "env_key"  # pragma: allowlist secret
 
     @pytest.mark.anyio
     async def test_error_handling_in_async_methods(self):

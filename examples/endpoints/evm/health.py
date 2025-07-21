@@ -28,9 +28,9 @@ async def main():
         else:
             print(f"⚠️ API status: {health}")
 
-    except Exception as e:
-        print(f"❌ Connection failed: {e}")
-        print("💡 Check your THEGRAPH_API_KEY environment variable")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Connection failed: {e}")
+        print("\ud83d\udca1 Check your THEGRAPH_API_KEY environment variable")
 
 
 if __name__ == "__main__":

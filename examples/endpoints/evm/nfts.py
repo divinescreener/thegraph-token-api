@@ -53,9 +53,9 @@ async def main():
 
         print("\n✅ NFT data loaded!")
 
-    except Exception as e:
-        print(f"❌ Failed to load NFT data: {e}")
-        print("💡 NFT queries can be slow - this is normal!")
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"\u274c Failed to load NFT data: {e}")
+        print("\ud83d\udca1 NFT queries can be slow - this is normal!")
 
 
 if __name__ == "__main__":
