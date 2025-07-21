@@ -64,7 +64,7 @@ EVM methods support Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, Base,
 
 ### EVM Balances
 
-#### `api.evm.balances(address, contract=None, limit=10, page=1, network=None)`
+#### `api.evm.balances(address, contract=None, limit=10, page=1, network=None, chain=None)`
 
 Get ERC-20 token balances for a wallet address.
 
@@ -74,6 +74,7 @@ Get ERC-20 token balances for a wallet address.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[Balance]`: List of balance objects with structured data access
@@ -92,7 +93,7 @@ usdc_balance = await api.evm.balances(
 # Query different network
 polygon_balances = await api.evm.balances(
     "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-    network="matic"  # or NetworkId.MATIC
+    chain="matic"  # or NetworkId.MATIC
 )
 
 # Access structured data with clean attribute syntax
@@ -132,7 +133,7 @@ for balance in balances:
 
 ### EVM NFTs
 
-#### `api.evm.nfts.ownerships(address, token_standard=None, limit=10, page=1, network=None)`
+#### `api.evm.nfts.ownerships(address, token_standard=None, limit=10, page=1, network=None, chain=None)`
 
 Get NFT ownerships for a wallet address.
 
@@ -142,6 +143,7 @@ Get NFT ownerships for a wallet address.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[NFTOwnership]`: List of NFT ownership objects with structured data access
@@ -158,13 +160,14 @@ erc721_nfts = await api.evm.nfts.ownerships(
 )
 ```
 
-#### `api.evm.nfts.collection(contract, network=None)`
+#### `api.evm.nfts.collection(contract, network=None, chain=None)`
 
 Get NFT collection metadata by contract address.
 
 **Parameters:**
 - `contract` (str, required): NFT contract address
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `Optional[NFTCollection]`: Collection metadata object or None if not found
@@ -177,7 +180,7 @@ print(f"Collection: {collection.name} ({collection.symbol})")
 print(f"Total Supply: {collection.total_supply}")
 ```
 
-#### `api.evm.nfts.activities(contract, from_address=None, to_address=None, any_address=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None)`
+#### `api.evm.nfts.activities(contract, from_address=None, to_address=None, any_address=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None, chain=None)`
 
 Get NFT activities (transfers, mints, burns) for a contract.
 
@@ -193,6 +196,7 @@ Get NFT activities (transfers, mints, burns) for a contract.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[NFTActivity]`: List of NFT activity objects with structured data access
@@ -220,7 +224,7 @@ recent_activities = await api.evm.nfts.activities(
 )
 ```
 
-#### `api.evm.nfts.item(contract, token_id, network=None)`
+#### `api.evm.nfts.item(contract, token_id, network=None, chain=None)`
 
 Get specific NFT item metadata by contract and token ID.
 
@@ -228,6 +232,7 @@ Get specific NFT item metadata by contract and token ID.
 - `contract` (str, required): NFT contract address
 - `token_id` (str, required): Token ID
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `Optional[NFTItem]`: NFT item metadata object or None if not found
@@ -244,13 +249,14 @@ print(f"Owner: {nft_item.owner}")
 print(f"Attributes: {nft_item.attributes or []}")
 ```
 
-#### `api.evm.nfts.holders(contract, network=None)`
+#### `api.evm.nfts.holders(contract, network=None, chain=None)`
 
 Get NFT holders for a contract address.
 
 **Parameters:**
 - `contract` (str, required): NFT contract address
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[NFTHolder]`: List of NFT holder objects with structured data access
@@ -265,7 +271,7 @@ for holder in holders:
     print(f"Percentage: {holder.percentage:.2f}%")
 ```
 
-#### `api.evm.nfts.sales(contract=None, token_id=None, any_address=None, offerer=None, recipient=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None)`
+#### `api.evm.nfts.sales(contract=None, token_id=None, any_address=None, offerer=None, recipient=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None, chain=None)`
 
 Get NFT marketplace sales data.
 
@@ -282,6 +288,7 @@ Get NFT marketplace sales data.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[NFTSale]`: List of NFT sale objects with structured data access
@@ -313,13 +320,14 @@ recent_sales = await api.evm.nfts.sales(
 
 ### EVM Tokens
 
-#### `api.evm.token_info(contract, network=None)`
+#### `api.evm.token_info(contract, network=None, chain=None)`
 
 Get token contract metadata and information.
 
 **Parameters:**
 - `contract` (str, required): Token contract address
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `Optional[Token]`: Token information object or None if not found
@@ -333,7 +341,7 @@ print(f"Decimals: {token.decimals}")
 print(f"Price: ${token.price_usd}")
 ```
 
-#### `api.evm.token_holders(contract, limit=10, network=None)`
+#### `api.evm.token_holders(contract, limit=10, network=None, chain=None)`
 
 Get token holder balances by contract address.
 
@@ -341,6 +349,7 @@ Get token holder balances by contract address.
 - `contract` (str, required): Token contract address
 - `limit` (int, optional): Number of results to return (default: 10)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[TokenHolder]`: List of token holder objects with structured data access
@@ -357,7 +366,7 @@ for holder in holders:
 
 ### EVM Transfers
 
-#### `api.evm.transfers(from_address=None, to_address=None, contract=None, transaction_id=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None)`
+#### `api.evm.transfers(from_address=None, to_address=None, contract=None, transaction_id=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None, chain=None)`
 
 Get ERC-20 token transfer events.
 
@@ -373,6 +382,7 @@ Get ERC-20 token transfer events.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[Transfer]`: List of transfer objects with structured data access
@@ -393,7 +403,7 @@ incoming = await api.evm.transfers(to_address="0xd8dA6BF26964aF9D7eEd9e03E53415D
 
 ### EVM Swaps
 
-#### `api.evm.swaps(pool=None, caller=None, sender=None, recipient=None, protocol=None, transaction_id=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None)`
+#### `api.evm.swaps(pool=None, caller=None, sender=None, recipient=None, protocol=None, transaction_id=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network=None, chain=None)`
 
 Get DEX swap transactions with filtering and time range support.
 
@@ -411,6 +421,7 @@ Get DEX swap transactions with filtering and time range support.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[Swap]`: List of swap objects with structured data access
@@ -427,7 +438,7 @@ v3_swaps = await api.evm.swaps(protocol="uniswap_v3")  # or Protocol.UNISWAP_V3
 pool_swaps = await api.evm.swaps(pool="0x3E456E2A71adafb6fe0AF8098334ee41ef53A7C6")
 ```
 
-#### `api.evm.swaps_advanced(...)`
+#### `api.evm.swaps_advanced(..., network=None, chain=None)`
 
 Get DEX swap transactions with advanced filtering and time range support.
 
@@ -444,6 +455,7 @@ Get DEX swap transactions with advanced filtering and time range support.
 - `order_direction` (OrderDirection, optional): Order direction (default: desc)
 - `limit` (int, optional): Number of results to return (default: 10)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[Swap]`: List of swap objects with structured data access
@@ -468,7 +480,7 @@ recent_swaps = await api.evm.swaps_advanced(
 
 ### EVM Pools
 
-#### `api.evm.pools(pool=None, factory=None, token=None, symbol=None, protocol=None, limit=10, page=1, network=None)`
+#### `api.evm.pools(pool=None, factory=None, token=None, symbol=None, protocol=None, limit=10, page=1, network=None, chain=None)`
 
 Get DEX liquidity pool information.
 
@@ -481,6 +493,7 @@ Get DEX liquidity pool information.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[Pool]`: List of pool objects with structured data access
@@ -501,7 +514,7 @@ v3_pools = await api.evm.pools(protocol="uniswap_v3")  # or Protocol.UNISWAP_V3
 
 ### EVM Price Data
 
-#### `api.evm.price_history(token, interval=Interval.ONE_HOUR, start_time=None, end_time=None, limit=24, page=1, network=None)`
+#### `api.evm.price_history(token, interval=Interval.ONE_HOUR, start_time=None, end_time=None, limit=24, page=1, network=None, chain=None)`
 
 Get OHLC price data for a token.
 
@@ -513,6 +526,7 @@ Get OHLC price data for a token.
 - `limit` (int, optional): Number of results to return (default: 24, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[PriceHistory]`: List of OHLC price objects with structured data access
@@ -535,7 +549,7 @@ weekly_prices = await api.evm.price_history(
 )
 ```
 
-#### `api.evm.pool_history(pool, interval=Interval.ONE_HOUR, start_time=None, end_time=None, limit=24, page=1, network=None)`
+#### `api.evm.pool_history(pool, interval=Interval.ONE_HOUR, start_time=None, end_time=None, limit=24, page=1, network=None, chain=None)`
 
 Get OHLC data for a DEX pool.
 
@@ -547,6 +561,7 @@ Get OHLC data for a DEX pool.
 - `limit` (int, optional): Number of results to return (default: 24, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[PoolHistory]`: List of OHLC pool data objects with structured data access
@@ -565,7 +580,7 @@ pool_data = await api.evm.pool_history(
 
 ### EVM Historical Balances
 
-#### `api.evm.historical_balances(address, interval=Interval.ONE_HOUR, contracts=None, start_time=None, end_time=None, limit=10, page=1, network=None)`
+#### `api.evm.historical_balances(address, interval=Interval.ONE_HOUR, contracts=None, start_time=None, end_time=None, limit=10, page=1, network=None, chain=None)`
 
 Get historical ERC-20 & Native balances by wallet address with time intervals.
 
@@ -578,6 +593,7 @@ Get historical ERC-20 & Native balances by wallet address with time intervals.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (NetworkId, optional): Network to query (default: mainnet)
+- `chain` (NetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[HistoricalBalance]`: List of historical balance objects with structured data access
@@ -677,7 +693,7 @@ SVM methods support Solana mainnet with SPL tokens and Solana DEXs.
 
 ### SVM Balances
 
-#### `api.svm.balances(token_account=None, mint=None, program_id=None, limit=10, page=1, network="solana")`
+#### `api.svm.balances(token_account=None, mint=None, program_id=None, limit=10, page=1, network="solana", chain=None)`
 
 Get Solana SPL token balances.
 
@@ -688,6 +704,7 @@ Get Solana SPL token balances.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (SolanaNetworkId, optional): Solana network (default: solana)
+- `chain` (SolanaNetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[SolanaBalance]`: List of Solana balance objects with structured data access
@@ -735,7 +752,7 @@ token_2022_balances = await api.svm.balances(
 
 ### SVM Transfers
 
-#### `api.svm.transfers(signature=None, program_id=None, mint=None, authority=None, source=None, destination=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network="solana")`
+#### `api.svm.transfers(signature=None, program_id=None, mint=None, authority=None, source=None, destination=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network="solana", chain=None)`
 
 Get Solana SPL token transfer events.
 
@@ -753,6 +770,7 @@ Get Solana SPL token transfer events.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (SolanaNetworkId, optional): Solana network (default: solana)
+- `chain` (SolanaNetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[SolanaTransfer]`: List of Solana transfer objects with structured data access
@@ -782,7 +800,7 @@ token_transfers = await api.svm.transfers(
 
 ### SVM Swaps
 
-#### `api.svm.swaps(program_id, amm=None, amm_pool=None, user=None, input_mint=None, output_mint=None, signature=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network="solana")`
+#### `api.svm.swaps(program_id, amm=None, amm_pool=None, user=None, input_mint=None, output_mint=None, signature=None, start_time=None, end_time=None, order_by=None, order_direction=None, limit=10, page=1, network="solana", chain=None)`
 
 Get Solana DEX swap transactions with time filtering support.
 
@@ -801,6 +819,7 @@ Get Solana DEX swap transactions with time filtering support.
 - `limit` (int, optional): Number of results to return (default: 10, max: 1000)
 - `page` (int, optional): Page number for pagination (default: 1)
 - `network` (SolanaNetworkId, optional): Solana network (default: solana)
+- `chain` (SolanaNetworkId, optional): Alias for `network`
 
 **Returns:**
 - `List[SolanaSwap]`: List of Solana swap objects with structured data access

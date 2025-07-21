@@ -604,6 +604,16 @@ class TestWrapperClasses:
                 assert result == ["balance"]
 
     @pytest.mark.anyio
+    async def test_evm_wrapper_balances_chain_override(self):
+        """Chain parameter overrides default network."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_evm_balances") as mock_balances:
+            mock_balances.return_value = []
+            await api.evm.balances(address="0xtest", chain="polygon")
+            mock_balances.assert_called_with(address="0xtest", contract=None, limit=10, network="polygon")
+
+    @pytest.mark.anyio
     async def test_evm_wrapper_token_info_with_data(self):
         """Test EVMWrapper.token_info method with data."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
@@ -648,6 +658,22 @@ class TestWrapperClasses:
                 )
 
                 assert result == ["solana_balance"]
+
+    @pytest.mark.anyio
+    async def test_svm_wrapper_balances_chain(self):
+        """Chain parameter forwards to network."""
+        api = TokenAPI(api_key="test_key", auto_load_env=False)
+
+        with patch.object(api, "_svm_balances") as mock_balances:
+            mock_balances.return_value = []
+            await api.svm.balances(chain="solana-devnet")
+            mock_balances.assert_called_with(
+                token_account=None,
+                mint=None,
+                program_id=None,
+                limit=10,
+                network="solana-devnet",
+            )
 
     @pytest.mark.anyio
     async def test_svm_wrapper_swaps(self):

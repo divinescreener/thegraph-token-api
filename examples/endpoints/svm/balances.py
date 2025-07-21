@@ -17,6 +17,10 @@ async def main():
         print("\nSPL Token Balances:")
         balances = await api.svm.balances(limit=6)
 
+        # Query devnet for comparison
+        devnet = await api.svm.balances(limit=2, chain="solana-devnet")
+        print(f"\n🌐 Devnet Balances: {len(devnet)} items")
+
         for i, balance in enumerate(balances, 1):
             mint = balance.mint[:10] + "..."
             amount = balance.amount

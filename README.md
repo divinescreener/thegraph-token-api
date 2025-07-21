@@ -26,6 +26,11 @@ async def main():
     eth_nfts = await api.evm.nfts.ownerships("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
     eth_swaps = await api.evm.swaps(protocol=Protocol.UNISWAP_V3, limit=10)
 
+    # Override chain per call
+    polygon_balances = await api.evm.balances(
+        "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", chain="polygon"
+    )
+
     # SVM (Solana)
     sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
     sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=10)
@@ -54,6 +59,7 @@ Get your free API key at: [thegraph.market](https://thegraph.market) (click "Get
 - 📦 **Type Safety**: Full type hints and runtime validation
 - 🚀 **Async/Await**: Built for modern Python async patterns
 - 🔄 **Auto Environment**: Loads API keys from `.env` automatically
+- 🌐 **Chain Override**: Pass `chain="polygon"` to override the default
 
 ## API Structure
 

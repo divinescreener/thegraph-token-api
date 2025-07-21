@@ -36,6 +36,10 @@ async def main():
         print("\n🎯 Specific Token:")
         imagine = await api.evm.balances(wallet, contract="0x6A1B2AE3a55B5661b40d86c2bF805f7DAdB16978", limit=1)
 
+        # Query Polygon instead of default chain
+        polygon = await api.evm.balances(wallet, limit=3, chain="polygon")
+        print(f"\n🔀 Polygon Top Tokens: {len(polygon)} items")
+
         if imagine:
             token = imagine[0]
             print(f"  {token.symbol or 'TOKEN'}: {format_amount(token.value)}")

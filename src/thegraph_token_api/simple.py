@@ -64,14 +64,22 @@ class NFTWrapper:
         token_standard: TokenStandard | str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[NFTOwnership]:
         """Get NFT ownerships for an address."""
-        data = await self._api._evm_nfts(address=address, token_standard=token_standard, limit=limit, network=network)
+        net = chain or network
+        data = await self._api._evm_nfts(address=address, token_standard=token_standard, limit=limit, network=net)
         return convert_list_to_models(data, NFTOwnership)
 
-    async def collection(self, contract: str, network: NetworkId | str | None = None) -> NFTCollection | None:
+    async def collection(
+        self,
+        contract: str,
+        network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
+    ) -> NFTCollection | None:
         """Get NFT collection metadata by contract address."""
-        data = await self._api._evm_nft_collection(contract=contract, network=network)
+        net = chain or network
+        data = await self._api._evm_nft_collection(contract=contract, network=net)
         return convert_to_model(data, NFTCollection) if data else None
 
     async def activities(
@@ -81,21 +89,36 @@ class NFTWrapper:
         to_address: str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[NFTActivity]:
         """Get NFT activities (transfers, mints, burns) for a contract."""
+        net = chain or network
         data = await self._api._evm_nft_activities(
-            contract=contract, from_address=from_address, to_address=to_address, limit=limit, network=network
+            contract=contract, from_address=from_address, to_address=to_address, limit=limit, network=net
         )
         return convert_list_to_models(data, NFTActivity)
 
-    async def item(self, contract: str, token_id: str, network: NetworkId | str | None = None) -> list[dict[str, Any]]:
+    async def item(
+        self,
+        contract: str,
+        token_id: str,
+        network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get specific NFT item metadata by contract and token ID."""
-        data = await self._api._evm_nft_item(contract=contract, token_id=token_id, network=network)
+        net = chain or network
+        data = await self._api._evm_nft_item(contract=contract, token_id=token_id, network=net)
         return data.get("items", []) if data else []
 
-    async def holders(self, contract: str, network: NetworkId | str | None = None) -> list[dict[str, Any]]:
+    async def holders(
+        self,
+        contract: str,
+        network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get NFT holders for a contract."""
-        data = await self._api._evm_nft_holders(contract=contract, network=network)
+        net = chain or network
+        data = await self._api._evm_nft_holders(contract=contract, network=net)
         return data.get("holders", []) if data else []
 
     async def sales(
@@ -104,9 +127,11 @@ class NFTWrapper:
         token_id: str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[dict[str, Any]]:
         """Get NFT marketplace sales."""
-        data = await self._api._evm_nft_sales(contract=contract, token_id=token_id, limit=limit, network=network)
+        net = chain or network
+        data = await self._api._evm_nft_sales(contract=contract, token_id=token_id, limit=limit, network=net)
         return data.get("sales", []) if data else []
 
 
@@ -120,10 +145,16 @@ class EVMWrapper:
         self.nfts = NFTWrapper(api_instance)
 
     async def balances(
-        self, address: str, contract: str | None = None, limit: int = 10, network: NetworkId | str | None = None
+        self,
+        address: str,
+        contract: str | None = None,
+        limit: int = 10,
+        network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[Balance]:
         """Get EVM token balances for an address."""
-        data = await self._api._evm_balances(address=address, contract=contract, limit=limit, network=network)
+        net = chain or network
+        data = await self._api._evm_balances(address=address, contract=contract, limit=limit, network=net)
         return convert_list_to_models(data, Balance)
 
     async def historical_balances(
@@ -133,16 +164,24 @@ class EVMWrapper:
         interval: Interval | str = Interval.ONE_HOUR,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[dict[str, Any]]:
         """Get historical balance data for EVM addresses."""
+        net = chain or network
         data = await self._api._evm_historical_balances(
-            address=address, contracts=contracts, interval=interval, limit=limit, network=network
+            address=address, contracts=contracts, interval=interval, limit=limit, network=net
         )
         return data.get("balances", []) if data else []
 
-    async def token_info(self, contract: str, network: NetworkId | str | None = None) -> Token | None:
+    async def token_info(
+        self,
+        contract: str,
+        network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
+    ) -> Token | None:
         """Get EVM token contract information."""
-        data = await self._api._evm_token_info(contract=contract, network=network)
+        net = chain or network
+        data = await self._api._evm_token_info(contract=contract, network=net)
         return convert_to_model(data, Token) if data else None
 
     async def transfers(
@@ -152,10 +191,12 @@ class EVMWrapper:
         contract: str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[Transfer]:
         """Get EVM token transfer events."""
+        net = chain or network
         data = await self._api._evm_transfers(
-            from_address=from_address, to_address=to_address, contract=contract, limit=limit, network=network
+            from_address=from_address, to_address=to_address, contract=contract, limit=limit, network=net
         )
         return convert_list_to_models(data, Transfer)
 
@@ -165,9 +206,11 @@ class EVMWrapper:
         protocol: Protocol | str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[Swap]:
         """Get EVM DEX swap transactions."""
-        data = await self._api._evm_swaps(pool=pool, protocol=protocol, limit=limit, network=network)
+        net = chain or network
+        data = await self._api._evm_swaps(pool=pool, protocol=protocol, limit=limit, network=net)
         return convert_list_to_models(data, Swap)
 
     async def swaps_advanced(
@@ -184,8 +227,10 @@ class EVMWrapper:
         order_direction: OrderDirection | str = OrderDirection.DESC,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[Swap]:
         """Get EVM DEX swap transactions with advanced filtering."""
+        net = chain or network
         data = await self._api._evm_swaps_advanced(
             pool=pool,
             caller=caller,
@@ -198,7 +243,7 @@ class EVMWrapper:
             order_by=order_by,
             order_direction=order_direction,
             limit=limit,
-            network=network,
+            network=net,
         )
         return convert_list_to_models(data, Swap)
 
@@ -209,9 +254,11 @@ class EVMWrapper:
         protocol: Protocol | str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[Pool]:
         """Get EVM DEX liquidity pools."""
-        data = await self._api._evm_pools(pool=pool, token=token, protocol=protocol, limit=limit, network=network)
+        net = chain or network
+        data = await self._api._evm_pools(pool=pool, token=token, protocol=protocol, limit=limit, network=net)
         return convert_list_to_models(data, Pool)
 
     async def price_history(
@@ -221,10 +268,12 @@ class EVMWrapper:
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[OHLC]:
         """Get EVM OHLC price data for a token."""
+        net = chain or network
         data = await self._api._evm_price_history(
-            token=token, interval=interval, days=days, limit=limit, network=network
+            token=token, interval=interval, days=days, limit=limit, network=net
         )
         return convert_list_to_models(data, OHLC)
 
@@ -235,16 +284,23 @@ class EVMWrapper:
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[OHLC]:
         """Get EVM OHLC data for a DEX pool."""
-        data = await self._api._evm_pool_history(pool=pool, interval=interval, days=days, limit=limit, network=network)
+        net = chain or network
+        data = await self._api._evm_pool_history(pool=pool, interval=interval, days=days, limit=limit, network=net)
         return convert_list_to_models(data, OHLC)
 
     async def token_holders(
-        self, contract: str, limit: int = 10, network: NetworkId | str | None = None
+        self,
+        contract: str,
+        limit: int = 10,
+        network: NetworkId | str | None = None,
+        chain: NetworkId | str | None = None,
     ) -> list[TokenHolder]:
         """Get EVM token holder balances by contract address."""
-        data = await self._api._evm_token_holders(contract=contract, limit=limit, network=network)
+        net = chain or network
+        data = await self._api._evm_token_holders(contract=contract, limit=limit, network=net)
         return convert_list_to_models(data, TokenHolder)
 
 
@@ -267,8 +323,10 @@ class SVMWrapper:
         end_time: int | None = None,
         limit: int = 10,
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
+        chain: SolanaNetworkId | str | None = None,
     ) -> list[SolanaSwap]:
         """Get SVM DEX swap transactions."""
+        net = chain or network
         data = await self._api._svm_swaps(
             program_id=program_id,
             amm=amm,
@@ -280,7 +338,7 @@ class SVMWrapper:
             start_time=start_time,
             end_time=end_time,
             limit=limit,
-            network=network,
+            network=net,
         )
         return convert_list_to_models(data, SolanaSwap)
 
@@ -291,10 +349,12 @@ class SVMWrapper:
         program_id: SolanaPrograms | str | None = None,
         limit: int = 10,
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
+        chain: SolanaNetworkId | str | None = None,
     ) -> list[SolanaBalance]:
         """Get SVM token balances."""
+        net = chain or network
         data = await self._api._svm_balances(
-            token_account=token_account, mint=mint, program_id=program_id, limit=limit, network=network
+            token_account=token_account, mint=mint, program_id=program_id, limit=limit, network=net
         )
         return convert_list_to_models(data, SolanaBalance)
 
@@ -308,8 +368,10 @@ class SVMWrapper:
         destination: str | None = None,
         limit: int = 10,
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
+        chain: SolanaNetworkId | str | None = None,
     ) -> list[SolanaTransfer]:
         """Get SVM token transfers."""
+        net = chain or network
         data = await self._api._svm_transfers(
             signature=signature,
             program_id=program_id,
@@ -318,7 +380,7 @@ class SVMWrapper:
             source=source,
             destination=destination,
             limit=limit,
-            network=network,
+            network=net,
         )
         return convert_list_to_models(data, SolanaTransfer)
 
