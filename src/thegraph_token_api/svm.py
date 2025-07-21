@@ -18,7 +18,6 @@ from .types import (
     # Enums
     SolanaNetworkId,
     SolanaPrograms,
-    SolanaSwap,
     SolanaSwapsResponse,
     SolanaTransfersResponse,
     SwapPrograms,
@@ -349,33 +348,30 @@ class SVMTokenAPI(BaseTokenAPI):
         except Exception:  # noqa: BLE001
             return None
 
-    async def _fetch_sol_usdc_swaps(self, limit: int, minutes_back: int) -> list[SolanaSwap]:
-        """Fetch SOL/USDC swaps from Jupiter v6."""
+    async def _fetch_sol_usdc_swaps(self, limit: int, minutes_back: int) -> list[dict[str, Any]]:
+        """Fetch SOL/USDC swaps from Jupiter v6 using existing swap method."""
         end_time = int(time.time())
         start_time = end_time - (minutes_back * 60)
 
-        params = {
-            "network_id": self.network,
-            "program_id": _JUPITER_V6,
-            "startTime": start_time,
-            "endTime": end_time,
-            "orderBy": "timestamp",
-            "orderDirection": "desc",
-            "limit": limit,
-            "page": 1,
-        }
-
-        response = await self.manager.get(
-            f"{self.base_url}/swaps/svm", headers=self._headers, params=params, timeout=30, expected_type=dict
+        # Use existing get_swaps method instead of duplicating logic
+        response = await self.get_swaps(
+            program_id=SwapPrograms.JUPITER_V6,
+            input_mint=_SOL_MINT,
+            output_mint=_USDC_MINT,
+            start_time=start_time,
+            end_time=end_time,
+            order_by=OrderBy.TIMESTAMP,
+            order_direction=OrderDirection.DESC,
+            limit=limit,
         )
 
-        if hasattr(response, "data") and hasattr(response.data, "get"):
-            swaps = response.data.get("data", [])  # type: ignore[attr-defined]
-        else:
-            swaps = response.get("data", [])  # type: ignore[attr-defined]
-        return swaps  # type: ignore[return-value,no-any-return]
+        # Convert response to list of dicts for price extraction
+        return [
+            swap.__dict__ if hasattr(swap, "__dict__") else swap  # type: ignore[misc]
+            for swap in response
+        ]
 
-    def _extract_sol_prices(self, swaps: list[SolanaSwap]) -> list[float]:
+    def _extract_sol_prices(self, swaps: list[dict[str, Any]]) -> list[float]:
         """Extract SOL prices from swap data with intelligent filtering."""
         prices = []
 

@@ -545,10 +545,9 @@ class TestOptimizedSOLPriceCalculation:
         """Test simple SOL price retrieval."""
         client = SVMTokenAPI(api_key="test_key")
 
-        with patch.object(client, "manager") as mock_manager:
-            mock_response = MagicMock()
-            mock_response.data = {"data": mock_swap_data}
-            mock_manager.get = AsyncMock(return_value=mock_response)
+        with patch.object(client, "get_swaps") as mock_get_swaps:
+            # Mock get_swaps to return list of dicts
+            mock_get_swaps.return_value = mock_swap_data
 
             price = await client.get_sol_price()
             assert isinstance(price, float)
@@ -559,10 +558,9 @@ class TestOptimizedSOLPriceCalculation:
         """Test SOL price with detailed statistics."""
         client = SVMTokenAPI(api_key="test_key")
 
-        with patch.object(client, "manager") as mock_manager:
-            mock_response = MagicMock()
-            mock_response.data = {"data": mock_swap_data}
-            mock_manager.get = AsyncMock(return_value=mock_response)
+        with patch.object(client, "get_swaps") as mock_get_swaps:
+            # Mock get_swaps to return list of dicts
+            mock_get_swaps.return_value = mock_swap_data
 
             stats = await client.get_sol_price(include_stats=True)
             assert isinstance(stats, dict)
@@ -577,29 +575,27 @@ class TestOptimizedSOLPriceCalculation:
         """Test smart caching with automatic cache hits."""
         client = SVMTokenAPI(api_key="test_key")
 
-        with patch.object(client, "manager") as mock_manager:
-            mock_response = MagicMock()
-            mock_response.data = {"data": mock_swap_data}
-            mock_manager.get = AsyncMock(return_value=mock_response)
+        with patch.object(client, "get_swaps") as mock_get_swaps:
+            # Mock get_swaps to return list of dicts
+            mock_get_swaps.return_value = mock_swap_data
 
             # First call
             price1 = await client.get_sol_price()
-            assert mock_manager.get.call_count == 1
+            assert mock_get_swaps.call_count == 1
 
             # Second call should use cache
             price2 = await client.get_sol_price()
             assert price1 == price2
-            assert mock_manager.get.call_count == 1  # No additional API call
+            assert mock_get_swaps.call_count == 1  # No additional API call
 
     @pytest.mark.anyio
     async def test_no_data_handling(self):
         """Test graceful handling when no swap data available."""
         client = SVMTokenAPI(api_key="test_key")
 
-        with patch.object(client, "manager") as mock_manager:
-            mock_response = MagicMock()
-            mock_response.data = {"data": []}
-            mock_manager.get = AsyncMock(return_value=mock_response)
+        with patch.object(client, "get_swaps") as mock_get_swaps:
+            # Mock get_swaps to return empty list
+            mock_get_swaps.return_value = []
 
             price = await client.get_sol_price()
             assert price is None
@@ -611,52 +607,44 @@ class TestOptimizedSOLPriceCalculation:
 
         # Mock responses: empty, then small data, then good data
         mock_responses = [
-            MagicMock(data={"data": []}),  # First attempt fails
-            MagicMock(
-                data={
-                    "data": [
-                        {
-                            "input_mint": SOL_MINT,
-                            "output_mint": USDC_MINT,
-                            "input_amount": 1_000_000_000,
-                            "output_amount": 100_000_000,
-                        }
-                    ]
+            [],  # First attempt fails
+            [
+                {
+                    "input_mint": SOL_MINT,
+                    "output_mint": USDC_MINT,
+                    "input_amount": 1_000_000_000,
+                    "output_amount": 100_000_000,
                 }
-            ),  # Second has minimal data
-            MagicMock(
-                data={
-                    "data": [
-                        {
-                            "input_mint": SOL_MINT,
-                            "output_mint": USDC_MINT,
-                            "input_amount": 1_000_000_000,
-                            "output_amount": 100_000_000,
-                        },
-                        {
-                            "input_mint": USDC_MINT,
-                            "output_mint": SOL_MINT,
-                            "input_amount": 50_000_000,
-                            "output_amount": 500_000_000,
-                        },
-                        {
-                            "input_mint": SOL_MINT,
-                            "output_mint": USDC_MINT,
-                            "input_amount": 2_000_000_000,
-                            "output_amount": 200_000_000,
-                        },
-                    ]
-                }
-            ),  # Third attempt has good data
+            ],  # Second has minimal data
+            [
+                {
+                    "input_mint": SOL_MINT,
+                    "output_mint": USDC_MINT,
+                    "input_amount": 1_000_000_000,
+                    "output_amount": 100_000_000,
+                },
+                {
+                    "input_mint": USDC_MINT,
+                    "output_mint": SOL_MINT,
+                    "input_amount": 50_000_000,
+                    "output_amount": 500_000_000,
+                },
+                {
+                    "input_mint": SOL_MINT,
+                    "output_mint": USDC_MINT,
+                    "input_amount": 2_000_000_000,
+                    "output_amount": 200_000_000,
+                },
+            ],  # Third attempt has good data
         ]
 
-        with patch.object(client, "manager") as mock_manager:
-            mock_manager.get = AsyncMock(side_effect=mock_responses)
+        with patch.object(client, "get_swaps") as mock_get_swaps:
+            mock_get_swaps.side_effect = mock_responses
 
             price = await client.get_sol_price()
             assert isinstance(price, float)
             # Should have made multiple attempts
-            assert mock_manager.get.call_count >= 2
+            assert mock_get_swaps.call_count >= 2
 
     @pytest.mark.anyio
     async def test_outlier_filtering(self):
