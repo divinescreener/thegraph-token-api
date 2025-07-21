@@ -1,7 +1,7 @@
 # See https://pre-commit.com for more information
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.4
+    rev: v0.12.4
     hooks:
       # Run the linter
       - id: ruff
@@ -10,7 +10,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: 582b9c66e0791980685c8b80bb11e6a3df1a06ef  # pragma: allowlist secret
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -23,7 +23,7 @@ repos:
         language_version: python3.13
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v1.17.0
     hooks:
       - id: mypy
         additional_dependencies: [types-requests, divine-typed-requests==0.1.10, divine-type-enforcer==0.1.8, httpx, anyio]
@@ -31,14 +31,14 @@ repos:
         files: ^src/
 
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
+    rev: 5a820865d7041564c0d7c576840dc272835dfa0d  # pragma: allowlist secret
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
         additional_dependencies: ["bandit[toml]"]
 
   - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
+    rev: 50119d658ab48021cad234fc5c8d3253263b2ec0  # pragma: allowlist secret
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
