@@ -70,9 +70,9 @@ jobs:
         run: |
           poetry install --no-interaction --with dev --no-root
 
-      - name: Run Safety check
+      - name: Run Safety scan
         run: |
-          poetry run safety check --json --output safety-results.json || true
+          poetry run safety scan --output json --save-as safety-results.json || true
 
       - name: Run Bandit security scan
         run: |
