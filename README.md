@@ -6,6 +6,10 @@ A clean, intuitive Python client for The Graph Token API with elegant EVM/SVM se
 
 ## Quick Start
 
+### Requirements
+
+- Python 3.13+
+
 ### Installation
 
 ```bash
