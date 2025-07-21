@@ -1,13 +1,19 @@
 """
 SVM API Testing - Comprehensive coverage for svm.py
-Tests all SVM (Solana) API methods with various parameter combinations.
+Tests all SVM (Solana) API methods with various parameter combinations including SOL price calculation.
 """
 
+import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from thegraph_token_api.svm import SVMTokenAPI
+from thegraph_token_api.svm import (
+    SOL_MINT,
+    USDC_MINT,
+    SVMTokenAPI,
+    _PriceData,
+)
 from thegraph_token_api.types import (
     SolanaNetworkId,
     SolanaPrograms,
@@ -485,3 +491,235 @@ class TestSVMMethodCombinations:
             await client.get_transfers(start_time=1640995200, end_time=1640995300)
 
             assert mock_manager.get.call_count == 3
+
+
+class TestOptimizedSOLPriceCalculation:
+    """Test optimized SOL price calculation functionality in SVM API."""
+
+    @pytest.fixture
+    def mock_swap_data(self):
+        """Create mock swap data for testing."""
+        return [
+            {
+                "input_mint": {"address": SOL_MINT, "symbol": "SOL", "decimals": 9},
+                "input_amount": 1_000_000_000,  # 1 SOL
+                "output_mint": {"address": USDC_MINT, "symbol": "USDC", "decimals": 6},
+                "output_amount": 100_000_000,  # 100 USDC
+            },
+            {
+                "input_mint": USDC_MINT,  # String format
+                "input_amount": 50_000_000,  # 50 USDC
+                "output_mint": SOL_MINT,  # String format
+                "output_amount": 500_000_000,  # 0.5 SOL
+            },
+            {
+                "input_mint": {"address": SOL_MINT},
+                "input_amount": 2_000_000_000,  # 2 SOL
+                "output_mint": {"address": USDC_MINT},
+                "output_amount": 200_000_000,  # 200 USDC
+            },
+        ]
+
+    def test_price_data_smart_caching(self):
+        """Test smart price data caching with volatility-based TTL."""
+        # High volatility should have shorter TTL
+        high_vol_stats = {"std_deviation": 10, "mean_price": 100}  # 10% volatility
+        price_data = _PriceData(price=100.0, stats=high_vol_stats, cached_at=time.time())
+        # Should expire quickly due to high volatility
+
+        # Low volatility should have longer TTL
+        low_vol_stats = {"std_deviation": 1, "mean_price": 100}  # 1% volatility
+        stable_data = _PriceData(price=100.0, stats=low_vol_stats, cached_at=time.time())
+        # Should stay fresh longer due to low volatility
+
+        assert price_data.is_fresh == stable_data.is_fresh  # Both should be fresh initially
+
+    @pytest.mark.anyio
+    async def test_svm_api_initialization(self):
+        """Test SVM API initialization with optimized cache."""
+        client = SVMTokenAPI(api_key="test_key")
+        assert client._sol_price_cache is None
+
+    @pytest.mark.anyio
+    async def test_get_sol_price_simple(self, mock_swap_data):
+        """Test simple SOL price retrieval."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        with patch.object(client, "manager") as mock_manager:
+            mock_response = MagicMock()
+            mock_response.data = {"data": mock_swap_data}
+            mock_manager.get = AsyncMock(return_value=mock_response)
+
+            price = await client.get_sol_price()
+            assert isinstance(price, float)
+            assert 50 <= price <= 200  # Reasonable range
+
+    @pytest.mark.anyio
+    async def test_get_sol_price_with_stats(self, mock_swap_data):
+        """Test SOL price with detailed statistics."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        with patch.object(client, "manager") as mock_manager:
+            mock_response = MagicMock()
+            mock_response.data = {"data": mock_swap_data}
+            mock_manager.get = AsyncMock(return_value=mock_response)
+
+            stats = await client.get_sol_price(include_stats=True)
+            assert isinstance(stats, dict)
+            assert "price" in stats
+            assert "confidence" in stats
+            assert "trades_analyzed" in stats
+            assert "std_deviation" in stats
+            assert 0 <= stats["confidence"] <= 1
+
+    @pytest.mark.anyio
+    async def test_smart_caching_behavior(self, mock_swap_data):
+        """Test smart caching with automatic cache hits."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        with patch.object(client, "manager") as mock_manager:
+            mock_response = MagicMock()
+            mock_response.data = {"data": mock_swap_data}
+            mock_manager.get = AsyncMock(return_value=mock_response)
+
+            # First call
+            price1 = await client.get_sol_price()
+            assert mock_manager.get.call_count == 1
+
+            # Second call should use cache
+            price2 = await client.get_sol_price()
+            assert price1 == price2
+            assert mock_manager.get.call_count == 1  # No additional API call
+
+    @pytest.mark.anyio
+    async def test_no_data_handling(self):
+        """Test graceful handling when no swap data available."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        with patch.object(client, "manager") as mock_manager:
+            mock_response = MagicMock()
+            mock_response.data = {"data": []}
+            mock_manager.get = AsyncMock(return_value=mock_response)
+
+            price = await client.get_sol_price()
+            assert price is None
+
+    @pytest.mark.anyio
+    async def test_progressive_retry_logic(self):
+        """Test smart retry logic with progressive sampling."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        # Mock responses: empty, then small data, then good data
+        mock_responses = [
+            MagicMock(data={"data": []}),  # First attempt fails
+            MagicMock(
+                data={
+                    "data": [
+                        {
+                            "input_mint": SOL_MINT,
+                            "output_mint": USDC_MINT,
+                            "input_amount": 1_000_000_000,
+                            "output_amount": 100_000_000,
+                        }
+                    ]
+                }
+            ),  # Second has minimal data
+            MagicMock(
+                data={
+                    "data": [
+                        {
+                            "input_mint": SOL_MINT,
+                            "output_mint": USDC_MINT,
+                            "input_amount": 1_000_000_000,
+                            "output_amount": 100_000_000,
+                        },
+                        {
+                            "input_mint": USDC_MINT,
+                            "output_mint": SOL_MINT,
+                            "input_amount": 50_000_000,
+                            "output_amount": 500_000_000,
+                        },
+                        {
+                            "input_mint": SOL_MINT,
+                            "output_mint": USDC_MINT,
+                            "input_amount": 2_000_000_000,
+                            "output_amount": 200_000_000,
+                        },
+                    ]
+                }
+            ),  # Third attempt has good data
+        ]
+
+        with patch.object(client, "manager") as mock_manager:
+            mock_manager.get = AsyncMock(side_effect=mock_responses)
+
+            price = await client.get_sol_price()
+            assert isinstance(price, float)
+            # Should have made multiple attempts
+            assert mock_manager.get.call_count >= 2
+
+    @pytest.mark.anyio
+    async def test_outlier_filtering(self):
+        """Test intelligent outlier filtering."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        # Create test data with outliers
+        test_swaps = [
+            {
+                "input_mint": SOL_MINT,
+                "output_mint": USDC_MINT,
+                "input_amount": 1_000_000_000,
+                "output_amount": 100_000_000,
+            },  # $100
+            {
+                "input_mint": SOL_MINT,
+                "output_mint": USDC_MINT,
+                "input_amount": 1_000_000_000,
+                "output_amount": 101_000_000,
+            },  # $101
+            {
+                "input_mint": SOL_MINT,
+                "output_mint": USDC_MINT,
+                "input_amount": 1_000_000_000,
+                "output_amount": 99_000_000,
+            },  # $99
+            {
+                "input_mint": SOL_MINT,
+                "output_mint": USDC_MINT,
+                "input_amount": 1_000_000_000,
+                "output_amount": 5000_000_000,
+            },  # $5000 - outlier
+        ]
+
+        prices = client._extract_sol_prices(test_swaps)
+        # Should filter out the $5000 outlier
+        assert all(50 <= p <= 200 for p in prices)
+
+    @pytest.mark.anyio
+    async def test_mint_address_extraction(self):
+        """Test flexible mint address extraction."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        # Test dict format
+        dict_mint = {"address": SOL_MINT, "symbol": "SOL"}
+        assert client._get_mint_address(dict_mint) == SOL_MINT
+
+        # Test string format
+        assert client._get_mint_address(SOL_MINT) == SOL_MINT
+
+        # Test None/invalid
+        assert client._get_mint_address(None) == ""
+        assert client._get_mint_address({}) == ""
+
+    @pytest.mark.anyio
+    async def test_sol_usdc_pair_detection(self):
+        """Test SOL/USDC pair detection."""
+        client = SVMTokenAPI(api_key="test_key")
+
+        # Valid pairs
+        assert client._is_sol_usdc_pair(SOL_MINT, USDC_MINT) is True
+        assert client._is_sol_usdc_pair(USDC_MINT, SOL_MINT) is True
+
+        # Invalid pairs
+        assert client._is_sol_usdc_pair(SOL_MINT, SOL_MINT) is False
+        assert client._is_sol_usdc_pair("other_mint", USDC_MINT) is False

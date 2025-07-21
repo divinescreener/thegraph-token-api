@@ -22,6 +22,7 @@ Usage:
         # SVM (Solana)
         sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
         sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=5)
+        sol_price = await api.svm.get_sol_price()  # Get current SOL price with smart caching
 
         # Utility
         health = await api.health()

@@ -322,6 +322,40 @@ class SVMWrapper:
         )
         return convert_list_to_models(data, SolanaTransfer)
 
+    async def get_sol_price(
+        self, *, include_stats: bool = False, network: SolanaNetworkId | str = SolanaNetworkId.SOLANA
+    ) -> float | dict[str, Any] | None:
+        """
+        Get current SOL price in USD with smart caching and auto-optimization.
+
+        This method automatically:
+        - Uses optimal trade sampling based on market conditions
+        - Caches results with volatility-based TTL
+        - Handles retries and outlier filtering
+        - Adapts parameters based on data availability
+
+        Args:
+            include_stats: If True, returns detailed statistics instead of just price
+            network: Solana network to use (default: mainnet)
+
+        Returns:
+            float: Current SOL price in USD (if include_stats=False)
+            dict: Price with statistics (if include_stats=True)
+            None: If no valid price data available
+
+        Example:
+            ```python
+            # Simple usage
+            price = await api.svm.get_sol_price()
+            print(f"SOL price: ${price:.2f}")
+
+            # With detailed stats
+            stats = await api.svm.get_sol_price(include_stats=True)
+            print(f"Price: ${stats['price']:.2f} (confidence: {stats['confidence']:.0%})")
+            ```
+        """
+        return await self._api._svm_get_sol_price(include_stats=include_stats, network=network)  # type: ignore[no-any-return]
+
 
 class TokenAPI:
     """
@@ -350,6 +384,7 @@ class TokenAPI:
         sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
         sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=10)
         sol_transfers = await api.svm.transfers(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")  # pragma: allowlist secret
+        sol_price = await api.svm.get_sol_price()  # Get current SOL price
 
         # Utility
         health = await api.health()
@@ -683,6 +718,15 @@ class TokenAPI:
                 limit=limit,
             )
             return self._extract_data(response)
+
+    async def _svm_get_sol_price(
+        self,
+        include_stats: bool = False,
+        network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
+    ) -> float | dict[str, Any] | None:
+        """Internal SVM SOL price implementation."""
+        async with self._api.svm(str(network)) as client:
+            return await client.get_sol_price(include_stats=include_stats)  # type: ignore[no-any-return]
 
     # ===== Utility Methods =====
 
