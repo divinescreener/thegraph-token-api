@@ -29,7 +29,7 @@ python3 examples/endpoints/svm/swaps.py
 ## Requirements
 
 1. **API Key**: Set `THEGRAPH_API_KEY` in your `.env` file
-2. **Python 3.8+** with `anyio` and other dependencies
+2. **Python 3.13+** with `anyio` and other dependencies
 
 ## Usage Pattern
 
