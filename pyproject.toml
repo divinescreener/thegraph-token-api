@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "divine-thegraph-token-api"
-version = "0.1.28"
+version = "0.1.29"
 description = "A Python client for The Graph Token API with elegant EVM/SVM separation and excellent test coverage"
 authors = ["DIVINE <admin@divine.sh>"]
 readme = "README.md"
@@ -17,8 +17,8 @@ Issues = "https://github.com/divinescreener/thegraph-token-api/issues"
 
 [tool.poetry.dependencies]
 python = ">=3.13"
-divine-typed-requests = ">=0.1.25"
-divine-type-enforcer = ">=0.1.9"
+divine-typed-requests = ">=0.1.30"
+divine-type-enforcer = ">=0.1.11"
 httpx = {extras = ["http2"], version = "^0.28.1"}
 
 [tool.poetry.group.dev.dependencies]
