@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "divine-thegraph-token-api"
-version = "0.1.30"
+version = "0.1.31"
 description = "A Python client for The Graph Token API with elegant EVM/SVM separation and excellent test coverage"
 authors = [{name = "DIVINE", email = "admin@divine.sh"}]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.13"
 dependencies = [
-    "divine-typed-requests>=0.1.30",
-    "divine-type-enforcer>=0.1.11",
+    "divine-typed-requests>=0.1.31",
+    "divine-type-enforcer>=0.1.12",
     "httpx[http2]>=0.28.1",
 ]
 
