@@ -40,7 +40,7 @@ class BaseTokenAPI:
         self._headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
-            "User-Agent": "TheGraphTokenAPI-Python-Client/0.1.0",
+            "User-Agent": "TheGraphTokenAPI-Python-Client/0.1.36",
         }
 
     def _validate_pagination(self, limit: int, page: int) -> None:

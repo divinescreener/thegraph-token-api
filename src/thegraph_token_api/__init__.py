@@ -95,7 +95,7 @@ from .types import (
     VersionResponse,
 )
 
-__version__ = "0.1.22"
+__version__ = "0.1.36"
 __all__ = [
     "OHLC",
     "ActivityType",
