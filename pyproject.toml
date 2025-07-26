@@ -140,6 +140,7 @@ line-ending               = "auto"
 python_version         = "3.13"
 warn_unused_configs    = true
 ignore_missing_imports = true
+strict                 = true
 
 [[tool.mypy.overrides]]
 module                = "tests.*"
