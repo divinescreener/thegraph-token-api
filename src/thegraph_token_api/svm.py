@@ -138,7 +138,7 @@ class SVMTokenAPI(BaseTokenAPI):
             expected_type=SolanaBalancesResponse,
             timeout=30,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Transfer Methods =====
 
@@ -210,7 +210,7 @@ class SVMTokenAPI(BaseTokenAPI):
             expected_type=SolanaTransfersResponse,
             timeout=30,
         )
-        return response.data  # type: ignore[no-any-return]
+        return response.data
 
     # ===== Swap Methods =====
 
@@ -286,7 +286,7 @@ class SVMTokenAPI(BaseTokenAPI):
             timeout=30,
         )
         # Extract the swap data from nested response structure
-        data = response.data  # type: ignore[attr-defined]
+        data = response.data
         if isinstance(data, dict) and "data" in data:
             return [SolanaSwap(**swap) for swap in data["data"]]
         return []
@@ -390,10 +390,15 @@ class SVMTokenAPI(BaseTokenAPI):
         if not swaps:
             return []
 
-        return [
-            swap.__dict__ if hasattr(swap, "__dict__") else swap  # type: ignore[misc]
-            for swap in swaps
-        ]
+        result: list[dict[str, Any]] = []
+        for swap in swaps:
+            if hasattr(swap, "__dict__"):
+                result.append(swap.__dict__)
+            elif hasattr(swap, "items"):
+                result.append(dict(swap))
+            else:
+                result.append(swap if isinstance(swap, dict) else {})  # type: ignore[arg-type]
+        return result
 
     def _extract_sol_prices(self, swaps: list[dict[str, Any]]) -> list[float]:
         """Extract SOL prices from swap data with intelligent filtering."""
@@ -402,8 +407,8 @@ class SVMTokenAPI(BaseTokenAPI):
         for swap in swaps:
             try:
                 # Get mint addresses (handle both dict and string formats)
-                input_mint = self._get_mint_address(swap.get("input_mint"))  # type: ignore[arg-type]
-                output_mint = self._get_mint_address(swap.get("output_mint"))  # type: ignore[arg-type]
+                input_mint = self._get_mint_address(swap.get("input_mint"))
+                output_mint = self._get_mint_address(swap.get("output_mint"))
 
                 # Only process SOL/USDC pairs
                 if not self._is_sol_usdc_pair(input_mint, output_mint):

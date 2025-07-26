@@ -39,6 +39,7 @@ from .models import (
     convert_list_to_models,
     convert_to_model,
 )
+from .svm import SVMTokenAPI
 from .types import (
     Interval,
     NetworkId,
@@ -55,7 +56,7 @@ from .types import (
 class NFTWrapper:
     """NFT-specific methods wrapper for EVM chains."""
 
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: "TokenAPI") -> None:
         self._api = api_instance
 
     async def ownerships(
@@ -90,13 +91,11 @@ class NFTWrapper:
 
     async def item(self, contract: str, token_id: str, network: NetworkId | str | None = None) -> list[dict[str, Any]]:
         """Get specific NFT item metadata by contract and token ID."""
-        data = await self._api._evm_nft_item(contract=contract, token_id=token_id, network=network)
-        return data.get("items", []) if data else []
+        return await self._api._evm_nft_item(contract=contract, token_id=token_id, network=network)
 
     async def holders(self, contract: str, network: NetworkId | str | None = None) -> list[dict[str, Any]]:
         """Get NFT holders for a contract."""
-        data = await self._api._evm_nft_holders(contract=contract, network=network)
-        return data.get("holders", []) if data else []
+        return await self._api._evm_nft_holders(contract=contract, network=network)
 
     async def sales(
         self,
@@ -106,14 +105,13 @@ class NFTWrapper:
         network: NetworkId | str | None = None,
     ) -> list[dict[str, Any]]:
         """Get NFT marketplace sales."""
-        data = await self._api._evm_nft_sales(contract=contract, token_id=token_id, limit=limit, network=network)
-        return data.get("sales", []) if data else []
+        return await self._api._evm_nft_sales(contract=contract, token_id=token_id, limit=limit, network=network)
 
 
 class EVMWrapper:
     """EVM-specific methods wrapper."""
 
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: "TokenAPI") -> None:
         self._api = api_instance
 
         # Initialize nested NFT wrapper
@@ -135,10 +133,9 @@ class EVMWrapper:
         network: NetworkId | str | None = None,
     ) -> list[dict[str, Any]]:
         """Get historical balance data for EVM addresses."""
-        data = await self._api._evm_historical_balances(
+        return await self._api._evm_historical_balances(
             address=address, contracts=contracts, interval=interval, limit=limit, network=network
         )
-        return data.get("balances", []) if data else []
 
     async def token_info(self, contract: str, network: NetworkId | str | None = None) -> Token | None:
         """Get EVM token contract information."""
@@ -251,7 +248,7 @@ class EVMWrapper:
 class SVMWrapper:
     """SVM-specific methods wrapper."""
 
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: "TokenAPI") -> None:
         self._api = api_instance
 
     async def swaps(
@@ -354,7 +351,7 @@ class SVMWrapper:
             print(f"Price: ${stats['price']:.2f} (confidence: {stats['confidence']:.0%})")
             ```
         """
-        return await self._api._svm_get_sol_price(include_stats=include_stats, network=network)  # type: ignore[no-any-return]
+        return await self._api._svm_get_sol_price(include_stats=include_stats, network=network)
 
 
 class TokenAPI:
@@ -421,7 +418,7 @@ class TokenAPI:
         self.evm = EVMWrapper(self)
         self.svm = SVMWrapper(self)
 
-    def _extract_data(self, response) -> list[dict[Any, Any]]:
+    def _extract_data(self, response: Any) -> list[dict[str, Any]]:
         """Extract clean data from API response."""
         if hasattr(response, "data") and isinstance(response.data, dict):
             data = response.data.get("data", [])
@@ -430,7 +427,7 @@ class TokenAPI:
 
     async def _call_evm_method(
         self, method_name: str, network: NetworkId | str | None = None, **kwargs: Any
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Generic EVM method delegation helper."""
         net = str(network) if network else self._default_network
         async with self._api.evm(net) as client:
@@ -440,14 +437,14 @@ class TokenAPI:
 
     async def _call_evm_method_single(
         self, method_name: str, network: NetworkId | str | None = None, **kwargs: Any
-    ) -> dict | None:
+    ) -> dict[str, Any] | None:
         """Generic EVM method delegation helper that returns single result."""
         data = await self._call_evm_method(method_name, network, **kwargs)
         return data[0] if data else None
 
     async def _call_svm_method(
         self, method_name: str, network: SolanaNetworkId | str = SolanaNetworkId.SOLANA, **kwargs: Any
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Generic SVM method delegation helper."""
         async with self._api.svm(str(network)) as client:
             method = getattr(client, method_name)
@@ -471,7 +468,7 @@ class TokenAPI:
 
     async def _evm_balances(
         self, address: str, contract: str | None = None, limit: int = 10, network: NetworkId | str | None = None
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM balances implementation."""
         return await self._call_evm_method("get_balances", network, address=address, contract=contract, limit=limit)
 
@@ -481,13 +478,13 @@ class TokenAPI:
         token_standard: TokenStandard | str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM NFTs implementation."""
         return await self._call_evm_method(
             "get_nft_ownerships", network, address=address, token_standard=token_standard, limit=limit
         )
 
-    async def _evm_token_info(self, contract: str, network: NetworkId | str | None = None) -> dict | None:
+    async def _evm_token_info(self, contract: str, network: NetworkId | str | None = None) -> dict[str, Any] | None:
         """Internal EVM token info implementation."""
         return await self._call_evm_method_single("get_token", network, contract=contract)
 
@@ -498,7 +495,7 @@ class TokenAPI:
         contract: str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM transfers implementation."""
         return await self._call_evm_method(
             "get_transfers", network, from_address=from_address, to_address=to_address, contract=contract, limit=limit
@@ -510,7 +507,7 @@ class TokenAPI:
         protocol: Protocol | str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM swaps implementation."""
         return await self._call_evm_method("get_swaps", network, pool=pool, protocol=protocol, limit=limit)
 
@@ -528,7 +525,7 @@ class TokenAPI:
         order_direction: OrderDirection | str = OrderDirection.DESC,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM advanced swaps implementation."""
         return await self._call_evm_method(
             "get_swaps",
@@ -546,7 +543,7 @@ class TokenAPI:
             limit=limit,
         )
 
-    async def _evm_nft_collection(self, contract: str, network: NetworkId | str | None = None) -> dict | None:
+    async def _evm_nft_collection(self, contract: str, network: NetworkId | str | None = None) -> dict[str, Any] | None:
         """Internal EVM NFT collection implementation."""
         return await self._call_evm_method_single("get_nft_collection", network, contract=contract)
 
@@ -557,7 +554,7 @@ class TokenAPI:
         to_address: str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM NFT activities implementation."""
         return await self._call_evm_method(
             "get_nft_activities",
@@ -570,7 +567,7 @@ class TokenAPI:
 
     async def _evm_nft_item(
         self, contract: str, token_id: str, network: NetworkId | str | None = None
-    ) -> list[dict[Any, Any]]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM NFT item implementation."""
         return await self._call_evm_method("get_nft_item", network, contract=contract, token_id=token_id)
 
@@ -584,7 +581,7 @@ class TokenAPI:
         token_id: str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict[Any, Any]]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM NFT sales implementation."""
         return await self._call_evm_method("get_nft_sales", network, contract=contract, token_id=token_id, limit=limit)
 
@@ -595,7 +592,7 @@ class TokenAPI:
         interval: Interval | str = Interval.ONE_DAY,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict[Any, Any]]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM historical balances implementation."""
         return await self._call_evm_method(
             "get_historical_balances", network, address=address, contracts=contracts, interval=interval, limit=limit
@@ -608,7 +605,7 @@ class TokenAPI:
         protocol: Protocol | str | None = None,
         limit: int = 10,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM pools implementation."""
         return await self._call_evm_method("get_pools", network, pool=pool, token=token, protocol=protocol, limit=limit)
 
@@ -619,7 +616,7 @@ class TokenAPI:
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM price history implementation."""
         start_time = int((datetime.now() - timedelta(days=days)).timestamp())
         return await self._call_evm_method(
@@ -633,7 +630,7 @@ class TokenAPI:
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM pool history implementation."""
         start_time = int((datetime.now() - timedelta(days=days)).timestamp())
         return await self._call_evm_method(
@@ -642,7 +639,7 @@ class TokenAPI:
 
     async def _evm_token_holders(
         self, contract: str, limit: int = 10, network: NetworkId | str | None = None
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal EVM token holders implementation."""
         return await self._call_evm_method("get_token_holders", network, contract=contract, limit=limit)
 
@@ -655,7 +652,7 @@ class TokenAPI:
         program_id: SolanaPrograms | str | None = None,
         limit: int = 10,
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal SVM balances implementation."""
         return await self._call_svm_method(
             "get_balances", network, token_account=token_account, mint=mint, program_id=program_id, limit=limit
@@ -671,7 +668,7 @@ class TokenAPI:
         destination: str | None = None,
         limit: int = 10,
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal SVM transfers implementation."""
         return await self._call_svm_method(
             "get_transfers",
@@ -698,7 +695,7 @@ class TokenAPI:
         end_time: int | None = None,
         limit: int = 10,
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Internal SVM swaps implementation."""
         return await self._call_svm_method(
             "get_swaps",
@@ -721,7 +718,9 @@ class TokenAPI:
         network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
     ) -> float | dict[str, Any] | None:
         """Internal SVM SOL price implementation."""
-        return await self._call_svm_method_direct("get_sol_price", network, include_stats=include_stats)  # type: ignore[no-any-return]
+        # Direct API call to avoid circular dependency
+        async with SVMTokenAPI(self._api.api_key or "", str(network), self._api.base_url) as client:
+            return await client._get_sol_price_internal(include_stats=include_stats)  # type: ignore[no-any-return,attr-defined]
 
     # ===== Utility Methods =====
 

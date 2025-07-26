@@ -6,7 +6,7 @@ All types are designed for use with divine-type-enforcer for runtime validation.
 """
 
 from enum import Enum
-from typing import TypedDict
+from typing import Any, TypedDict
 
 # ===== Common Types =====
 
@@ -22,9 +22,9 @@ class BaseResponse(TypedDict, total=False):
     """Base response structure for all API endpoints."""
 
     results: int | None  # Number of results returned
-    statistics: dict | None
+    statistics: dict[str, Any] | None
     duration_ms: float | None
-    pagination: dict | None
+    pagination: dict[str, Any] | None
     request_time: str | None
     total_results: int | None
 
@@ -593,7 +593,7 @@ class VersionResponse(TypedDict):
 class NetworkIcon(TypedDict):
     """Network icon information."""
 
-    web3Icons: dict
+    web3Icons: dict[str, Any]
 
 
 class Network(TypedDict):

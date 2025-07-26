@@ -9,6 +9,7 @@ for backward compatibility.
 
 import inspect
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -270,7 +271,7 @@ class OHLC(BaseModel):
     transactions: float
 
 
-def convert_to_model[T: BaseModel](data: dict, model_class: type[T]) -> T | None:
+def convert_to_model[T: BaseModel](data: dict[str, Any], model_class: type[T]) -> T | None:
     """Convert dictionary data to structured model."""
     if not data:
         return None
@@ -320,6 +321,6 @@ def convert_to_model[T: BaseModel](data: dict, model_class: type[T]) -> T | None
         return model_class(**working_data)
 
 
-def convert_list_to_models[T: BaseModel](data_list: list[dict], model_class: type[T]) -> list[T]:
+def convert_list_to_models[T: BaseModel](data_list: list[dict[str, Any]], model_class: type[T]) -> list[T]:
     """Convert list of dictionaries to list of structured models."""
     return [model for item in data_list if item and (model := convert_to_model(item, model_class)) is not None]

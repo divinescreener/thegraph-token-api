@@ -8,7 +8,7 @@ import os
 from typing import Any
 
 # Import divine-typed-requests (should be installed as a package)
-from typed_requests import NetworkingManager  # type: ignore[attr-defined]
+from typed_requests import NetworkingManager
 
 from .types import NetworksResponse, VersionResponse
 
@@ -59,7 +59,7 @@ class BaseTokenAPI:
             "page": page,
         }
 
-    def _add_optional_params(self, params: dict, **kwargs: Any) -> dict:
+    def _add_optional_params(self, params: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
         """Add optional parameters to params dict, excluding None values."""
         for key, value in kwargs.items():
             if value is not None:
@@ -67,12 +67,12 @@ class BaseTokenAPI:
                 params[key] = str(value) if hasattr(value, "value") else value
         return params
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "BaseTokenAPI":
         """Async context manager entry."""
         await self.manager.startup()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         await self.manager.shutdown()
 
