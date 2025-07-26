@@ -8,12 +8,13 @@ This example demonstrates the new optimized SOL price functionality:
 4. Zero-config usage - just works!
 """
 
-import asyncio
 import os
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
+
+import anyio
 
 # Use pathlib to resolve the parent directory four levels up
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
@@ -159,4 +160,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    anyio.run(main)
