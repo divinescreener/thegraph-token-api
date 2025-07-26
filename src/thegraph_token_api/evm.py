@@ -187,11 +187,11 @@ class EVMTokenAPI(BaseTokenAPI):
         }
 
         if any_address:
-            params["any"] = any_address
+            params["anyAddress"] = any_address
         if from_address:
-            params["from"] = from_address
+            params["fromAddress"] = from_address
         if to_address:
-            params["to"] = to_address
+            params["toAddress"] = to_address
         if start_time:
             params["startTime"] = start_time
         if end_time:
@@ -273,11 +273,11 @@ class EVMTokenAPI(BaseTokenAPI):
         if token_id:
             params["token_id"] = token_id
         if any_address:
-            params["any"] = any_address
+            params["anyAddress"] = any_address
         if offerer:
-            params["offerer"] = offerer
+            params["offererAddress"] = offerer
         if recipient:
-            params["recipient"] = recipient
+            params["recipientAddress"] = recipient
         if start_time:
             params["startTime"] = start_time
         if end_time:
@@ -366,9 +366,9 @@ class EVMTokenAPI(BaseTokenAPI):
         }
 
         if from_address:
-            params["from"] = from_address
+            params["fromAddress"] = from_address
         if to_address:
-            params["to"] = to_address
+            params["toAddress"] = to_address
         if contract:
             params["contract"] = contract
         if transaction_id:

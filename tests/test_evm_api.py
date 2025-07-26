@@ -144,9 +144,9 @@ class TestEVMNFTMethods:
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
             assert params["contract"] == "0xtest"
-            assert params["any"] == "0xany"
-            assert params["from"] == "0xfrom"
-            assert params["to"] == "0xto"
+            assert params["anyAddress"] == "0xany"
+            assert params["fromAddress"] == "0xfrom"
+            assert params["toAddress"] == "0xto"
             assert params["startTime"] == 1640995200
             assert params["endTime"] == 1640995300
             assert params["orderBy"] == "timestamp"
@@ -196,8 +196,8 @@ class TestEVMNFTMethods:
             params = call_args[1]["params"]
             assert params["contract"] == "0xtest"
             assert params["token_id"] == "123"
-            assert params["offerer"] == "0xofferer"
-            assert params["recipient"] == "0xrecipient"
+            assert params["offererAddress"] == "0xofferer"
+            assert params["recipientAddress"] == "0xrecipient"
 
 
 class TestEVMTokenMethods:
@@ -304,8 +304,8 @@ class TestEVMTradingMethods:
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
-            assert params["from"] == "0xfrom"
-            assert params["to"] == "0xto"
+            assert params["fromAddress"] == "0xfrom"
+            assert params["toAddress"] == "0xto"
             assert params["contract"] == "0xtoken"
             assert params["transaction_id"] == "0xtx"
             assert params["startTime"] == 1640995200
