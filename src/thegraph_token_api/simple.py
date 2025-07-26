@@ -130,7 +130,7 @@ class EVMWrapper:
         self,
         address: str,
         contracts: list[str] | None = None,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         limit: int = 10,
         network: NetworkId | str | None = None,
     ) -> list[dict[str, Any]]:
@@ -217,7 +217,7 @@ class EVMWrapper:
     async def price_history(
         self,
         token: str,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,
@@ -231,7 +231,7 @@ class EVMWrapper:
     async def pool_history(
         self,
         pool: str,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,
@@ -592,7 +592,7 @@ class TokenAPI:
         self,
         address: str,
         contracts: list[str] | None = None,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         limit: int = 10,
         network: NetworkId | str | None = None,
     ) -> list[dict[Any, Any]]:
@@ -615,7 +615,7 @@ class TokenAPI:
     async def _evm_price_history(
         self,
         token: str,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,
@@ -629,7 +629,7 @@ class TokenAPI:
     async def _evm_pool_history(
         self,
         pool: str,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         days: int = 1,
         limit: int = 24,
         network: NetworkId | str | None = None,

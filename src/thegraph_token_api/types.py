@@ -92,6 +92,7 @@ class Protocol(StringEnum):
 
     UNISWAP_V2 = "uniswap_v2"
     UNISWAP_V3 = "uniswap_v3"
+    UNISWAP_V4 = "uniswap_v4"
 
 
 class SolanaPrograms(StringEnum):

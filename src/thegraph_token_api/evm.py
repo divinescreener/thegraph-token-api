@@ -76,13 +76,14 @@ class EVMTokenAPI(BaseTokenAPI):
     # ===== NFT Methods =====
 
     async def get_nft_ownerships(
-        self, address: str, token_standard: TokenStandard | str | None = None, limit: int = 10, page: int = 1
+        self, address: str, contract: str | None = None, token_standard: TokenStandard | str | None = None, limit: int = 10, page: int = 1
     ) -> NFTOwnershipsResponse:
         """
         Get NFT ownerships for an EVM address.
 
         Args:
             address: EVM address to query
+            contract: Filter by contract address
             token_standard: Filter by token standard (ERC721, ERC1155)
             limit: Maximum number of results (1-1000, default 10)
             page: Page number (default 1)
@@ -91,7 +92,7 @@ class EVMTokenAPI(BaseTokenAPI):
             NFTOwnershipsResponse with validated data
         """
         params = self._build_base_params(self.network, limit, page)
-        self._add_optional_params(params, token_standard=token_standard)
+        self._add_optional_params(params, contract=contract, token_standard=token_standard)
 
         response = await self.manager.get(
             f"{self.base_url}/nft/ownerships/evm/{address}",
@@ -570,7 +571,7 @@ class EVMTokenAPI(BaseTokenAPI):
     async def get_ohlc_pools(
         self,
         pool: str,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int = 10,
@@ -610,7 +611,7 @@ class EVMTokenAPI(BaseTokenAPI):
     async def get_ohlc_prices(
         self,
         token: str,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int = 10,
@@ -653,7 +654,7 @@ class EVMTokenAPI(BaseTokenAPI):
         self,
         address: str,
         contracts: list[str] | None = None,
-        interval: Interval | str = Interval.ONE_HOUR,
+        interval: Interval | str = Interval.ONE_DAY,
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int = 10,

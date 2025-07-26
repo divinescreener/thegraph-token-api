@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "divine-thegraph-token-api"
-version = "0.1.32"
+version = "0.1.33"
 description = "A Python client for The Graph Token API with elegant EVM/SVM separation and excellent test coverage"
 authors = [{name = "DIVINE", email = "admin@divine.sh"}]
 readme = "README.md"

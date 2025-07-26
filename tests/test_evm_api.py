@@ -76,11 +76,12 @@ class TestEVMNFTMethods:
             mock_response.data = []
             mock_manager.get = AsyncMock(return_value=mock_response)
 
-            await client.get_nft_ownerships(address="0xtest", token_standard=TokenStandard.ERC721, limit=20, page=2)
+            await client.get_nft_ownerships(address="0xtest", contract="0xcontract", token_standard=TokenStandard.ERC721, limit=20, page=2)
 
             call_args = mock_manager.get.call_args
             params = call_args[1]["params"]
             assert params["network_id"] == "polygon"
+            assert params["contract"] == "0xcontract"
             assert params["token_standard"] == "ERC721"
             assert params["limit"] == 20
             assert params["page"] == 2
