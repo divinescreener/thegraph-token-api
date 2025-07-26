@@ -8,7 +8,8 @@
 
 A powerful Python client for The Graph Token API that brings blockchain data to your fingertips. Access token balances, NFT ownership, DeFi swaps, and price histories across Ethereum, Solana, and 8+ other chains with an elegant, type-safe interface.
 
-*Current Spec version: 4.0*
+*Current Spec version: 4.0*  
+*Conforms to [token-api v2.3.3](https://github.com/pinax-network/token-api/releases/tag/v2.3.3)*
 
 ## 🌟 Why The Graph Token API Client?
 
