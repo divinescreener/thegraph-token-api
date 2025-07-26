@@ -75,7 +75,7 @@ class TestEnumStringConversions:
 
     def test_protocol_string_conversion(self):
         """Test Protocol enum string conversion."""
-        for protocol in [Protocol.UNISWAP_V2, Protocol.UNISWAP_V3]:
+        for protocol in [Protocol.UNISWAP_V2, Protocol.UNISWAP_V3, Protocol.UNISWAP_V4]:
             assert isinstance(str(protocol), str)
             assert str(protocol) == protocol.value
 
