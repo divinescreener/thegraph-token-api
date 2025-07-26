@@ -2,9 +2,8 @@
 Data classes for structured API responses.
 
 This module provides clean, attribute-accessible data classes that replace
-raw dictionary access with proper structured types. All classes support
-both attribute access (obj.symbol) and dictionary access (obj['symbol'])
-for backward compatibility.
+raw dictionary access with proper structured types. All classes use modern
+dataclass attribute access (obj.symbol) for clean, type-safe interfaces.
 """
 
 import inspect
