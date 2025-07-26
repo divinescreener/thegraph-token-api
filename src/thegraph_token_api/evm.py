@@ -76,7 +76,12 @@ class EVMTokenAPI(BaseTokenAPI):
     # ===== NFT Methods =====
 
     async def get_nft_ownerships(
-        self, address: str, contract: str | None = None, token_standard: TokenStandard | str | None = None, limit: int = 10, page: int = 1
+        self,
+        address: str,
+        contract: str | None = None,
+        token_standard: TokenStandard | str | None = None,
+        limit: int = 10,
+        page: int = 1,
     ) -> NFTOwnershipsResponse:
         """
         Get NFT ownerships for an EVM address.
