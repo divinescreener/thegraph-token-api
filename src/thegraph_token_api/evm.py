@@ -1,10 +1,15 @@
 """
 EVM-specific client for The Graph Token API.
 
-Provides access to EVM blockchain data including NFTs, tokens, balances, transfers, and DEX data.
+Provides access to EVM blockchain data including NFTs, tokens, balances, transfers, DEX data, and ETH price calculation.
 """
 
+import time
+from typing import Any
+
 from .base import BaseTokenAPI
+from .constants import USDC_ETH_ADDRESS, WETH_ADDRESS
+from .price_utils import PriceCalculator, PriceData, create_price_cache
 from .types import (
     BalancesResponse,
     HistoricalBalancesResponse,
@@ -72,6 +77,7 @@ class EVMTokenAPI(BaseTokenAPI):
         """
         super().__init__(api_key, base_url)
         self.network = str(network)
+        self._eth_price_cache: PriceData | None = None
 
     # ===== NFT Methods =====
 
@@ -698,3 +704,153 @@ class EVMTokenAPI(BaseTokenAPI):
             timeout=30,
         )
         return response.data
+
+    # ===== ETH Price Methods =====
+
+    async def get_eth_price(self, *, include_stats: bool = False) -> float | dict[str, Any] | None:
+        """
+        Get current ETH price in USD with smart caching and auto-optimization.
+
+        This method automatically:
+        - Uses optimal trade sampling based on market conditions
+        - Caches results with volatility-based TTL
+        - Handles retries and outlier filtering
+        - Adapts parameters based on data availability
+
+        Args:
+            include_stats: If True, returns detailed statistics instead of just price
+
+        Returns:
+            float: Current ETH price in USD (if include_stats=False)
+            dict: Price with statistics (if include_stats=True)
+            None: If no valid price data available
+        """
+        # Return cached data if fresh
+        if self._eth_price_cache and self._eth_price_cache.is_fresh:
+            return self._eth_price_cache.stats if include_stats else self._eth_price_cache.price
+
+        # Initialize price calculator
+        calculator = PriceCalculator()
+
+        try:
+            # Progressive retry with smart parameter adjustment
+            for attempt in range(1, 5):
+                trades, minutes = calculator.progressive_retry_params(attempt)
+
+                swaps = await self._fetch_eth_usdc_swaps(trades, minutes)
+
+                if not swaps:
+                    continue
+
+                prices = self._extract_eth_prices(swaps)
+
+                if len(prices) >= 3:  # Need minimum sample size
+                    break
+            else:
+                return None
+
+            # Calculate statistics
+            price_stats = calculator.calculate_price_statistics(prices, len(swaps))
+            if not price_stats:
+                return None
+
+            # Cache with smart TTL
+            price = price_stats["price"]
+            self._eth_price_cache = create_price_cache(price, price_stats)
+
+            return price_stats if include_stats else price
+
+        except Exception:  # noqa: BLE001
+            return None
+
+    async def _fetch_eth_usdc_swaps(self, limit: int, minutes_back: int) -> list[dict[str, Any]]:
+        """Fetch ETH/USDC swaps from Uniswap V3 using existing swap method."""
+        end_time = int(time.time())
+        start_time = end_time - (minutes_back * 60)
+
+        # Try to get swaps from Uniswap V3 (most liquid for ETH/USDC)
+        swaps = await self.get_swaps(
+            protocol=Protocol.UNISWAP_V3, start_time=start_time, end_time=end_time, limit=limit
+        )
+
+        # If no results, try without protocol filter
+        if not swaps or len(swaps) == 0:
+            swaps = await self.get_swaps(start_time=start_time, end_time=end_time, limit=limit)
+
+        # Convert to list of dicts for price extraction
+        if not swaps:
+            return []
+
+        result: list[dict[str, Any]] = []
+        for swap in swaps:
+            if hasattr(swap, "__dict__"):
+                result.append(swap.__dict__)
+            elif isinstance(swap, dict):
+                result.append(swap)
+            else:
+                result.append({})
+
+        return result
+
+    def _extract_eth_prices(self, swaps: list[dict[str, Any]]) -> list[float]:
+        """Extract ETH prices from swap data with intelligent filtering."""
+        prices = []
+
+        for swap in swaps:
+            try:
+                # Get token addresses
+                token0_addr = swap.get("token0", {}).get("address", "").lower()
+                token1_addr = swap.get("token1", {}).get("address", "").lower()
+
+                weth_addr = WETH_ADDRESS.lower()
+                usdc_addr = USDC_ETH_ADDRESS.lower()
+
+                # Only process WETH/USDC pairs
+                if not self._is_eth_usdc_pair(token0_addr, token1_addr, weth_addr, usdc_addr):
+                    continue
+
+                # Get amounts and decimals
+                amount0_str = swap.get("amount0", "0")
+                amount1_str = swap.get("amount1", "0")
+                token0_decimals = int(swap.get("token0", {}).get("decimals", 18))
+                token1_decimals = int(swap.get("token1", {}).get("decimals", 6))
+
+                # Convert string amounts to float (they might be very large numbers)
+                amount0 = float(amount0_str)
+                amount1 = float(amount1_str)
+
+                if amount0 == 0 or amount1 == 0:
+                    continue
+
+                # Normalize amounts based on decimals
+                amount0_normalized = abs(amount0) / (10**token0_decimals)
+                amount1_normalized = abs(amount1) / (10**token1_decimals)
+
+                # Calculate price based on which token is WETH
+                if token0_addr == weth_addr:  # WETH is token0, USDC is token1
+                    price = amount1_normalized / amount0_normalized
+                else:  # USDC is token0, WETH is token1
+                    price = amount0_normalized / amount1_normalized
+
+                # Basic sanity check for ETH price (should be between $100 and $10,000)
+                if 100 <= price <= 10000:
+                    prices.append(price)
+
+            except (ValueError, ZeroDivisionError, KeyError, TypeError):
+                continue
+
+        # Additional outlier removal using IQR method for better data quality
+        if len(prices) >= 5:
+            prices.sort()
+            q1, q3 = prices[len(prices) // 4], prices[3 * len(prices) // 4]
+            iqr = q3 - q1
+            lower, upper = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+            prices = [p for p in prices if lower <= p <= upper]
+
+        return prices
+
+    def _is_eth_usdc_pair(self, token0: str, token1: str, weth_addr: str, usdc_addr: str) -> bool:
+        """Check if the pair is WETH/USDC."""
+        token_set = {token0, token1}
+        target_set = {weth_addr, usdc_addr}
+        return token_set == target_set

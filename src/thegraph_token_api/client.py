@@ -9,6 +9,7 @@ from .base import BaseTokenAPI
 from .evm import EVMTokenAPI
 from .svm import SVMTokenAPI
 from .types import NetworkId, SolanaNetworkId
+from .unified_price_api import UnifiedPriceAPI
 
 
 class TheGraphTokenAPI(BaseTokenAPI):
@@ -162,3 +163,29 @@ class TheGraphTokenAPI(BaseTokenAPI):
             ```
         """
         return SVMTokenAPI(network=network, api_key=api_key, base_url=base_url)
+
+    # ===== Unified Price API =====
+
+    @property
+    def price(self) -> UnifiedPriceAPI:
+        """
+        Get Unified Price API for multi-blockchain price calculation.
+
+        Returns:
+            UnifiedPriceAPI instance for getting cryptocurrency prices
+
+        Example:
+            ```python
+            async def main():
+                api = TheGraphTokenAPI(api_key="your_key")
+
+                # Simple price queries
+                eth_price = await api.price.get(Currency.ETH)
+                sol_price = await api.price.get(Currency.SOL)
+
+                # With detailed statistics
+                eth_stats = await api.price.get(Currency.ETH, include_stats=True)
+                print(f"ETH: ${eth_stats['price']:.2f} (confidence: {eth_stats['confidence']:.0%})")
+            ```
+        """
+        return UnifiedPriceAPI(self)

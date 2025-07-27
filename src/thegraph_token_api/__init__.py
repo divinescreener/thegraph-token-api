@@ -22,7 +22,11 @@ Usage:
         # SVM (Solana)
         sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
         sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=5)
-        sol_price = await api.svm.get_sol_price()  # Get current SOL price with smart caching
+
+        # Unified Price API
+        eth_price = await api.price.get(Currency.ETH)  # Get current ETH price
+        sol_price = await api.price.get(Currency.SOL)  # Get current SOL price
+        eth_stats = await api.price.get(Currency.ETH, include_stats=True)  # With confidence metrics
 
         # Utility
         health = await api.health()
@@ -45,6 +49,7 @@ from .types import (
     Balance,
     BalancesResponse,
     BaseResponse,
+    Currency,
     ErrorResponse,
     HistoricalBalance,
     HistoricalBalancesResponse,
@@ -94,6 +99,7 @@ from .types import (
     TransfersResponse,
     VersionResponse,
 )
+from .unified_price_api import UnifiedPriceAPI  # Unified Price API
 
 __version__ = "0.1.36"
 __all__ = [
@@ -102,6 +108,7 @@ __all__ = [
     "Balance",
     "BalancesResponse",
     "BaseResponse",
+    "Currency",
     "ErrorResponse",
     "HistoricalBalance",
     "HistoricalBalancesResponse",
@@ -152,5 +159,6 @@ __all__ = [
     "TokensResponse",
     "Transfer",
     "TransfersResponse",
+    "UnifiedPriceAPI",
     "VersionResponse",
 ]

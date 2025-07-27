@@ -38,11 +38,15 @@ if response.status_code == 200:
     # Parse nested structures, handle errors...
 
 # With this client - Clean and simple ✨
-from thegraph_token_api import TokenAPI
+from thegraph_token_api import TokenAPI, Currency
 
 api = TokenAPI()
 balances = await api.evm.balances(wallet_address)
 # That's it! Fully typed, validated, and ready to use
+
+# NEW: Unified Price API (convenience feature - not an API endpoint)
+eth_price = await api.price.get(Currency.ETH)  # Uses DEX swap data internally
+sol_price = await api.price.get(Currency.SOL)  # Calculates from API data
 ```
 
 ## ✨ Features
@@ -54,6 +58,7 @@ balances = await api.evm.balances(wallet_address)
 - 🛡️ **Type Safety**: Full type hints with runtime validation
 - 🔄 **Smart Defaults**: Auto-loads API keys, sensible limits, mainnet defaults
 - 📈 **Time-Series Data**: Historical prices and time-filtered swap data
+- 💰 **Unified Price API**: Convenience feature for current crypto prices (uses API data internally)
 - 🎯 **Developer Friendly**: Clean API, great docs, extensive examples
 
 ## 📦 Installation
@@ -106,12 +111,18 @@ async def main():
         if token["balance"] > 0:
             print(f"{token['symbol']}: {token['balance']} (${token['value_usd']:,.2f})")
     
-    # Get Solana NFTs
-    sol_nfts = await api.svm.balances(
-        mint="So11111111111111111111111111111111111111112"
-    )
+    # Get current cryptocurrency prices (convenience feature)
+    eth_price = await api.price.get(Currency.ETH)
+    sol_price = await api.price.get(Currency.SOL)
     
-    print(f"\nFound {len(sol_nfts)} Solana NFT holders")
+    print(f"\nCurrent Prices:")
+    print(f"ETH: ${eth_price:.2f}") if eth_price else print("ETH: unavailable")
+    print(f"SOL: ${sol_price:.2f}") if sol_price else print("SOL: unavailable")
+    
+    # Get detailed price statistics
+    eth_stats = await api.price.get(Currency.ETH, include_stats=True)
+    if eth_stats:
+        print(f"ETH confidence: {eth_stats['confidence']:.0%} (from {eth_stats['trades_analyzed']} trades)")
 
 anyio.run(main)
 ```
@@ -132,6 +143,10 @@ await api.evm.swaps(protocol=...)      # Get DEX swaps
 await api.svm.balances(mint=...)       # Get SPL token holders
 await api.svm.transfers(mint=...)      # Get token transfers
 await api.svm.swaps(program_id=...)    # Get DEX swaps
+
+# Unified Price API (convenience feature - uses API data internally)
+await api.price.get(Currency.ETH)      # Get current ETH price from DEX swaps
+await api.price.get(Currency.SOL)      # Get current SOL price from DEX swaps
 ```
 
 ### Smart Organization
@@ -147,6 +162,11 @@ api.evm.nfts.activities(contract)   # Recent NFT activities
 # Pool operations grouped together
 api.evm.pools(token=address)        # Find liquidity pools
 api.evm.pool_history(pool, "1h")    # Get pool metrics over time
+
+# Price operations (convenience feature)
+api.price.get(Currency.ETH)          # Current ETH price from DEX data
+api.price.get(Currency.SOL)          # Current SOL price from DEX data
+api.price.get_supported_currencies() # List available currencies
 ```
 
 ## 🔥 Usage Examples
@@ -234,6 +254,46 @@ async def monitor_solana_swaps():
     for swap in swaps:
         print(f"${swap['value_usd']:,.2f} swap at "
               f"{datetime.fromtimestamp(swap['timestamp'])}")
+```
+
+### Unified Price API (Convenience Feature)
+
+```python
+from thegraph_token_api import TokenAPI, Currency
+
+# The Unified Price API is a convenience feature that uses DEX swap data
+# internally to calculate current cryptocurrency prices
+async def get_current_prices():
+    api = TokenAPI()
+    
+    # Simple price queries using Currency enum (type-safe)
+    eth_price = await api.price.get(Currency.ETH)
+    sol_price = await api.price.get(Currency.SOL)
+    
+    print(f"ETH: ${eth_price:.2f}" if eth_price else "ETH: unavailable")
+    print(f"SOL: ${sol_price:.2f}" if sol_price else "SOL: unavailable")
+    
+    # Also works with strings (case-insensitive)
+    eth_price_str = await api.price.get("eth")
+    sol_price_str = await api.price.get("SOL")
+    
+    # Get detailed statistics with confidence metrics
+    eth_stats = await api.price.get(Currency.ETH, include_stats=True)
+    if eth_stats:
+        print(f"\nETH Detailed Analysis:")
+        print(f"  Price: ${eth_stats['price']:.2f}")
+        print(f"  Confidence: {eth_stats['confidence']:.0%}")
+        print(f"  Trades analyzed: {eth_stats['trades_analyzed']}")
+        print(f"  Volatility: ${eth_stats['std_deviation']:.2f}")
+        print(f"  Range: ${eth_stats['min_price']:.2f} - ${eth_stats['max_price']:.2f}")
+    
+    # Check supported currencies
+    supported = await api.price.get_supported_currencies()
+    print(f"\nSupported currencies: {[c.value for c in supported]}")
+    
+    # Cache management
+    await api.price.clear_cache(Currency.ETH)  # Clear specific currency
+    await api.price.clear_cache()              # Clear all cache
 ```
 
 ### Price History Analysis
@@ -329,6 +389,11 @@ The main entry point for all API operations.
 ```python
 api = TokenAPI(api_key: Optional[str] = None)
 # If api_key is None, loads from THEGRAPH_API_KEY env var
+
+# Access different interfaces
+api.evm     # EVM chain operations
+api.svm     # Solana operations  
+api.price   # Unified Price API (convenience feature)
 ```
 
 #### `EVMInterface`
@@ -356,6 +421,32 @@ await api.evm.pool_history(pool: str, interval: str)
 
 # Transfers
 await api.evm.transfers(from_address: str = None, to_address: str = None)
+
+#### `UnifiedPriceAPI` (Convenience Feature)
+
+Access via `api.price` - provides unified cryptocurrency prices.
+
+**Note:** This is a convenience feature that uses the API's DEX swap data internally to calculate prices. It is not a separate API endpoint.
+
+```python
+# Simple price queries
+await api.price.get(Currency.ETH)                    # Current ETH price
+await api.price.get(Currency.SOL)                    # Current SOL price
+await api.price.get("ETH")                           # Also works with strings
+
+# Detailed statistics
+autostats = await api.price.get(Currency.ETH, include_stats=True)
+# Returns: {"price": 3500.0, "confidence": 0.9, "trades_analyzed": 15, ...}
+
+# Utility methods
+await api.price.get_supported_currencies()          # List[Currency]
+await api.price.is_supported(Currency.ETH)          # bool
+await api.price.clear_cache(Currency.ETH)           # Clear specific cache
+await api.price.clear_cache()                       # Clear all cache
+
+# Force refresh (bypass cache)
+await api.price.get(Currency.ETH, force_refresh=True)
+```
 ```
 
 #### `SVMInterface`
@@ -379,7 +470,7 @@ await api.svm.swaps(
 ### Enums
 
 ```python
-from thegraph_token_api import Chain, Protocol, SwapPrograms
+from thegraph_token_api import Chain, Protocol, SwapPrograms, Currency
 
 # EVM chains
 Chain.ETHEREUM
@@ -398,6 +489,11 @@ SwapPrograms.RAYDIUM
 SwapPrograms.ORCA
 SwapPrograms.JUPITER
 SwapPrograms.PUMP_FUN
+
+# Supported currencies for Unified Price API
+Currency.ETH    # Ethereum
+Currency.SOL    # Solana
+# More currencies coming soon...
 ```
 
 ### Error Handling
@@ -539,8 +635,20 @@ The client is optimized for production use:
 
 - **Connection Pooling**: Reuses HTTP connections
 - **Async Operations**: Non-blocking I/O for high throughput
-- **Smart Caching**: SOL price caching reduces API calls
+- **Smart Caching**: Unified Price API with volatility-based TTL
 - **Batch Support**: Efficient multi-request handling
+- **Statistical Analysis**: Median pricing with IQR outlier filtering
+- **Progressive Retry**: Adaptive sampling for reliable price data
+
+### Unified Price API Performance
+
+The Unified Price API uses advanced techniques for reliable pricing:
+
+- **Volatility-Based Caching**: Shorter cache (60s) during high volatility, longer (300s) during stable periods
+- **Multi-Source Aggregation**: Uses recent DEX swap data from multiple sources
+- **Statistical Robustness**: Median prices with outlier filtering prevent manipulation
+- **Confidence Scoring**: Returns confidence metrics based on sample size and data quality
+- **Smart Retries**: Progressive retry with increasing sample sizes for reliable data
 
 ## 🔒 Security
 

@@ -112,6 +112,14 @@ class SwapPrograms(StringEnum):
     JUPITER_V6 = "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"  # Jupiter Aggregator v6  # pragma: allowlist secret
 
 
+class Currency(StringEnum):
+    """Supported currencies for Unified Price API."""
+
+    ETH = "ETH"
+    SOL = "SOL"
+    POL = "POL"
+
+
 # ===== Common Response Structure =====
 
 

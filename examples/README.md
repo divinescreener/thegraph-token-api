@@ -25,6 +25,10 @@ python examples/endpoints/evm/nfts.py       # 🎨 NFT collections
 # SVM examples
 python examples/endpoints/svm/balances.py   # ⚡ SPL token balances
 python examples/endpoints/svm/swaps.py      # 🌊 Solana DEX trading
+
+# Unified Price API examples (convenience feature)
+python examples/unified_price_api_enum.py # 💰 Current crypto prices
+python examples/unified_price_api.py     # 📈 Detailed price analytics
 ```
 
 ## ✨ **NEW: Optimized for Simplicity**
@@ -78,13 +82,19 @@ async def main():
     # SVM methods (Solana)
     sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
     sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM)
-
+    
+    # Unified Price API (convenience feature - uses API data internally)
+    eth_price = await api.price.get(Currency.ETH)
+    sol_price = await api.price.get(Currency.SOL)
+    
     # Clean structured data access
     for balance in balances:
         print(f"{balance.symbol}: {balance.value:.2f}")
 
     for swap in swaps:
         print(f"{swap.token0.symbol} → {swap.token1.symbol}")
+        
+    print(f"Current prices: ETH ${eth_price:.2f}, SOL ${sol_price:.2f}")
 ```
 
 ## 🎯 Use Cases by Role
@@ -94,6 +104,8 @@ async def main():
 - `evm/swaps.py` - Market activity and volume analysis
 - `evm/prices.py` - Price history and trend analysis
 - `svm/swaps.py` - Solana DEX arbitrage opportunities
+- `unified_price_api_enum.py` - Current ETH/SOL prices (convenience feature)
+- `unified_price_api.py` - Detailed price analytics with confidence metrics
 
 ### 🎨 **NFT Enthusiasts**
 - `evm/nfts.py` - Complete NFT market analysis

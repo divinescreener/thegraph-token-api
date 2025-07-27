@@ -39,7 +39,6 @@ from .models import (
     convert_list_to_models,
     convert_to_model,
 )
-from .svm import SVMTokenAPI
 from .types import (
     Interval,
     NetworkId,
@@ -51,6 +50,7 @@ from .types import (
     SwapPrograms,
     TokenStandard,
 )
+from .unified_price_api import UnifiedPriceAPI
 
 
 class NFTWrapper:
@@ -319,40 +319,6 @@ class SVMWrapper:
         )
         return convert_list_to_models(data, SolanaTransfer)
 
-    async def get_sol_price(
-        self, *, include_stats: bool = False, network: SolanaNetworkId | str = SolanaNetworkId.SOLANA
-    ) -> float | dict[str, Any] | None:
-        """
-        Get current SOL price in USD with smart caching and auto-optimization.
-
-        This method automatically:
-        - Uses optimal trade sampling based on market conditions
-        - Caches results with volatility-based TTL
-        - Handles retries and outlier filtering
-        - Adapts parameters based on data availability
-
-        Args:
-            include_stats: If True, returns detailed statistics instead of just price
-            network: Solana network to use (default: mainnet)
-
-        Returns:
-            float: Current SOL price in USD (if include_stats=False)
-            dict: Price with statistics (if include_stats=True)
-            None: If no valid price data available
-
-        Example:
-            ```python
-            # Simple usage
-            price = await api.svm.get_sol_price()
-            print(f"SOL price: ${price:.2f}")
-
-            # With detailed stats
-            stats = await api.svm.get_sol_price(include_stats=True)
-            print(f"Price: ${stats['price']:.2f} (confidence: {stats['confidence']:.0%})")
-            ```
-        """
-        return await self._api._svm_get_sol_price(include_stats=include_stats, network=network)
-
 
 class TokenAPI:
     """
@@ -381,7 +347,11 @@ class TokenAPI:
         sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
         sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=10)
         sol_transfers = await api.svm.transfers(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")  # pragma: allowlist secret
-        sol_price = await api.svm.get_sol_price()  # Get current SOL price
+
+        # Unified Price API
+        eth_price = await api.price.get(Currency.ETH)  # Get current ETH price
+        sol_price = await api.price.get(Currency.SOL)  # Get current SOL price
+        eth_stats = await api.price.get(Currency.ETH, include_stats=True)  # With confidence metrics
 
         # Utility
         health = await api.health()
@@ -417,6 +387,7 @@ class TokenAPI:
         # Initialize nested API wrappers
         self.evm = EVMWrapper(self)
         self.svm = SVMWrapper(self)
+        self.price = UnifiedPriceAPI(self._api)
 
     def _extract_data(self, response: Any) -> list[dict[str, Any]]:
         """Extract clean data from API response."""
@@ -711,16 +682,6 @@ class TokenAPI:
             end_time=end_time,
             limit=limit,
         )
-
-    async def _svm_get_sol_price(
-        self,
-        include_stats: bool = False,
-        network: SolanaNetworkId | str = SolanaNetworkId.SOLANA,
-    ) -> float | dict[str, Any] | None:
-        """Internal SVM SOL price implementation."""
-        # Direct API call to avoid circular dependency
-        async with SVMTokenAPI(self._api.api_key or "", str(network), self._api.base_url) as client:
-            return await client._get_sol_price_internal(include_stats=include_stats)  # type: ignore[no-any-return,attr-defined]
 
     # ===== Utility Methods =====
 

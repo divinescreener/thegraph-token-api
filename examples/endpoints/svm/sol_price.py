@@ -1,8 +1,8 @@
 """
-Example: Optimized SOL price calculation with smart SVM API.
+Example: SOL price using Unified Price API.
 
-This example demonstrates the new optimized SOL price functionality:
-1. Super simple price retrieval with smart defaults
+This example demonstrates how to get SOL price using the Unified Price API:
+1. Super simple price retrieval with Currency.SOL
 2. Detailed statistics with confidence scoring
 3. Automatic caching with volatility-based TTL
 4. Zero-config usage - just works!
@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
 from dotenv import load_dotenv
 
-from thegraph_token_api import SwapPrograms, TokenAPI
+from thegraph_token_api import Currency, SwapPrograms, TokenAPI
 
 # Load environment variables
 load_dotenv()
@@ -29,7 +29,7 @@ load_dotenv()
 
 async def example_simple_usage():
     """Example: Super simple SOL price - just one line!"""
-    print("\n=== ✨ Optimized Simple Usage ===")
+    print("\n=== ✨ Unified Price API Usage ===")
 
     api_key = os.environ.get("THEGRAPH_API_KEY")
     if not api_key:
@@ -37,8 +37,8 @@ async def example_simple_usage():
         return
 
     api = TokenAPI(api_key=api_key)
-    # One line to get SOL price - that's it!
-    price = await api.svm.get_sol_price()
+    # One line to get SOL price using Unified Price API!
+    price = await api.price.get(Currency.SOL)
 
     if price:
         print(f"💰 Current SOL price: ${price:.2f}")
@@ -60,7 +60,7 @@ async def example_with_confidence():
 
     api = TokenAPI(api_key=api_key)
     # Get detailed stats with one parameter
-    stats = await api.svm.get_sol_price(include_stats=True)
+    stats = await api.price.get(Currency.SOL, include_stats=True)
 
     if stats and stats.get("price"):
         print(f"💰 Price: ${stats['price']:.2f}")
@@ -94,12 +94,12 @@ async def example_cached_performance():
 
     # First call - fetches from API
     start = time.time()
-    price1 = await api.svm.get_sol_price()
+    price1 = await api.price.get(Currency.SOL)
     time1 = time.time() - start
 
     # Second call - uses smart cache
     start = time.time()
-    price2 = await api.svm.get_sol_price()
+    price2 = await api.price.get(Currency.SOL)
     time2 = time.time() - start
 
     if price1 and price2:
@@ -111,7 +111,7 @@ async def example_cached_performance():
         return
 
     # Show cache intelligence
-    stats = await api.svm.get_sol_price(include_stats=True)
+    stats = await api.price.get(Currency.SOL, include_stats=True)
     if stats:
         volatility = stats["std_deviation"] / stats["price"]
         ttl = 60 if volatility > 0.05 else 300
@@ -131,7 +131,7 @@ async def example_integration():
     # All in one API session - share connections efficiently
 
     # Get current SOL price
-    sol_price = await api.svm.get_sol_price()
+    sol_price = await api.price.get(Currency.SOL)
 
     # Get recent Jupiter swaps
     swaps = await api.svm.swaps(program_id=SwapPrograms.JUPITER_V6, limit=3)
