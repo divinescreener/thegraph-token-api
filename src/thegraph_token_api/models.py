@@ -21,7 +21,6 @@ class Balance(BaseModel):
     """Token balance with clean attribute access."""
 
     block_num: float
-    datetime: str
     contract: str
     amount: str
     value: float
@@ -31,6 +30,9 @@ class Balance(BaseModel):
     price_usd: float | None = None
     value_usd: float | None = None
     low_liquidity: bool | None = None
+    datetime: str | None = None  # Made optional as API may not always return this field
+    last_balance_update: str | None = None  # New field from API
+    name: str | None = None  # New field from API
 
 
 @dataclass

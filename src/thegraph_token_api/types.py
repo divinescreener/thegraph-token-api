@@ -287,7 +287,6 @@ class Balance(TypedDict):
     """Token balance record."""
 
     block_num: float
-    datetime: str
     contract: str
     amount: str
     value: float
@@ -297,6 +296,9 @@ class Balance(TypedDict):
     price_usd: float | None
     value_usd: float | None
     low_liquidity: bool | None
+    datetime: str | None  # Made optional as API may not always return this field
+    last_balance_update: str | None  # New field from API
+    name: str | None  # New field from API
 
 
 class BalancesResponse(BaseResponse):
