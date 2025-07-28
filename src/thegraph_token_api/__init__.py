@@ -101,7 +101,7 @@ from .types import (
 )
 from .unified_price_api import UnifiedPriceAPI  # Unified Price API
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __all__ = [
     "OHLC",
     "ActivityType",

@@ -350,7 +350,11 @@ class UnifiedPriceAPI:
         end_time = int(time.time())
 
         # Network-specific optimizations: Polygon, BSC, and Avalanche use no time filter for maximum data
-        start_time = None if network_id in (NetworkId.MATIC, NetworkId.BSC, NetworkId.AVALANCHE) else end_time - (minutes_back * 60)
+        start_time = (
+            None
+            if network_id in (NetworkId.MATIC, NetworkId.BSC, NetworkId.AVALANCHE)
+            else end_time - (minutes_back * 60)
+        )
 
         # Use direct API client access for better control
         async with self.token_api._api.evm(network_id) as evm_client:
