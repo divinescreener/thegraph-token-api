@@ -486,4 +486,57 @@ class TestSVMMethodCombinations:
 
             assert mock_manager.get.call_count == 3
 
+    @pytest.mark.asyncio
+    async def test_get_swaps_edge_case_response(self):
+        """Test get_swaps with edge case response format."""
+        svm_api = SVMTokenAPI(SolanaNetworkId.SOLANA, "test_key")
+
+        with patch.object(svm_api.manager, "get") as mock_get:
+            # Mock response with non-dict data
+            mock_get.return_value = MagicMock(data=[])  # Not a dict with "data" key
+
+            result = await svm_api.get_swaps(SwapPrograms.JUPITER_V6)
+            
+            # Should return empty list for invalid format
+            assert result == []
+
+    @pytest.mark.asyncio
+    async def test_get_swaps_nested_dict_response(self):
+        """Test get_swaps with nested dict response format (line 258)."""
+        svm_api = SVMTokenAPI(SolanaNetworkId.SOLANA, "test_key")
+
+        with patch.object(svm_api.manager, "get") as mock_get:
+            # Mock response with nested dict structure  
+            mock_swap_data = {
+                "program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+                "amm": "test_amm",
+                "amm_pool": "test_pool", 
+                "user": "test_user",
+                "input_mint": "So11111111111111111111111111111111111111112",
+                "output_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "input_amount": 1000000000,
+                "output_amount": 100000000,
+                "timestamp": 1640995200,
+                "signature": "test_signature"
+            }
+            
+            # Mock the response object with nested data structure
+            mock_response = MagicMock()
+            mock_response.data = {"data": [mock_swap_data]}  # This triggers line 258
+            mock_get.return_value = mock_response
+            
+            result = await svm_api.get_swaps(SwapPrograms.RAYDIUM)
+            
+            # Should return list with data from the nested structure  
+            assert len(result) == 1
+            # The result should contain the expected data (may be dict or object depending on conversion)
+            swap = result[0]
+            # Test works with both dict and object formats
+            if hasattr(swap, 'program_id'):
+                assert swap.program_id == "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
+                assert swap.input_mint == "So11111111111111111111111111111111111111112"
+            else:
+                assert swap["program_id"] == "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
+                assert swap["input_mint"] == "So11111111111111111111111111111111111111112"
+
 

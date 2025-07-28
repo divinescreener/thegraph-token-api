@@ -230,3 +230,12 @@ class TestFactoryMethodsIntegration:
         # Should produce equivalent results
         assert evm_str.network == evm_enum.network
         assert svm_str.network == svm_enum.network
+
+    def test_price_property(self):
+        """Test the price property returns UnifiedPriceAPI."""
+        from thegraph_token_api.unified_price_api import UnifiedPriceAPI
+        
+        api = TheGraphTokenAPI("test_key")
+        price_api = api.price
+        assert isinstance(price_api, UnifiedPriceAPI)
+        assert price_api.token_api == api
