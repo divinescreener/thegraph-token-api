@@ -32,10 +32,12 @@ class TestCurrencyEnum:
         assert Currency.SOL == "SOL"
         assert Currency.POL == "POL"
         assert Currency.BNB == "BNB"
+        assert Currency.AVAX == "AVAX"
         assert str(Currency.ETH) == "ETH"
         assert str(Currency.SOL) == "SOL"
         assert str(Currency.POL) == "POL"
         assert str(Currency.BNB) == "BNB"
+        assert str(Currency.AVAX) == "AVAX"
 
     def test_currency_enum_creation(self):
         """Test creating Currency enum from strings."""
@@ -43,6 +45,7 @@ class TestCurrencyEnum:
         assert Currency("SOL") == Currency.SOL
         assert Currency("POL") == Currency.POL
         assert Currency("BNB") == Currency.BNB
+        assert Currency("AVAX") == Currency.AVAX
         # Note: Currency enum is case-sensitive as designed
 
     def test_currency_enum_invalid(self):
@@ -78,6 +81,10 @@ class TestCurrencyConfig:
         assert bnb_config is not None
         assert bnb_config["blockchain"] == "bsc"
 
+        avax_config = get_currency_config(Currency.AVAX)
+        assert avax_config is not None
+        assert avax_config["blockchain"] == "avalanche"
+
     def test_get_currency_config_string(self):
         """Test getting config with string (utility function still supports strings)."""
         eth_config = get_currency_config("ETH")
@@ -96,6 +103,10 @@ class TestCurrencyConfig:
         assert bnb_config is not None
         assert bnb_config["blockchain"] == "bsc"
 
+        avax_config = get_currency_config("AVAX")
+        assert avax_config is not None
+        assert avax_config["blockchain"] == "avalanche"
+
     def test_get_currency_config_invalid(self):
         """Test getting config with invalid currency."""
         assert get_currency_config("BTC") is None
@@ -107,6 +118,7 @@ class TestCurrencyConfig:
         assert is_currency_supported(Currency.SOL) is True
         assert is_currency_supported(Currency.POL) is True
         assert is_currency_supported(Currency.BNB) is True
+        assert is_currency_supported(Currency.AVAX) is True
 
     def test_is_currency_supported_string(self):
         """Test currency support check with string (utility function still supports strings)."""
@@ -114,6 +126,7 @@ class TestCurrencyConfig:
         assert is_currency_supported("sol") is True  # Case insensitive
         assert is_currency_supported("POL") is True
         assert is_currency_supported("BNB") is True
+        assert is_currency_supported("AVAX") is True
         assert is_currency_supported("BTC") is False
         assert is_currency_supported("INVALID") is False
 
@@ -511,6 +524,7 @@ class TestUnifiedPriceAPI:
         assert Currency.SOL in currencies
         assert Currency.POL in currencies
         assert Currency.BNB in currencies
+        assert Currency.AVAX in currencies
 
     @pytest.mark.asyncio
     async def test_is_supported(self):
@@ -519,6 +533,7 @@ class TestUnifiedPriceAPI:
         assert await self.oracle.is_supported(Currency.SOL) is True
         assert await self.oracle.is_supported(Currency.POL) is True
         assert await self.oracle.is_supported(Currency.BNB) is True
+        assert await self.oracle.is_supported(Currency.AVAX) is True
 
     @pytest.mark.asyncio
     async def test_is_supported_invalid_type(self):
@@ -597,6 +612,16 @@ class TestUnifiedPriceAPI:
 
             result = await self.oracle._fetch_price(Currency.BNB)
             assert result == {"price": 800.0}
+            mock_fetch.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_fetch_price_avax(self):
+        """Test _fetch_price routing to AVAX (Avalanche)."""
+        with patch.object(self.oracle, "_fetch_avalanche_price") as mock_fetch:
+            mock_fetch.return_value = {"price": 25.0}
+
+            result = await self.oracle._fetch_price(Currency.AVAX)
+            assert result == {"price": 25.0}
             mock_fetch.assert_called_once()
 
     @pytest.mark.asyncio

@@ -42,6 +42,12 @@ WBNB_BSC_ADDRESS = "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"  # WBNB on BSC
 USDT_BSC_ADDRESS = "0x55d398326f99059fF775485246999027B3197955"  # BSC-USD (USDT) on BSC
 USDC_BSC_ADDRESS = "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"  # USDC on BSC
 
+# ===== Avalanche Token Addresses =====
+
+# Native AVAX and stablecoins
+WAVAX_AVALANCHE_ADDRESS = "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"  # WAVAX on Avalanche
+USDC_AVALANCHE_ADDRESS = "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"  # USDC on Avalanche
+
 
 @dataclass
 class TokenConfig:
@@ -74,11 +80,13 @@ TOKEN_CONFIGS = {
     "SOL": TokenConfig(address=SOL_MINT, symbol="SOL", decimals=9, blockchain="solana"),
     "POL": TokenConfig(address=WMATIC_POLYGON_ADDRESS, symbol="WMATIC", decimals=18, blockchain="polygon"),
     "BNB": TokenConfig(address=WBNB_BSC_ADDRESS, symbol="WBNB", decimals=18, blockchain="bsc"),
+    "AVAX": TokenConfig(address=WAVAX_AVALANCHE_ADDRESS, symbol="WAVAX", decimals=18, blockchain="avalanche"),
     "USDC_ETH": TokenConfig(address=USDC_ETH_ADDRESS, symbol="USDC", decimals=6, blockchain="ethereum"),
     "USDC_SOL": TokenConfig(address=USDC_SOL_MINT, symbol="USDC", decimals=6, blockchain="solana"),
     "USDT_POLYGON": TokenConfig(address=USDT_POLYGON_ADDRESS, symbol="USDT", decimals=6, blockchain="polygon"),
     "USDT_BSC": TokenConfig(address=USDT_BSC_ADDRESS, symbol="USDT", decimals=18, blockchain="bsc"),
     "USDC_BSC": TokenConfig(address=USDC_BSC_ADDRESS, symbol="USDC", decimals=18, blockchain="bsc"),
+    "USDC_AVALANCHE": TokenConfig(address=USDC_AVALANCHE_ADDRESS, symbol="USDC", decimals=6, blockchain="avalanche"),
 }
 
 # ===== DEX Configurations =====
@@ -112,6 +120,13 @@ DEX_CONFIGS = {
             (WBNB_BSC_ADDRESS, USDT_BSC_ADDRESS),  # WBNB/USDT primary pair
         ],
         min_liquidity_threshold=1000.0,  # Standard threshold for BSC
+    ),
+    "avalanche": DEXConfig(
+        protocol=Protocol.UNISWAP_V3,  # Uniswap V3 on Avalanche for WAVAX/USDC
+        preferred_pairs=[
+            (WAVAX_AVALANCHE_ADDRESS, USDC_AVALANCHE_ADDRESS),  # WAVAX/USDC primary pair
+        ],
+        min_liquidity_threshold=1000.0,  # Standard threshold for Avalanche
     ),
 }
 
@@ -163,6 +178,12 @@ SUPPORTED_CURRENCIES = {
         "token_config": TOKEN_CONFIGS["BNB"],
         "dex_config": DEX_CONFIGS["bsc"],
         "base_pair": TOKEN_CONFIGS["USDT_BSC"],
+    },
+    Currency.AVAX: {
+        "blockchain": "avalanche",
+        "token_config": TOKEN_CONFIGS["AVAX"],
+        "dex_config": DEX_CONFIGS["avalanche"],
+        "base_pair": TOKEN_CONFIGS["USDC_AVALANCHE"],
     },
 }
 

@@ -175,17 +175,19 @@ class UnifiedPriceAPI:
             return await self._fetch_polygon_price(config)
         if blockchain == "bsc":
             return await self._fetch_bsc_price(config)
+        if blockchain == "avalanche":
+            return await self._fetch_avalanche_price(config)
         if blockchain == "solana":
             return await self._fetch_solana_price(config)
         return None
 
     async def _fetch_evm_price(self, config: dict[str, Any], network_id: NetworkId) -> dict[str, Any] | None:
         """
-        Generic EVM price fetching for Ethereum and Polygon networks.
+        Generic EVM price fetching for Ethereum, Polygon, BSC, and Avalanche networks.
 
         Args:
             config: Currency configuration dictionary
-            network_id: Network to fetch from (MAINNET or MATIC)
+            network_id: Network to fetch from (MAINNET, MATIC, BSC, or AVALANCHE)
 
         Returns:
             Price statistics or None if failed
@@ -261,6 +263,18 @@ class UnifiedPriceAPI:
         """
         return await self._fetch_evm_price(config, NetworkId.BSC)
 
+    async def _fetch_avalanche_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
+        """
+        Fetch AVAX price using Avalanche DEX swaps.
+
+        Args:
+            config: Currency configuration dictionary
+
+        Returns:
+            Price statistics or None if failed
+        """
+        return await self._fetch_evm_price(config, NetworkId.AVALANCHE)
+
     # Backward compatibility methods for tests
     async def _fetch_ethereum_swaps(
         self, protocol: Protocol | str, limit: int, minutes_back: int
@@ -325,7 +339,7 @@ class UnifiedPriceAPI:
         Generic EVM swap fetching for any supported network.
 
         Args:
-            network_id: EVM network to fetch from (MAINNET, MATIC, etc.)
+            network_id: EVM network to fetch from (MAINNET, MATIC, BSC, AVALANCHE, etc.)
             protocol: DEX protocol to query (should be UNISWAP_V3 for reliability)
             limit: Maximum number of swaps
             minutes_back: Time window in minutes
@@ -335,8 +349,8 @@ class UnifiedPriceAPI:
         """
         end_time = int(time.time())
 
-        # Network-specific optimizations: Polygon and BSC use no time filter for maximum data
-        start_time = None if network_id in (NetworkId.MATIC, NetworkId.BSC) else end_time - (minutes_back * 60)
+        # Network-specific optimizations: Polygon, BSC, and Avalanche use no time filter for maximum data
+        start_time = None if network_id in (NetworkId.MATIC, NetworkId.BSC, NetworkId.AVALANCHE) else end_time - (minutes_back * 60)
 
         # Use direct API client access for better control
         async with self.token_api._api.evm(network_id) as evm_client:
