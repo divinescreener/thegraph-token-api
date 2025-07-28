@@ -212,7 +212,7 @@ def print_comprehensive_summary() -> None:
     print("   ")
     print("   # Detailed analysis with statistics")
     print("   stats = await api.price.get(Currency.SOL, include_stats=True)")
-    print("   print(f'Price: ${stats[\"price\"]:.2f}, Confidence: {stats[\"confidence\"]:.0%}')")
+    print('   print(f\'Price: ${stats["price"]:.2f}, Confidence: {stats["confidence"]:.0%}\')')
     print("   ")
     print("   # Check supported currencies")
     print("   supported = await api.price.get_supported_currencies()")

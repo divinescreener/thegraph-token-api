@@ -85,9 +85,7 @@ class UnifiedPriceAPI:
         """
         # Validate Currency enum only - no string support
         if not isinstance(currency, Currency):
-            msg = (
-                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, Currency.POL, Currency.BNB, or Currency.AVAX"
-            )
+            msg = f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, Currency.POL, Currency.BNB, or Currency.AVAX"
             raise TypeError(msg)
 
         # Check cache first (unless force refresh)
@@ -131,9 +129,7 @@ class UnifiedPriceAPI:
             True if currency is supported
         """
         if not isinstance(currency, Currency):
-            msg = (
-                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, Currency.POL, Currency.BNB, or Currency.AVAX"
-            )
+            msg = f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, Currency.POL, Currency.BNB, or Currency.AVAX"
             raise TypeError(msg)
         return is_currency_supported(currency)
 
@@ -232,8 +228,6 @@ class UnifiedPriceAPI:
 
         # Calculate statistics
         return self.calculator.calculate_price_statistics(prices, len(swaps))
-
-
 
     async def _fetch_solana_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
         """
