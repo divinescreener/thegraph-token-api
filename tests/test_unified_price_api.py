@@ -31,15 +31,18 @@ class TestCurrencyEnum:
         assert Currency.ETH == "ETH"
         assert Currency.SOL == "SOL"
         assert Currency.POL == "POL"
+        assert Currency.BNB == "BNB"
         assert str(Currency.ETH) == "ETH"
         assert str(Currency.SOL) == "SOL"
         assert str(Currency.POL) == "POL"
+        assert str(Currency.BNB) == "BNB"
 
     def test_currency_enum_creation(self):
         """Test creating Currency enum from strings."""
         assert Currency("ETH") == Currency.ETH
         assert Currency("SOL") == Currency.SOL
         assert Currency("POL") == Currency.POL
+        assert Currency("BNB") == Currency.BNB
         # Note: Currency enum is case-sensitive as designed
 
     def test_currency_enum_invalid(self):
@@ -71,6 +74,10 @@ class TestCurrencyConfig:
         assert pol_config is not None
         assert pol_config["blockchain"] == "polygon"
 
+        bnb_config = get_currency_config(Currency.BNB)
+        assert bnb_config is not None
+        assert bnb_config["blockchain"] == "bsc"
+
     def test_get_currency_config_string(self):
         """Test getting config with string (utility function still supports strings)."""
         eth_config = get_currency_config("ETH")
@@ -85,6 +92,10 @@ class TestCurrencyConfig:
         assert pol_config is not None
         assert pol_config["blockchain"] == "polygon"
 
+        bnb_config = get_currency_config("bnb")  # Case insensitive
+        assert bnb_config is not None
+        assert bnb_config["blockchain"] == "bsc"
+
     def test_get_currency_config_invalid(self):
         """Test getting config with invalid currency."""
         assert get_currency_config("BTC") is None
@@ -95,12 +106,14 @@ class TestCurrencyConfig:
         assert is_currency_supported(Currency.ETH) is True
         assert is_currency_supported(Currency.SOL) is True
         assert is_currency_supported(Currency.POL) is True
+        assert is_currency_supported(Currency.BNB) is True
 
     def test_is_currency_supported_string(self):
         """Test currency support check with string (utility function still supports strings)."""
         assert is_currency_supported("ETH") is True
         assert is_currency_supported("sol") is True  # Case insensitive
         assert is_currency_supported("POL") is True
+        assert is_currency_supported("BNB") is True
         assert is_currency_supported("BTC") is False
         assert is_currency_supported("INVALID") is False
 
@@ -497,6 +510,7 @@ class TestUnifiedPriceAPI:
         assert Currency.ETH in currencies
         assert Currency.SOL in currencies
         assert Currency.POL in currencies
+        assert Currency.BNB in currencies
 
     @pytest.mark.asyncio
     async def test_is_supported(self):
@@ -504,6 +518,7 @@ class TestUnifiedPriceAPI:
         assert await self.oracle.is_supported(Currency.ETH) is True
         assert await self.oracle.is_supported(Currency.SOL) is True
         assert await self.oracle.is_supported(Currency.POL) is True
+        assert await self.oracle.is_supported(Currency.BNB) is True
 
     @pytest.mark.asyncio
     async def test_is_supported_invalid_type(self):
@@ -572,6 +587,16 @@ class TestUnifiedPriceAPI:
 
             result = await self.oracle._fetch_price(Currency.POL)
             assert result == {"price": 0.5}
+            mock_fetch.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_fetch_price_bnb(self):
+        """Test _fetch_price routing to BNB (BSC)."""
+        with patch.object(self.oracle, "_fetch_bsc_price") as mock_fetch:
+            mock_fetch.return_value = {"price": 800.0}
+
+            result = await self.oracle._fetch_price(Currency.BNB)
+            assert result == {"price": 800.0}
             mock_fetch.assert_called_once()
 
     @pytest.mark.asyncio

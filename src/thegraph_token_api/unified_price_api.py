@@ -173,6 +173,8 @@ class UnifiedPriceAPI:
             return await self._fetch_ethereum_price(config)
         if blockchain == "polygon":
             return await self._fetch_polygon_price(config)
+        if blockchain == "bsc":
+            return await self._fetch_bsc_price(config)
         if blockchain == "solana":
             return await self._fetch_solana_price(config)
         return None
@@ -246,6 +248,18 @@ class UnifiedPriceAPI:
             Price statistics or None if failed
         """
         return await self._fetch_evm_price(config, NetworkId.MATIC)
+
+    async def _fetch_bsc_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
+        """
+        Fetch BNB price using BSC DEX swaps.
+
+        Args:
+            config: Currency configuration dictionary
+
+        Returns:
+            Price statistics or None if failed
+        """
+        return await self._fetch_evm_price(config, NetworkId.BSC)
 
     # Backward compatibility methods for tests
     async def _fetch_ethereum_swaps(
@@ -321,8 +335,8 @@ class UnifiedPriceAPI:
         """
         end_time = int(time.time())
 
-        # Network-specific optimizations: Polygon uses no time filter for maximum data
-        start_time = None if network_id == NetworkId.MATIC else end_time - (minutes_back * 60)
+        # Network-specific optimizations: Polygon and BSC use no time filter for maximum data
+        start_time = None if network_id in (NetworkId.MATIC, NetworkId.BSC) else end_time - (minutes_back * 60)
 
         # Use direct API client access for better control
         async with self.token_api._api.evm(network_id) as evm_client:

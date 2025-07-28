@@ -118,6 +118,7 @@ class Currency(StringEnum):
     ETH = "ETH"
     SOL = "SOL"
     POL = "POL"
+    BNB = "BNB"
 
 
 # ===== Common Response Structure =====

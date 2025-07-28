@@ -35,6 +35,13 @@ WMATIC_POLYGON_ADDRESS = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"  # WMATIC 
 SOL_MINT = "So11111111111111111111111111111111111111112"  # Native SOL
 USDC_SOL_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # USDC on Solana
 
+# ===== BSC Token Addresses =====
+
+# Native BNB and stablecoins
+WBNB_BSC_ADDRESS = "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"  # WBNB on BSC
+USDT_BSC_ADDRESS = "0x55d398326f99059fF775485246999027B3197955"  # BSC-USD (USDT) on BSC
+USDC_BSC_ADDRESS = "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"  # USDC on BSC
+
 
 @dataclass
 class TokenConfig:
@@ -43,7 +50,7 @@ class TokenConfig:
     address: str
     symbol: str
     decimals: int
-    blockchain: str  # "ethereum" or "solana"
+    blockchain: str  # "ethereum", "polygon", "bsc", or "solana"
 
 
 @dataclass
@@ -66,9 +73,12 @@ TOKEN_CONFIGS = {
     ),
     "SOL": TokenConfig(address=SOL_MINT, symbol="SOL", decimals=9, blockchain="solana"),
     "POL": TokenConfig(address=WMATIC_POLYGON_ADDRESS, symbol="WMATIC", decimals=18, blockchain="polygon"),
+    "BNB": TokenConfig(address=WBNB_BSC_ADDRESS, symbol="WBNB", decimals=18, blockchain="bsc"),
     "USDC_ETH": TokenConfig(address=USDC_ETH_ADDRESS, symbol="USDC", decimals=6, blockchain="ethereum"),
     "USDC_SOL": TokenConfig(address=USDC_SOL_MINT, symbol="USDC", decimals=6, blockchain="solana"),
     "USDT_POLYGON": TokenConfig(address=USDT_POLYGON_ADDRESS, symbol="USDT", decimals=6, blockchain="polygon"),
+    "USDT_BSC": TokenConfig(address=USDT_BSC_ADDRESS, symbol="USDT", decimals=18, blockchain="bsc"),
+    "USDC_BSC": TokenConfig(address=USDC_BSC_ADDRESS, symbol="USDC", decimals=18, blockchain="bsc"),
 }
 
 # ===== DEX Configurations =====
@@ -95,6 +105,13 @@ DEX_CONFIGS = {
             (SOL_MINT, USDC_SOL_MINT),  # SOL/USDC primary pair
         ],
         min_liquidity_threshold=1000.0,  # Lower threshold for Solana
+    ),
+    "bsc": DEXConfig(
+        protocol=Protocol.UNISWAP_V3,  # PancakeSwap V3 uses same protocol as Uniswap V3
+        preferred_pairs=[
+            (WBNB_BSC_ADDRESS, USDT_BSC_ADDRESS),  # WBNB/USDT primary pair
+        ],
+        min_liquidity_threshold=1000.0,  # Standard threshold for BSC
     ),
 }
 
@@ -140,6 +157,12 @@ SUPPORTED_CURRENCIES = {
         "token_config": TOKEN_CONFIGS["POL"],
         "dex_config": DEX_CONFIGS["polygon"],
         "base_pair": TOKEN_CONFIGS["USDT_POLYGON"],
+    },
+    Currency.BNB: {
+        "blockchain": "bsc",
+        "token_config": TOKEN_CONFIGS["BNB"],
+        "dex_config": DEX_CONFIGS["bsc"],
+        "base_pair": TOKEN_CONFIGS["USDT_BSC"],
     },
 }
 
