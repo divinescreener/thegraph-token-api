@@ -387,7 +387,7 @@ class TokenAPI:
         # Initialize nested API wrappers
         self.evm = EVMWrapper(self)
         self.svm = SVMWrapper(self)
-        self.price = UnifiedPriceAPI(self._api)
+        self.price = UnifiedPriceAPI(self)
 
     def _extract_data(self, response: Any) -> list[dict[str, Any]]:
         """Extract clean data from API response."""
