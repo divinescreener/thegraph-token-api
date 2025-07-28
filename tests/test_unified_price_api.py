@@ -11,8 +11,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from thegraph_token_api.constants import get_currency_config, is_currency_supported
-from thegraph_token_api.price_utils import PriceCalculator, create_price_cache
-from thegraph_token_api.types import Currency, Protocol, SwapPrograms, OrderBy, OrderDirection, NetworkId, SolanaNetworkId
+from thegraph_token_api.price_utils import (
+    PriceCalculator,
+    create_price_cache,
+    extract_ethereum_price,
+    extract_solana_price,
+    validate_price_confidence,
+)
+from thegraph_token_api.simple import TokenAPI
+from thegraph_token_api.types import Currency, OrderBy, OrderDirection, Protocol, SwapPrograms
 from thegraph_token_api.unified_price_api import UnifiedPriceAPI
 
 
@@ -168,12 +175,12 @@ class TestPriceCalculator:
             {"token0": "A", "token1": "B", "price": 200.0},  # outlier
             {"token0": "A", "token1": "B", "price": 102.0},
         ]
-        
+
         def mock_extractor(swap, token_pair):
             if swap.get("price") == 200.0:
                 return 20000.0  # This will be filtered as outlier
             return swap.get("price")
-        
+
         prices = calculator.extract_prices_from_swaps(swaps, ("A", "B"), mock_extractor)
         assert 20000.0 not in prices  # Outlier should be filtered
         assert 100.0 in prices
@@ -187,12 +194,12 @@ class TestPriceCalculator:
             {"invalid": True},  # Will cause exception in extractor
             {"valid": True, "price": 101.0},
         ]
-        
+
         def mock_extractor(swap, token_pair):
             if swap.get("invalid"):
                 raise ValueError("Invalid swap")
             return swap.get("price")
-        
+
         prices = calculator.extract_prices_from_swaps(swaps, ("A", "B"), mock_extractor)
         assert len(prices) == 2  # Only valid swaps should be included
         assert 100.0 in prices
@@ -200,22 +207,19 @@ class TestPriceCalculator:
 
     def test_validate_price_confidence_low(self):
         """Test price confidence validation with low confidence."""
-        from thegraph_token_api.price_utils import validate_price_confidence
-        
+
         stats = {"confidence": 0.05, "trades_analyzed": 2}
         assert validate_price_confidence(stats) is False
 
     def test_validate_price_confidence_high(self):
-        """Test price confidence validation with high confidence.""" 
-        from thegraph_token_api.price_utils import validate_price_confidence
-        
+        """Test price confidence validation with high confidence."""
+
         stats = {"confidence": 0.8, "trades_analyzed": 10}
         assert validate_price_confidence(stats) is True
 
     def test_extract_solana_price_valid(self):
         """Test Solana price extraction with valid data."""
-        from thegraph_token_api.price_utils import extract_solana_price
-        
+
         swap = {
             "input_mint": {"address": "So11111111111111111111111111111111111111112"},
             "output_mint": {"address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"},
@@ -223,14 +227,13 @@ class TestPriceCalculator:
             "output_amount": 150000000,  # 150 USDC
         }
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-        
+
         price = extract_solana_price(swap, token_pair)
         assert price == 150.0
 
     def test_extract_solana_price_invalid_pair(self):
         """Test Solana price extraction with invalid token pair."""
-        from thegraph_token_api.price_utils import extract_solana_price
-        
+
         swap = {
             "input_mint": {"address": "WRONG_MINT"},
             "output_mint": {"address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"},
@@ -238,14 +241,13 @@ class TestPriceCalculator:
             "output_amount": 150000000,
         }
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-        
+
         price = extract_solana_price(swap, token_pair)
         assert price is None
 
     def test_extract_solana_price_zero_amounts(self):
         """Test Solana price extraction with zero amounts."""
-        from thegraph_token_api.price_utils import extract_solana_price
-        
+
         swap = {
             "input_mint": {"address": "So11111111111111111111111111111111111111112"},
             "output_mint": {"address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"},
@@ -253,14 +255,13 @@ class TestPriceCalculator:
             "output_amount": 150000000,
         }
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-        
+
         price = extract_solana_price(swap, token_pair)
         assert price is None
 
     def test_extract_solana_price_reverse(self):
         """Test Solana price extraction with reverse direction."""
-        from thegraph_token_api.price_utils import extract_solana_price
-        
+
         swap = {
             "input_mint": {"address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"},  # USDC first
             "output_mint": {"address": "So11111111111111111111111111111111111111112"},  # SOL second
@@ -268,14 +269,13 @@ class TestPriceCalculator:
             "output_amount": 1000000000,  # 1 SOL
         }
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-        
+
         price = extract_solana_price(swap, token_pair)
         assert price == 150.0
 
     def test_extract_solana_price_out_of_range(self):
         """Test Solana price extraction with out of range price."""
-        from thegraph_token_api.price_utils import extract_solana_price
-        
+
         swap = {
             "input_mint": {"address": "So11111111111111111111111111111111111111112"},
             "output_mint": {"address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"},
@@ -283,14 +283,13 @@ class TestPriceCalculator:
             "output_amount": 5000000000,  # 5000 USDC - out of range
         }
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-        
+
         price = extract_solana_price(swap, token_pair)
         assert price is None
 
     def test_extract_ethereum_price_valid(self):
         """Test Ethereum price extraction with valid data."""
-        from thegraph_token_api.price_utils import extract_ethereum_price
-        
+
         swap = {
             "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
             "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
@@ -298,14 +297,13 @@ class TestPriceCalculator:
             "amount1": "3500000000",  # 3500 USDC
         }
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af")
-        
+
         price = extract_ethereum_price(swap, token_pair)
         assert price == 3500.0
 
     def test_extract_ethereum_price_invalid_pair(self):
         """Test Ethereum price extraction with invalid token pair."""
-        from thegraph_token_api.price_utils import extract_ethereum_price
-        
+
         swap = {
             "token0": {"address": "0xWRONG", "decimals": 18},
             "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
@@ -313,14 +311,13 @@ class TestPriceCalculator:
             "amount1": "3500000000",
         }
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af")
-        
+
         price = extract_ethereum_price(swap, token_pair)
         assert price is None
 
     def test_extract_ethereum_price_zero_amount(self):
         """Test Ethereum price extraction with zero amount."""
-        from thegraph_token_api.price_utils import extract_ethereum_price
-        
+
         swap = {
             "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
             "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
@@ -328,7 +325,7 @@ class TestPriceCalculator:
             "amount1": "3500000000",
         }
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af")
-        
+
         price = extract_ethereum_price(swap, token_pair)
         assert price is None
 
@@ -547,7 +544,6 @@ class TestUnifiedPriceAPI:
         with pytest.raises(TypeError, match="Currency must be Currency enum"):
             await self.oracle.clear_cache("ETH")
 
-
     @pytest.mark.asyncio
     async def test_fetch_price_ethereum(self):
         """Test _fetch_price routing to Ethereum."""
@@ -584,7 +580,7 @@ class TestUnifiedPriceAPI:
         # Mock get_currency_config to return None
         with patch("thegraph_token_api.unified_price_api.get_currency_config") as mock_config:
             mock_config.return_value = None
-            
+
             result = await self.oracle._fetch_price(Currency.ETH)
             assert result is None
 
@@ -594,10 +590,9 @@ class TestUnifiedPriceAPI:
         # Mock get_currency_config to return invalid blockchain
         with patch("thegraph_token_api.unified_price_api.get_currency_config") as mock_config:
             mock_config.return_value = {"blockchain": "unknown"}
-            
+
             result = await self.oracle._fetch_price(Currency.ETH)
             assert result is None
-
 
     @pytest.mark.asyncio
     async def test_error_handling(self):
@@ -635,11 +630,11 @@ class TestUnifiedPriceAPI:
                 "trades_analyzed": 50,
                 "timestamp": time.time(),
                 "source_count": 3,
-                "sources": ["ethereum_swaps", "polygon_swaps", "arbitrum_swaps"]
+                "sources": ["ethereum_swaps", "polygon_swaps", "arbitrum_swaps"],
             }
-            
+
             result = await self.oracle.get(Currency.ETH, include_stats=True)
-            
+
             # Should return dictionary with statistics when include_stats=True
             assert isinstance(result, dict)
             assert "price" in result
@@ -659,23 +654,23 @@ class TestUnifiedPriceAPI:
                 "trades_analyzed": 50,
                 "timestamp": time.time(),
             }
-            
+
             # First call to populate cache
             result1 = await self.oracle.get(Currency.ETH)
             assert result1 == 2000.0
-            
+
             # Change mock to return different price
             mock_fetch.return_value = {
                 "price": 2500.0,
-                "confidence": 0.95, 
+                "confidence": 0.95,
                 "trades_analyzed": 50,
                 "timestamp": time.time(),
             }
-            
+
             # Normal call should use cache
             result2 = await self.oracle.get(Currency.ETH)
             assert result2 == 2000.0  # Should use cached value
-            
+
             # Force refresh should get new value
             result3 = await self.oracle.get(Currency.ETH, force_refresh=True)
             assert result3 == 2500.0  # Should get fresh value
@@ -684,7 +679,7 @@ class TestUnifiedPriceAPI:
     async def test_cache_mechanism_basic(self):
         """Test basic cache mechanism."""
         currency = Currency.ETH
-        
+
         # Mock successful price fetch
         with patch.object(self.oracle, "_fetch_price") as mock_fetch:
             mock_fetch.return_value = {
@@ -693,15 +688,15 @@ class TestUnifiedPriceAPI:
                 "trades_analyzed": 50,
                 "timestamp": time.time(),
             }
-            
+
             # First call should fetch and cache
             result1 = await self.oracle.get(currency)
             assert result1 == 2000.0
-            
+
             # Second call should use cache (no new fetch)
             result2 = await self.oracle.get(currency)
             assert result2 == 2000.0
-            
+
             # Should only have called the fetch method once
             assert mock_fetch.call_count == 1
 
@@ -710,14 +705,14 @@ class TestUnifiedPriceAPI:
         """Test that price cache uses correct structure."""
         # The cache should use Currency enums as keys, not strings
         assert isinstance(self.oracle._price_caches, dict)
-        
+
         # Add some mock data to test cache access
         mock_price_data = MagicMock()
         mock_price_data.is_fresh = True
         mock_price_data.price = 2000.0
-        
+
         self.oracle._price_caches[Currency.ETH] = mock_price_data
-        
+
         # Should be able to access by Currency enum
         assert Currency.ETH in self.oracle._price_caches
         assert self.oracle._price_caches[Currency.ETH].price == 2000.0
@@ -728,8 +723,7 @@ class TestUnifiedPriceAPIInternalMethods:
 
     def setup_method(self):
         """Set up test fixtures."""
-        from thegraph_token_api.simple import TokenAPI
-        
+
         self.token_api = TokenAPI(api_key="test_key", auto_load_env=False)
         self.oracle = UnifiedPriceAPI(self.token_api)
 
@@ -740,21 +734,24 @@ class TestUnifiedPriceAPIInternalMethods:
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
             "dex_config": MagicMock(protocol=Protocol.UNISWAP_V3),
-            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1")
+            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1"),
         }
-        
+
         # Mock the calculator methods
-        with patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)), \
-             patch.object(self.oracle, "_fetch_ethereum_swaps") as mock_fetch_swaps, \
-             patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[2000.0, 2001.0, 1999.0]), \
-             patch.object(self.oracle.calculator, "calculate_price_statistics", return_value={
-                 "price": 2000.0, "confidence": 0.95, "trades_analyzed": 3, "timestamp": time.time()
-             }):
-            
+        with (
+            patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
+            patch.object(self.oracle, "_fetch_ethereum_swaps") as mock_fetch_swaps,
+            patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[2000.0, 2001.0, 1999.0]),
+            patch.object(
+                self.oracle.calculator,
+                "calculate_price_statistics",
+                return_value={"price": 2000.0, "confidence": 0.95, "trades_analyzed": 3, "timestamp": time.time()},
+            ),
+        ):
             mock_fetch_swaps.return_value = [{"swap": "data1"}, {"swap": "data2"}, {"swap": "data3"}]
-            
+
             result = await self.oracle._fetch_ethereum_price(config)
-            
+
             assert result is not None
             assert result["price"] == 2000.0
             assert result["confidence"] == 0.95
@@ -766,40 +763,43 @@ class TestUnifiedPriceAPIInternalMethods:
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
             "dex_config": MagicMock(protocol=Protocol.UNISWAP_V3),
-            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1")
+            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1"),
         }
-        
+
         # Mock progressive retry params to return different values for different attempts
         retry_calls = [(50, 10), (100, 15), (200, 30), (400, 60)]
-        
-        with patch.object(self.oracle.calculator, "progressive_retry_params", side_effect=retry_calls), \
-             patch.object(self.oracle, "_fetch_ethereum_swaps") as mock_fetch_swaps, \
-             patch.object(self.oracle.calculator, "extract_prices_from_swaps") as mock_extract, \
-             patch.object(self.oracle.calculator, "calculate_price_statistics", return_value={
-                 "price": 2000.0, "confidence": 0.95, "trades_analyzed": 10, "timestamp": time.time()
-             }):
-            
+
+        with (
+            patch.object(self.oracle.calculator, "progressive_retry_params", side_effect=retry_calls),
+            patch.object(self.oracle, "_fetch_ethereum_swaps") as mock_fetch_swaps,
+            patch.object(self.oracle.calculator, "extract_prices_from_swaps") as mock_extract,
+            patch.object(
+                self.oracle.calculator,
+                "calculate_price_statistics",
+                return_value={"price": 2000.0, "confidence": 0.95, "trades_analyzed": 10, "timestamp": time.time()},
+            ),
+        ):
             # First 3 attempts return insufficient data, 4th succeeds
             mock_fetch_swaps.side_effect = [
                 [{"swap": "data1"}],  # Attempt 1: insufficient
-                [{"swap": "data2"}],  # Attempt 2: insufficient  
+                [{"swap": "data2"}],  # Attempt 2: insufficient
                 [{"swap": "data3"}],  # Attempt 3: insufficient
-                [{"swap": f"data{i}"} for i in range(10)]  # Attempt 4: sufficient
+                [{"swap": f"data{i}"} for i in range(10)],  # Attempt 4: sufficient
             ]
-            
+
             # Mock extract_prices to return insufficient then sufficient data
             mock_extract.side_effect = [
                 [2000.0],  # Attempt 1: 1 price (insufficient)
                 [2000.0],  # Attempt 2: 1 price (insufficient)
                 [2000.0],  # Attempt 3: 1 price (insufficient)
-                [2000.0 + i for i in range(10)]  # Attempt 4: 10 prices (sufficient)
+                [2000.0 + i for i in range(10)],  # Attempt 4: 10 prices (sufficient)
             ]
-            
+
             # Mock minimum sample size
             self.oracle.calculator.settings = MagicMock(min_sample_size=5)
-            
+
             result = await self.oracle._fetch_ethereum_price(config)
-            
+
             assert result is not None
             assert mock_fetch_swaps.call_count == 4  # Should retry 4 times
             assert result["price"] == 2000.0
@@ -810,15 +810,16 @@ class TestUnifiedPriceAPIInternalMethods:
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
             "dex_config": MagicMock(protocol=Protocol.UNISWAP_V3),
-            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1")
+            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1"),
         }
-        
-        with patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)), \
-             patch.object(self.oracle, "_fetch_ethereum_swaps", return_value=[]), \
-             patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[]):
-            
+
+        with (
+            patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
+            patch.object(self.oracle, "_fetch_ethereum_swaps", return_value=[]),
+            patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[]),
+        ):
             result = await self.oracle._fetch_ethereum_price(config)
-            
+
             assert result is None
 
     @pytest.mark.anyio
@@ -827,15 +828,16 @@ class TestUnifiedPriceAPIInternalMethods:
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
             "dex_config": MagicMock(protocol=Protocol.UNISWAP_V3),
-            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1")
+            "base_pair": MagicMock(address="0xA0b86a33E6417E97e54A0FE34e2eBfB3Cc88C7e1"),
         }
-        
-        with patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)), \
-             patch.object(self.oracle, "_fetch_ethereum_swaps", side_effect=Exception("Network error")), \
-             patch("builtins.print") as mock_print:  # Capture print statements
-            
+
+        with (
+            patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
+            patch.object(self.oracle, "_fetch_ethereum_swaps", side_effect=Exception("Network error")),
+            patch("builtins.print") as mock_print,
+        ):  # Capture print statements
             result = await self.oracle._fetch_ethereum_price(config)
-            
+
             assert result is None
             # Should have printed warning messages
             assert mock_print.call_count >= 1
@@ -847,20 +849,23 @@ class TestUnifiedPriceAPIInternalMethods:
         config = {
             "token_config": MagicMock(address="So11111111111111111111111111111111111111112"),
             "dex_config": MagicMock(protocol=SwapPrograms.RAYDIUM),
-            "base_pair": MagicMock(address="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+            "base_pair": MagicMock(address="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
         }
-        
-        with patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)), \
-             patch.object(self.oracle, "_fetch_solana_swaps") as mock_fetch_swaps, \
-             patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[100.0, 101.0, 99.0]), \
-             patch.object(self.oracle.calculator, "calculate_price_statistics", return_value={
-                 "price": 100.0, "confidence": 0.95, "trades_analyzed": 3, "timestamp": time.time()
-             }):
-            
+
+        with (
+            patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
+            patch.object(self.oracle, "_fetch_solana_swaps") as mock_fetch_swaps,
+            patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[100.0, 101.0, 99.0]),
+            patch.object(
+                self.oracle.calculator,
+                "calculate_price_statistics",
+                return_value={"price": 100.0, "confidence": 0.95, "trades_analyzed": 3, "timestamp": time.time()},
+            ),
+        ):
             mock_fetch_swaps.return_value = [{"swap": "data1"}, {"swap": "data2"}, {"swap": "data3"}]
-            
+
             result = await self.oracle._fetch_solana_price(config)
-            
+
             assert result is not None
             assert result["price"] == 100.0
             assert result["confidence"] == 0.95
@@ -872,31 +877,34 @@ class TestUnifiedPriceAPIInternalMethods:
         config = {
             "token_config": MagicMock(address="So11111111111111111111111111111111111111112"),
             "dex_config": MagicMock(protocol=SwapPrograms.RAYDIUM),
-            "base_pair": MagicMock(address="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+            "base_pair": MagicMock(address="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
         }
-        
-        with patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)), \
-             patch.object(self.oracle, "_fetch_solana_swaps") as mock_fetch_swaps, \
-             patch.object(self.oracle.calculator, "extract_prices_from_swaps") as mock_extract, \
-             patch.object(self.oracle.calculator, "calculate_price_statistics", return_value={
-                 "price": 100.0, "confidence": 0.95, "trades_analyzed": 5, "timestamp": time.time()
-             }):
-            
+
+        with (
+            patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
+            patch.object(self.oracle, "_fetch_solana_swaps") as mock_fetch_swaps,
+            patch.object(self.oracle.calculator, "extract_prices_from_swaps") as mock_extract,
+            patch.object(
+                self.oracle.calculator,
+                "calculate_price_statistics",
+                return_value={"price": 100.0, "confidence": 0.95, "trades_analyzed": 5, "timestamp": time.time()},
+            ),
+        ):
             # First attempt insufficient, second sufficient
             mock_fetch_swaps.side_effect = [
                 [{"swap": "data1"}],  # Insufficient
-                [{"swap": f"data{i}"} for i in range(5)]  # Sufficient
+                [{"swap": f"data{i}"} for i in range(5)],  # Sufficient
             ]
-            
+
             mock_extract.side_effect = [
                 [100.0],  # 1 price (insufficient)
-                [100.0 + i for i in range(5)]  # 5 prices (sufficient)
+                [100.0 + i for i in range(5)],  # 5 prices (sufficient)
             ]
-            
+
             self.oracle.calculator.settings = MagicMock(min_sample_size=3)
-            
+
             result = await self.oracle._fetch_solana_price(config)
-            
+
             assert result is not None
             assert mock_fetch_swaps.call_count == 2
 
@@ -906,33 +914,31 @@ class TestUnifiedPriceAPIInternalMethods:
         protocol = Protocol.UNISWAP_V3
         limit = 100
         minutes_back = 60
-        
+
         # Mock time
         current_time = int(time.time())
         start_time = current_time - (minutes_back * 60)
-        
+
         # Mock response with nested data structure
         mock_response = MagicMock()
         mock_response.data = MagicMock()
         mock_response.data.data = [
             {"token_amount": "1000000000000000000", "amount_usd": "2000.0"},
-            {"token_amount": "500000000000000000", "amount_usd": "1000.0"}
+            {"token_amount": "500000000000000000", "amount_usd": "1000.0"},
         ]
-        
-        with patch.object(self.oracle.token_api._api, "evm") as mock_evm, \
-             patch("time.time", return_value=current_time):
-            
+
+        with patch.object(self.oracle.token_api._api, "evm") as mock_evm, patch("time.time", return_value=current_time):
             mock_evm_client = AsyncMock()
             mock_evm_client.get_swaps.return_value = mock_response
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
-            
+
             assert len(result) == 2
             assert result[0]["token_amount"] == "1000000000000000000"
             assert result[0]["amount_usd"] == "2000.0"
-            
+
             # Verify correct API call
             mock_evm_client.get_swaps.assert_called_once_with(
                 protocol=protocol,
@@ -949,19 +955,19 @@ class TestUnifiedPriceAPIInternalMethods:
         protocol = Protocol.UNISWAP_V2
         limit = 50
         minutes_back = 30
-        
+
         # Test response with direct data list
         mock_response = MagicMock()
         mock_response.data = [{"swap": "data1"}, {"swap": "data2"}]
-        
+
         with patch.object(self.oracle.token_api._api, "evm") as mock_evm:
             mock_evm_client = AsyncMock()
             mock_evm_client.get_swaps.return_value = mock_response
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
-            
+
             assert len(result) == 2
             assert result[0]["swap"] == "data1"
 
@@ -971,25 +977,25 @@ class TestUnifiedPriceAPIInternalMethods:
         protocol = Protocol.UNISWAP_V3
         limit = 50
         minutes_back = 30
-        
+
         # Mock swap objects with model_dump method
         mock_swap1 = MagicMock()
         mock_swap1.model_dump.return_value = {"id": 1, "amount": "1000"}
         mock_swap2 = MagicMock()
         mock_swap2.model_dump.return_value = {"id": 2, "amount": "2000"}
-        
+
         mock_response = MagicMock()
         mock_response.data = MagicMock()
         mock_response.data.data = [mock_swap1, mock_swap2]
-        
+
         with patch.object(self.oracle.token_api._api, "evm") as mock_evm:
             mock_evm_client = AsyncMock()
             mock_evm_client.get_swaps.return_value = mock_response
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
-            
+
             assert len(result) == 2
             assert result[0] == {"id": 1, "amount": "1000"}
             assert result[1] == {"id": 2, "amount": "2000"}
@@ -1002,15 +1008,15 @@ class TestUnifiedPriceAPIInternalMethods:
         protocol = Protocol.UNISWAP_V3
         limit = 100
         minutes_back = 60
-        
+
         with patch.object(self.oracle.token_api._api, "evm") as mock_evm:
             mock_evm_client = AsyncMock()
             mock_evm_client.get_swaps.side_effect = Exception("API Error")
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
-            
+
             assert result == []
 
     @pytest.mark.anyio
@@ -1021,33 +1027,31 @@ class TestUnifiedPriceAPIInternalMethods:
         base_token_address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         limit = 100
         minutes_back = 60
-        
+
         # Mock time
         current_time = int(time.time())
         start_time = current_time - (minutes_back * 60)
-        
+
         # Mock successful swap response
         mock_swap1 = MagicMock()
         mock_swap1.__dict__ = {"input_mint": token_address, "output_mint": base_token_address, "amount": 1000}
         mock_swap2 = MagicMock()
         mock_swap2.__dict__ = {"input_mint": token_address, "output_mint": base_token_address, "amount": 2000}
-        
-        with patch.object(self.oracle.token_api._api, "svm") as mock_svm, \
-             patch("time.time", return_value=current_time):
-            
+
+        with patch.object(self.oracle.token_api._api, "svm") as mock_svm, patch("time.time", return_value=current_time):
             mock_svm_client = AsyncMock()
             mock_svm_client.get_swaps.return_value = [mock_swap1, mock_swap2]
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_svm_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_solana_swaps(
                 program_id, token_address, base_token_address, limit, minutes_back
             )
-            
+
             assert len(result) == 2
             assert result[0]["input_mint"] == token_address
             assert result[0]["amount"] == 1000
-            
+
             # Verify correct API call
             mock_svm_client.get_swaps.assert_called_once_with(
                 program_id=program_id,
@@ -1068,25 +1072,25 @@ class TestUnifiedPriceAPIInternalMethods:
         base_token_address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         limit = 100
         minutes_back = 60
-        
+
         # Mock successful fallback response
         mock_swap = MagicMock()
         mock_swap.__dict__ = {"program_id": str(program_id), "amount": 1000}
-        
+
         with patch.object(self.oracle.token_api._api, "svm") as mock_svm:
             mock_svm_client = AsyncMock()
             # First call (with mints) returns empty, second call (without mints) succeeds
             mock_svm_client.get_swaps.side_effect = [[], [mock_swap]]
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_svm_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_solana_swaps(
                 program_id, token_address, base_token_address, limit, minutes_back
             )
-            
+
             assert len(result) == 1
             assert result[0]["program_id"] == str(program_id)
-            
+
             # Should have called get_swaps twice (fallback logic)
             assert mock_svm_client.get_swaps.call_count == 2
 
@@ -1098,20 +1102,20 @@ class TestUnifiedPriceAPIInternalMethods:
         base_token_address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         limit = 50
         minutes_back = 30
-        
+
         # Test with plain dictionary objects
         mock_swap = {"key1": "value1", "key2": "value2"}
-        
+
         with patch.object(self.oracle.token_api._api, "svm") as mock_svm:
             mock_svm_client = AsyncMock()
             mock_svm_client.get_swaps.return_value = [mock_swap]
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_svm_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_solana_swaps(
                 program_id, token_address, base_token_address, limit, minutes_back
             )
-            
+
             assert len(result) == 1
             assert result[0] == {"key1": "value1", "key2": "value2"}
 
@@ -1123,40 +1127,40 @@ class TestUnifiedPriceAPIInternalMethods:
         base_token_address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         limit = 50
         minutes_back = 30
-        
+
         with patch.object(self.oracle.token_api._api, "svm") as mock_svm:
             mock_svm_client = AsyncMock()
             # Both calls return empty results
             mock_svm_client.get_swaps.side_effect = [[], []]
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_svm_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_solana_swaps(
                 program_id, token_address, base_token_address, limit, minutes_back
             )
-            
+
             assert result == []
-            # Should have tried both calls  
+            # Should have tried both calls
             assert mock_svm_client.get_swaps.call_count == 2
 
-    @pytest.mark.anyio  
+    @pytest.mark.anyio
     async def test_fetch_ethereum_swaps_direct_list_response(self):
         """Test _fetch_ethereum_swaps when response is directly a list."""
         protocol = Protocol.UNISWAP_V3
         limit = 50
         minutes_back = 30
-        
+
         # Mock response that is directly a list
         mock_response = [{"swap": "data1"}, {"swap": "data2"}]
-        
+
         with patch.object(self.oracle.token_api._api, "evm") as mock_evm:
             mock_evm_client = AsyncMock()
             mock_evm_client.get_swaps.return_value = mock_response
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
-            
+
             assert len(result) == 2
             assert result[0]["swap"] == "data1"
             assert result[1]["swap"] == "data2"
@@ -1167,27 +1171,27 @@ class TestUnifiedPriceAPIInternalMethods:
         protocol = Protocol.UNISWAP_V2
         limit = 50
         minutes_back = 30
-        
+
         # Mock objects with __dict__ attribute
         class SwapObject:
             def __init__(self, data):
                 self.__dict__.update(data)
-        
+
         swap1 = SwapObject({"id": 1, "amount": "1000"})
         swap2 = SwapObject({"id": 2, "amount": "2000"})
-        
+
         mock_response = MagicMock()
         mock_response.data = MagicMock()
         mock_response.data.data = [swap1, swap2]
-        
+
         with patch.object(self.oracle.token_api._api, "evm") as mock_evm:
             mock_evm_client = AsyncMock()
             mock_evm_client.get_swaps.return_value = mock_response
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
-            
+
             assert len(result) == 2
             assert result[0] == {"id": 1, "amount": "1000"}
             assert result[1] == {"id": 2, "amount": "2000"}
@@ -1200,17 +1204,17 @@ class TestUnifiedPriceAPIInternalMethods:
         base_token_address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         limit = 100
         minutes_back = 60
-        
+
         with patch.object(self.oracle.token_api._api, "svm") as mock_svm:
             mock_svm_client = AsyncMock()
             mock_svm_client.get_swaps.side_effect = Exception("SVM API Error")
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_svm_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await self.oracle._fetch_solana_swaps(
                 program_id, token_address, base_token_address, limit, minutes_back
             )
-            
+
             assert result == []
 
     @pytest.mark.anyio
@@ -1232,7 +1236,7 @@ class TestUnifiedPriceAPIInternalMethods:
             ]
 
             result = await self.oracle._fetch_solana_price(config)
-            
+
             # Should return None after all attempts with empty swaps
             assert result is None
             assert mock_fetch_swaps.call_count == 4
@@ -1247,12 +1251,14 @@ class TestUnifiedPriceAPIInternalMethods:
         }
 
         # Mock _fetch_solana_swaps to raise an exception
-        with patch.object(self.oracle, "_fetch_solana_swaps") as mock_fetch_swaps, \
-             patch("builtins.print") as mock_print:
+        with (
+            patch.object(self.oracle, "_fetch_solana_swaps") as mock_fetch_swaps,
+            patch("builtins.print") as mock_print,
+        ):
             mock_fetch_swaps.side_effect = Exception("Network error")
 
             result = await self.oracle._fetch_solana_price(config)
-            
+
             # Should return None after exception
             assert result is None
             # Should have attempted 4 times due to retry logic, each with exception
@@ -1299,10 +1305,9 @@ class TestUnifiedPriceAPIInternalMethods:
                 "So11111111111111111111111111111111111111112",
                 "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
                 10,
-                60
+                60,
             )
 
             # Should have one empty dict for the non-convertible swap
             assert len(result) == 1
             assert result[0] == {}
-

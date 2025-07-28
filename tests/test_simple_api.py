@@ -894,73 +894,53 @@ class TestSimpleAPISpecificLineCoverage:
     async def test_nft_item_method_line_94(self):
         """Test NFT item method (line 94)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_evm_nft_item") as mock_method:
             mock_method.return_value = [{"token_id": "123", "name": "Test NFT"}]
-            
+
             result = await api.evm.nfts.item("0xcontract", "123")
-            
-            mock_method.assert_called_once_with(
-                contract="0xcontract", 
-                token_id="123", 
-                network=None
-            )
+
+            mock_method.assert_called_once_with(contract="0xcontract", token_id="123", network=None)
             assert result == [{"token_id": "123", "name": "Test NFT"}]
 
     @pytest.mark.anyio
     async def test_nft_holders_method_line_98(self):
         """Test NFT holders method (line 98)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_evm_nft_holders") as mock_method:
             mock_method.return_value = [{"holder": "0xholder", "balance": "1"}]
-            
+
             result = await api.evm.nfts.holders("0xcontract")
-            
-            mock_method.assert_called_once_with(
-                contract="0xcontract", 
-                network=None
-            )
+
+            mock_method.assert_called_once_with(contract="0xcontract", network=None)
             assert result == [{"holder": "0xholder", "balance": "1"}]
 
     @pytest.mark.anyio
     async def test_nft_sales_method_line_108(self):
         """Test NFT sales method (line 108)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_evm_nft_sales") as mock_method:
             mock_method.return_value = [{"price": "1.5", "buyer": "0xbuyer"}]
-            
+
             result = await api.evm.nfts.sales("0xcontract", token_id="123", limit=20)
-            
-            mock_method.assert_called_once_with(
-                contract="0xcontract",
-                token_id="123", 
-                limit=20,
-                network=None
-            )
+
+            mock_method.assert_called_once_with(contract="0xcontract", token_id="123", limit=20, network=None)
             assert result == [{"price": "1.5", "buyer": "0xbuyer"}]
 
     @pytest.mark.anyio
     async def test_historical_balances_method_line_136(self):
         """Test historical balances method (line 136)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_evm_historical_balances") as mock_method:
             mock_method.return_value = [{"timestamp": 1640995200, "balance": "100"}]
-            
-            result = await api.evm.historical_balances(
-                "0xaddress", 
-                contracts=["0xtoken"], 
-                interval=Interval.ONE_HOUR
-            )
-            
+
+            result = await api.evm.historical_balances("0xaddress", contracts=["0xtoken"], interval=Interval.ONE_HOUR)
+
             mock_method.assert_called_once_with(
-                address="0xaddress",
-                contracts=["0xtoken"],
-                interval=Interval.ONE_HOUR,
-                limit=10,
-                network=None
+                address="0xaddress", contracts=["0xtoken"], interval=Interval.ONE_HOUR, limit=10, network=None
             )
             assert result == [{"timestamp": 1640995200, "balance": "100"}]
 
@@ -968,15 +948,15 @@ class TestSimpleAPISpecificLineCoverage:
     async def test_call_svm_method_direct_lines_434_436(self):
         """Test _call_svm_method_direct (lines 434-436)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api._api, "svm") as mock_svm:
             mock_client = AsyncMock()
             mock_client.test_method = AsyncMock(return_value="direct_result")
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await api._call_svm_method_direct("test_method", "solana", param="value")
-            
+
             assert result == "direct_result"
             mock_client.test_method.assert_called_once_with(param="value")
 
@@ -984,53 +964,40 @@ class TestSimpleAPISpecificLineCoverage:
     async def test_evm_nft_item_internal_line_543(self):
         """Test _evm_nft_item internal method (line 543)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_call_evm_method") as mock_method:
             mock_method.return_value = [{"token_id": "123"}]
-            
+
             result = await api._evm_nft_item("0xcontract", "123", "mainnet")
-            
-            mock_method.assert_called_once_with(
-                "get_nft_item", 
-                "mainnet", 
-                contract="0xcontract", 
-                token_id="123"
-            )
+
+            mock_method.assert_called_once_with("get_nft_item", "mainnet", contract="0xcontract", token_id="123")
             assert result == [{"token_id": "123"}]
 
     @pytest.mark.anyio
     async def test_evm_nft_holders_internal_line_547(self):
         """Test _evm_nft_holders internal method (line 547)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_call_evm_method") as mock_method:
             mock_method.return_value = [{"holder": "0xholder"}]
-            
+
             result = await api._evm_nft_holders("0xcontract", "mainnet")
-            
-            mock_method.assert_called_once_with(
-                "get_nft_holders", 
-                "mainnet", 
-                contract="0xcontract"
-            )
+
+            mock_method.assert_called_once_with("get_nft_holders", "mainnet", contract="0xcontract")
             assert result == [{"holder": "0xholder"}]
 
     @pytest.mark.anyio
     async def test_evm_nft_sales_internal_line_557(self):
         """Test _evm_nft_sales internal method (line 557)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_call_evm_method") as mock_method:
             mock_method.return_value = [{"price": "1.5"}]
-            
+
             result = await api._evm_nft_sales("0xcontract", "123", 20, "mainnet")
-            
+
             mock_method.assert_called_once_with(
-                "get_nft_sales", 
-                "mainnet", 
-                contract="0xcontract", 
-                token_id="123", 
-                limit=20
+                "get_nft_sales", "mainnet", contract="0xcontract", token_id="123", limit=20
             )
             assert result == [{"price": "1.5"}]
 
@@ -1038,25 +1005,19 @@ class TestSimpleAPISpecificLineCoverage:
     async def test_evm_historical_balances_internal_line_568(self):
         """Test _evm_historical_balances internal method (line 568)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api, "_call_evm_method") as mock_method:
             mock_method.return_value = [{"timestamp": 1640995200}]
-            
-            result = await api._evm_historical_balances(
-                "0xaddress", 
-                ["0xtoken"], 
-                Interval.ONE_DAY, 
-                25, 
-                "polygon"
-            )
-            
+
+            result = await api._evm_historical_balances("0xaddress", ["0xtoken"], Interval.ONE_DAY, 25, "polygon")
+
             mock_method.assert_called_once_with(
-                "get_historical_balances", 
-                "polygon", 
-                address="0xaddress", 
-                contracts=["0xtoken"], 
-                interval=Interval.ONE_DAY, 
-                limit=25
+                "get_historical_balances",
+                "polygon",
+                address="0xaddress",
+                contracts=["0xtoken"],
+                interval=Interval.ONE_DAY,
+                limit=25,
             )
             assert result == [{"timestamp": 1640995200}]
 
@@ -1064,14 +1025,14 @@ class TestSimpleAPISpecificLineCoverage:
     async def test_version_method_lines_690_691(self):
         """Test version method (lines 690-691)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api._api, "get_version") as mock_method:
             mock_response = MagicMock()
             mock_response.data = {"data": [{"version": "1.0.0"}]}
             mock_method.return_value = mock_response
-            
+
             result = await api.version()
-            
+
             mock_method.assert_called_once()
             assert result == [{"version": "1.0.0"}]
 
@@ -1079,14 +1040,14 @@ class TestSimpleAPISpecificLineCoverage:
     async def test_networks_method_lines_695_696(self):
         """Test networks method (lines 695-696)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api._api, "get_networks") as mock_method:
             mock_response = MagicMock()
             mock_response.data = {"data": [{"name": "mainnet"}]}
             mock_method.return_value = mock_response
-            
+
             result = await api.networks()
-            
+
             mock_method.assert_called_once()
             assert result == [{"name": "mainnet"}]
 
@@ -1094,18 +1055,18 @@ class TestSimpleAPISpecificLineCoverage:
     async def test_call_svm_method_with_model_objects_line_426(self):
         """Test _call_svm_method handles model objects correctly (line 426)."""
         api = TokenAPI(api_key="test_key", auto_load_env=False)
-        
+
         with patch.object(api._api, "svm") as mock_svm:
             # Mock object with model_dump method
             mock_item = MagicMock()
             mock_item.model_dump.return_value = {"dumped": "data"}
-            
+
             mock_client = AsyncMock()
             mock_client.test_method = AsyncMock(return_value=[mock_item])
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
-            
+
             result = await api._call_svm_method("test_method", "solana")
-            
+
             assert result == [{"dumped": "data"}]
             mock_item.model_dump.assert_called_once()

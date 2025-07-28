@@ -293,7 +293,9 @@ def extract_ethereum_price(swap: dict[str, Any], token_pair: tuple[str, str]) ->
         amount1 = float(swap.get("amount1", 0))
 
         # Get decimals with fallbacks
-        token0_decimals = int(token0_data.get("decimals", 18)) if isinstance(token0_data, dict) else 18  # Default for most ERC-20 tokens
+        token0_decimals = (
+            int(token0_data.get("decimals", 18)) if isinstance(token0_data, dict) else 18
+        )  # Default for most ERC-20 tokens
         token1_decimals = int(token1_data.get("decimals", 6)) if isinstance(token1_data, dict) else 6  # USDC decimals
 
         if amount0 == 0 or amount1 == 0:

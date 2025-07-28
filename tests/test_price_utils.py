@@ -4,8 +4,6 @@ Test suite for price_utils.py to achieve 100% coverage.
 Focuses on edge cases and exception handling paths not covered by test_unified_price_api.py.
 """
 
-import pytest
-
 from thegraph_token_api.price_utils import extract_ethereum_price, extract_solana_price
 
 
@@ -20,10 +18,10 @@ class TestExtractSolanaPriceEdgeCases:
             "input_amount": 1000000000,  # 1 SOL (9 decimals)
             "output_amount": 100000000,  # 100 USDC (6 decimals)
         }
-        
+
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
         price = extract_solana_price(swap, token_pair)
-        
+
         assert price == 100.0
 
     def test_extract_solana_price_none_mint_address(self):
@@ -34,10 +32,10 @@ class TestExtractSolanaPriceEdgeCases:
             "input_amount": 1000000000,
             "output_amount": 100000000,
         }
-        
+
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
         price = extract_solana_price(swap, token_pair)
-        
+
         assert price is None  # Should return None due to invalid mint
 
     def test_extract_solana_price_exception_in_calculation(self):
@@ -48,10 +46,10 @@ class TestExtractSolanaPriceEdgeCases:
             "input_amount": "invalid",  # String instead of number - will cause ValueError
             "output_amount": 100000000,
         }
-        
+
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
         price = extract_solana_price(swap, token_pair)
-        
+
         assert price is None  # Should return None due to exception
 
     def test_extract_solana_price_key_error(self):
@@ -61,10 +59,10 @@ class TestExtractSolanaPriceEdgeCases:
             "output_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
             # Missing input_amount and output_amount
         }
-        
+
         token_pair = ("So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
         price = extract_solana_price(swap, token_pair)
-        
+
         assert price is None
 
 
@@ -79,10 +77,10 @@ class TestExtractEthereumPriceEdgeCases:
             "amount0": "1000000000000000000",  # 1 ETH
             "amount1": "3500000000",  # 3500 USDC
         }
-        
+
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c33E7407a0d2D5Ac14BD0a006Da31108")
         price = extract_ethereum_price(swap, token_pair)
-        
+
         assert price == 3500.0
 
     def test_extract_ethereum_price_reverse_pair_usdc_token0(self):
@@ -93,10 +91,10 @@ class TestExtractEthereumPriceEdgeCases:
             "amount0": "3500000000",  # 3500 USDC
             "amount1": "1000000000000000000",  # 1 ETH
         }
-        
+
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c33E7407a0d2D5Ac14BD0a006Da31108")
         price = extract_ethereum_price(swap, token_pair)
-        
+
         assert price == 3500.0
 
     def test_extract_ethereum_price_out_of_range_price(self):
@@ -107,10 +105,10 @@ class TestExtractEthereumPriceEdgeCases:
             "amount0": "1000000000000000000",  # 1 ETH
             "amount1": "2000000000000000",  # 2,000,000,000 USDC - unrealistic price
         }
-        
+
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c33E7407a0d2D5Ac14BD0a006Da31108")
         price = extract_ethereum_price(swap, token_pair)
-        
+
         assert price is None  # Should return None due to price > 1,000,000
 
     def test_extract_ethereum_price_exception_handling(self):
@@ -121,10 +119,10 @@ class TestExtractEthereumPriceEdgeCases:
             "amount0": None,  # None will cause AttributeError when trying float()
             "amount1": "3500000000",
         }
-        
+
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c33E7407a0d2D5Ac14BD0a006Da31108")
         price = extract_ethereum_price(swap, token_pair)
-        
+
         assert price is None  # Should return None due to exception
 
     def test_extract_ethereum_price_type_error(self):
@@ -135,10 +133,10 @@ class TestExtractEthereumPriceEdgeCases:
             "amount0": {"nested": "object"},  # Dict instead of number - will cause TypeError
             "amount1": "3500000000",
         }
-        
+
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c33E7407a0d2D5Ac14BD0a006Da31108")
         price = extract_ethereum_price(swap, token_pair)
-        
+
         assert price is None  # Should return None due to exception
 
     def test_extract_ethereum_price_mixed_string_dict_tokens(self):
@@ -149,10 +147,10 @@ class TestExtractEthereumPriceEdgeCases:
             "amount0": "1000000000000000000",  # 1 ETH (using default 18 decimals)
             "amount1": "3500000000",  # 3500 USDC
         }
-        
+
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c33E7407a0d2D5Ac14BD0a006Da31108")
         price = extract_ethereum_price(swap, token_pair)
-        
+
         assert price == 3500.0
 
     def test_extract_ethereum_price_negative_price_check(self):
@@ -163,8 +161,8 @@ class TestExtractEthereumPriceEdgeCases:
             "amount0": "1000000000000000000",  # 1 ETH
             "amount1": "0",  # 0 USDC - will result in 0 price
         }
-        
+
         token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c33E7407a0d2D5Ac14BD0a006Da31108")
         price = extract_ethereum_price(swap, token_pair)
-        
+
         assert price is None  # Should return None due to price <= 0

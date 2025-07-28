@@ -85,7 +85,9 @@ class UnifiedPriceAPI:
         """
         # Validate Currency enum only - no string support
         if not isinstance(currency, Currency):
-            msg = f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, or Currency.POL"
+            msg = (
+                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, or Currency.POL"
+            )
             raise TypeError(msg)
 
         # Check cache first (unless force refresh)
@@ -129,7 +131,9 @@ class UnifiedPriceAPI:
             True if currency is supported
         """
         if not isinstance(currency, Currency):
-            msg = f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, or Currency.POL"
+            msg = (
+                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, or Currency.POL"
+            )
             raise TypeError(msg)
         return is_currency_supported(currency)
 
@@ -191,9 +195,7 @@ class UnifiedPriceAPI:
 
             try:
                 # Fetch swaps from EVM API
-                swaps = await self._fetch_ethereum_swaps(
-                    dex_config.protocol, trades, minutes
-                )
+                swaps = await self._fetch_ethereum_swaps(dex_config.protocol, trades, minutes)
 
                 if not swaps:
                     continue

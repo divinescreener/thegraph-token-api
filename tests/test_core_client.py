@@ -7,6 +7,7 @@ from thegraph_token_api.client import TheGraphTokenAPI
 from thegraph_token_api.evm import EVMTokenAPI
 from thegraph_token_api.svm import SVMTokenAPI
 from thegraph_token_api.types import NetworkId, SolanaNetworkId
+from thegraph_token_api.unified_price_api import UnifiedPriceAPI
 
 
 class TestTheGraphTokenAPIInitialization:
@@ -233,8 +234,6 @@ class TestFactoryMethodsIntegration:
 
     def test_price_property(self):
         """Test the price property returns UnifiedPriceAPI."""
-        from thegraph_token_api.unified_price_api import UnifiedPriceAPI
-        
         api = TheGraphTokenAPI("test_key")
         price_api = api.price
         assert isinstance(price_api, UnifiedPriceAPI)
