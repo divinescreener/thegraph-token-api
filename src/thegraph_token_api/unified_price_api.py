@@ -171,16 +171,19 @@ class UnifiedPriceAPI:
 
         if blockchain == "ethereum":
             return await self._fetch_ethereum_price(config)
+        if blockchain == "polygon":
+            return await self._fetch_polygon_price(config)
         if blockchain == "solana":
             return await self._fetch_solana_price(config)
         return None
 
-    async def _fetch_ethereum_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
+    async def _fetch_evm_price(self, config: dict[str, Any], network_id: NetworkId) -> dict[str, Any] | None:
         """
-        Fetch ETH price using Ethereum DEX swaps.
+        Generic EVM price fetching for Ethereum and Polygon networks.
 
         Args:
             config: Currency configuration dictionary
+            network_id: Network to fetch from (MAINNET or MATIC)
 
         Returns:
             Price statistics or None if failed
@@ -190,17 +193,20 @@ class UnifiedPriceAPI:
         base_pair = config["base_pair"]
 
         # Progressive retry with smart parameter adjustment
+        prices = []
+        swaps = []
+
         for attempt in range(1, 5):
             trades, minutes = self.calculator.progressive_retry_params(attempt)
 
             try:
                 # Fetch swaps from EVM API
-                swaps = await self._fetch_ethereum_swaps(dex_config.protocol, trades, minutes)
+                swaps = await self._fetch_evm_swaps(network_id, dex_config.protocol, trades, minutes)
 
                 if not swaps:
                     continue
 
-                # Extract prices using blockchain-specific logic
+                # Extract prices using EVM logic (works for both Ethereum and Polygon)
                 token_pair = (token_config.address, base_pair.address)
                 prices = self.calculator.extract_prices_from_swaps(swaps, token_pair, extract_ethereum_price)
 
@@ -216,6 +222,43 @@ class UnifiedPriceAPI:
 
         # Calculate statistics
         return self.calculator.calculate_price_statistics(prices, len(swaps))
+
+    async def _fetch_ethereum_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
+        """
+        Fetch ETH price using Ethereum DEX swaps.
+
+        Args:
+            config: Currency configuration dictionary
+
+        Returns:
+            Price statistics or None if failed
+        """
+        return await self._fetch_evm_price(config, NetworkId.MAINNET)
+
+    async def _fetch_polygon_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
+        """
+        Fetch MATIC price using Polygon DEX swaps.
+
+        Args:
+            config: Currency configuration dictionary
+
+        Returns:
+            Price statistics or None if failed
+        """
+        return await self._fetch_evm_price(config, NetworkId.MATIC)
+
+    # Backward compatibility methods for tests
+    async def _fetch_ethereum_swaps(
+        self, protocol: Protocol | str, limit: int, minutes_back: int
+    ) -> list[dict[str, Any]]:
+        """Backward compatibility wrapper for _fetch_evm_swaps."""
+        return await self._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
+
+    async def _fetch_polygon_swaps(
+        self, protocol: Protocol | str, limit: int, minutes_back: int
+    ) -> list[dict[str, Any]]:
+        """Backward compatibility wrapper for _fetch_evm_swaps."""
+        return await self._fetch_evm_swaps(NetworkId.MATIC, protocol, limit, minutes_back)
 
     async def _fetch_solana_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
         """
@@ -261,15 +304,14 @@ class UnifiedPriceAPI:
         # Calculate statistics
         return self.calculator.calculate_price_statistics(prices, len(swaps))
 
-    async def _fetch_ethereum_swaps(
-        self, protocol: Protocol | str, limit: int, minutes_back: int
+    async def _fetch_evm_swaps(
+        self, network_id: NetworkId, protocol: Protocol | str, limit: int, minutes_back: int
     ) -> list[dict[str, Any]]:
         """
-        Fetch Ethereum swaps for price calculation.
-
-        Optimized for Uniswap V3 pools with proper time filtering and ordering.
+        Generic EVM swap fetching for any supported network.
 
         Args:
+            network_id: EVM network to fetch from (MAINNET, MATIC, etc.)
             protocol: DEX protocol to query (should be UNISWAP_V3 for reliability)
             limit: Maximum number of swaps
             minutes_back: Time window in minutes
@@ -278,27 +320,38 @@ class UnifiedPriceAPI:
             List of swap dictionaries
         """
         end_time = int(time.time())
-        start_time = end_time - (minutes_back * 60)
+
+        # Network-specific optimizations: Polygon uses no time filter for maximum data
+        start_time = None if network_id == NetworkId.MATIC else end_time - (minutes_back * 60)
 
         # Use direct API client access for better control
-        async with self.token_api._api.evm(NetworkId.MAINNET) as evm_client:
+        async with self.token_api._api.evm(network_id) as evm_client:
             try:
-                # Fetch swaps using EVM API with enhanced parameters for Uniswap V3
-                swaps_response = await evm_client.get_swaps(
-                    protocol=protocol,
-                    start_time=start_time,
-                    end_time=end_time,
-                    order_by=OrderBy.TIMESTAMP,
-                    order_direction=OrderDirection.DESC,
-                    limit=limit,
-                )
+                # Build parameters dynamically
+                params = {
+                    "protocol": protocol,
+                    "order_by": OrderBy.TIMESTAMP,
+                    "order_direction": OrderDirection.DESC,
+                    "limit": limit,
+                }
 
-                # Extract data from response
+                # Only add time filters if they're set (None means no filter)
+                if start_time is not None:
+                    params["start_time"] = start_time
+                if end_time is not None:
+                    params["end_time"] = end_time
+
+                swaps_response = await evm_client.get_swaps(**params)
+
+                # Extract data from response - handles various response formats
                 swaps_data = []
                 if hasattr(swaps_response, "data") and hasattr(swaps_response.data, "data"):
                     swaps_data = swaps_response.data.data
                 elif hasattr(swaps_response, "data") and isinstance(swaps_response.data, list):
                     swaps_data = swaps_response.data
+                elif isinstance(swaps_response, dict) and "data" in swaps_response:
+                    # Handle dict response with 'data' key (common API response format)
+                    swaps_data = swaps_response["data"]
                 elif isinstance(swaps_response, list):
                     swaps_data = swaps_response
 

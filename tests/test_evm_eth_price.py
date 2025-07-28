@@ -234,12 +234,12 @@ class TestEVMGetEthPrice:
         swaps = [
             {
                 "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},  # WETH
-                "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},  # USDC
+                "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},  # USDC
                 "amount0": "1000000000000000000",  # 1 ETH
                 "amount1": "3500000000",  # 3500 USDC
             },
             {
-                "token0": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},  # USDC
+                "token0": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},  # USDC
                 "token1": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},  # WETH
                 "amount0": "3600000000",  # 3600 USDC
                 "amount1": "1000000000000000000",  # 1 ETH
@@ -254,14 +254,14 @@ class TestEVMGetEthPrice:
             # Zero amount swap
             {
                 "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
-                "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+                "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
                 "amount0": "0",
                 "amount1": "3500000000",
             },
             # Out of range price
             {
                 "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
-                "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+                "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
                 "amount0": "1000000000000000000",  # 1 ETH
                 "amount1": "50000000000",  # 50,000 USDC - out of range
             },
@@ -279,11 +279,11 @@ class TestEVMGetEthPrice:
 
         # Create 6 swaps with one outlier
         swaps = []
-        for _i, price in enumerate([3500, 3501, 3502, 3503, 3504, 10000]):  # 10000 is outlier
+        for _i, price in enumerate([3500, 3501, 3502, 3503, 3504, 150000]):  # 150000 is outlier
             swaps.append(
                 {
                     "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
-                    "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+                    "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
                     "amount0": "1000000000000000000",  # 1 ETH
                     "amount1": str(price * 1000000),  # Price in USDC with 6 decimals
                 }
@@ -292,7 +292,7 @@ class TestEVMGetEthPrice:
         prices = evm_api._extract_eth_prices(swaps)
 
         # Outlier should be removed by IQR method
-        assert 10000 not in prices
+        assert 150000 not in prices
         assert len(prices) == 5
         assert all(3500 <= p <= 3504 for p in prices)
 
@@ -304,14 +304,14 @@ class TestEVMGetEthPrice:
             # Valid swap
             {
                 "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
-                "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+                "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
                 "amount0": "1000000000000000000",
                 "amount1": "3500000000",
             },
             # Swap that will cause ValueError
             {
                 "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
-                "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+                "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
                 "amount0": "invalid_number",
                 "amount1": "3500000000",
             },

@@ -17,11 +17,17 @@ ETH_ADDRESS = "0x0000000000000000000000000000000000000000"  # Native ETH (zero a
 WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"  # Wrapped ETH
 
 # Stablecoins on Ethereum
-USDC_ETH_ADDRESS = "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af"  # USDC on Ethereum
+USDC_ETH_ADDRESS = "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"  # USDC on Ethereum (correct address)
 USDT_ETH_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7"  # USDT on Ethereum
 
-# POL (previously MATIC) on Ethereum
-POL_ETH_ADDRESS = "0x455e53908438CC0ad355CA94c63FEcF6F5F44E3c"  # POL token on Ethereum
+# ===== Polygon Token Addresses =====
+
+# Stablecoins on Polygon
+USDT_POLYGON_ADDRESS = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"  # USDT (PoS) on Polygon
+
+# POL (previously MATIC) addresses
+POL_ETH_ADDRESS = "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"  # MATIC token on Ethereum (low liquidity)
+WMATIC_POLYGON_ADDRESS = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"  # WMATIC on Polygon (API lacks Polygon data)
 
 # ===== Solana Token Addresses =====
 
@@ -59,9 +65,10 @@ TOKEN_CONFIGS = {
         blockchain="ethereum",
     ),
     "SOL": TokenConfig(address=SOL_MINT, symbol="SOL", decimals=9, blockchain="solana"),
-    "POL": TokenConfig(address=POL_ETH_ADDRESS, symbol="POL", decimals=18, blockchain="ethereum"),
+    "POL": TokenConfig(address=WMATIC_POLYGON_ADDRESS, symbol="WMATIC", decimals=18, blockchain="polygon"),
     "USDC_ETH": TokenConfig(address=USDC_ETH_ADDRESS, symbol="USDC", decimals=6, blockchain="ethereum"),
     "USDC_SOL": TokenConfig(address=USDC_SOL_MINT, symbol="USDC", decimals=6, blockchain="solana"),
+    "USDT_POLYGON": TokenConfig(address=USDT_POLYGON_ADDRESS, symbol="USDT", decimals=6, blockchain="polygon"),
 }
 
 # ===== DEX Configurations =====
@@ -74,6 +81,13 @@ DEX_CONFIGS = {
             (ETH_ADDRESS, USDC_ETH_ADDRESS),  # Native ETH/USDC as fallback
         ],
         min_liquidity_threshold=5000.0,  # Higher threshold for Ethereum due to gas costs
+    ),
+    "polygon": DEXConfig(
+        protocol=Protocol.UNISWAP_V3,  # Uniswap V3 on Polygon for WMATIC/USDT
+        preferred_pairs=[
+            (WMATIC_POLYGON_ADDRESS, USDT_POLYGON_ADDRESS),  # WMATIC/USDT primary pair
+        ],
+        min_liquidity_threshold=100.0,  # Lower threshold for Polygon (lower volume)
     ),
     "solana": DEXConfig(
         protocol=SwapPrograms.JUPITER_V6,  # Best aggregated liquidity
@@ -96,7 +110,7 @@ class PriceSettings:
     max_trades: int = 500  # Maximum trades to sample
     max_minutes: int = 120  # Maximum time window in minutes
     min_sample_size: int = 3  # Minimum trades needed for price calculation
-    outlier_threshold: tuple[float, float] = (10.0, 10000.0)  # (min_price, max_price) sanity check
+    outlier_threshold: tuple[float, float] = (0.0001, 100000.0)  # (min_price, max_price) sanity check
     confidence_threshold: float = 0.1  # Minimum confidence score (0-1)
     cache_ttl_volatile: int = 60  # Cache TTL for volatile markets (seconds)
     cache_ttl_stable: int = 300  # Cache TTL for stable markets (seconds)
@@ -122,10 +136,10 @@ SUPPORTED_CURRENCIES = {
         "base_pair": TOKEN_CONFIGS["USDC_SOL"],
     },
     Currency.POL: {
-        "blockchain": "ethereum",
+        "blockchain": "polygon",
         "token_config": TOKEN_CONFIGS["POL"],
-        "dex_config": DEX_CONFIGS["ethereum"],
-        "base_pair": TOKEN_CONFIGS["USDC_ETH"],
+        "dex_config": DEX_CONFIGS["polygon"],
+        "base_pair": TOKEN_CONFIGS["USDT_POLYGON"],
     },
 }
 

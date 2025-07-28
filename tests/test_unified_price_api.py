@@ -69,7 +69,7 @@ class TestCurrencyConfig:
 
         pol_config = get_currency_config(Currency.POL)
         assert pol_config is not None
-        assert pol_config["blockchain"] == "ethereum"
+        assert pol_config["blockchain"] == "polygon"
 
     def test_get_currency_config_string(self):
         """Test getting config with string (utility function still supports strings)."""
@@ -83,7 +83,7 @@ class TestCurrencyConfig:
 
         pol_config = get_currency_config("POL")
         assert pol_config is not None
-        assert pol_config["blockchain"] == "ethereum"
+        assert pol_config["blockchain"] == "polygon"
 
     def test_get_currency_config_invalid(self):
         """Test getting config with invalid currency."""
@@ -133,10 +133,10 @@ class TestPriceCalculator:
     def test_outlier_filtering_basic(self):
         """Test basic outlier filtering."""
         calculator = PriceCalculator()
-        prices = [100.0, 101.0, 102.0, 15000.0, 99.0]  # 15000 is outlier (above 10000 max)
+        prices = [100.0, 101.0, 102.0, 150000.0, 99.0]  # 150000 is outlier (above 100000 max)
 
         filtered = calculator.filter_outliers_basic(prices)
-        assert 15000.0 not in filtered
+        assert 150000.0 not in filtered
         assert len(filtered) == 4
 
     def test_outlier_filtering_iqr(self):
@@ -178,11 +178,11 @@ class TestPriceCalculator:
 
         def mock_extractor(swap, token_pair):
             if swap.get("price") == 200.0:
-                return 20000.0  # This will be filtered as outlier
+                return 200000.0  # This will be filtered as outlier
             return swap.get("price")
 
         prices = calculator.extract_prices_from_swaps(swaps, ("A", "B"), mock_extractor)
-        assert 20000.0 not in prices  # Outlier should be filtered
+        assert 200000.0 not in prices  # Outlier should be filtered
         assert 100.0 in prices
         assert 102.0 in prices
 
@@ -292,11 +292,11 @@ class TestPriceCalculator:
 
         swap = {
             "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
-            "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+            "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
             "amount0": "1000000000000000000",  # 1 ETH
             "amount1": "3500000000",  # 3500 USDC
         }
-        token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af")
+        token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
 
         price = extract_ethereum_price(swap, token_pair)
         assert price == 3500.0
@@ -306,11 +306,11 @@ class TestPriceCalculator:
 
         swap = {
             "token0": {"address": "0xWRONG", "decimals": 18},
-            "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+            "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
             "amount0": "1000000000000000000",
             "amount1": "3500000000",
         }
-        token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af")
+        token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
 
         price = extract_ethereum_price(swap, token_pair)
         assert price is None
@@ -320,11 +320,11 @@ class TestPriceCalculator:
 
         swap = {
             "token0": {"address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18},
-            "token1": {"address": "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af", "decimals": 6},
+            "token1": {"address": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "decimals": 6},
             "amount0": "0",  # Zero amount
             "amount1": "3500000000",
         }
-        token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86a33E7c473D00e05A7B8A4bcF1e50e93D1Af")
+        token_pair = ("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
 
         price = extract_ethereum_price(swap, token_pair)
         assert price is None
@@ -566,8 +566,8 @@ class TestUnifiedPriceAPI:
 
     @pytest.mark.asyncio
     async def test_fetch_price_pol(self):
-        """Test _fetch_price routing to POL (Ethereum)."""
-        with patch.object(self.oracle, "_fetch_ethereum_price") as mock_fetch:
+        """Test _fetch_price routing to POL (Polygon)."""
+        with patch.object(self.oracle, "_fetch_polygon_price") as mock_fetch:
             mock_fetch.return_value = {"price": 0.5}
 
             result = await self.oracle._fetch_price(Currency.POL)
@@ -740,7 +740,7 @@ class TestUnifiedPriceAPIInternalMethods:
         # Mock the calculator methods
         with (
             patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
-            patch.object(self.oracle, "_fetch_ethereum_swaps") as mock_fetch_swaps,
+            patch.object(self.oracle, "_fetch_evm_swaps") as mock_fetch_swaps,
             patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[2000.0, 2001.0, 1999.0]),
             patch.object(
                 self.oracle.calculator,
@@ -771,7 +771,7 @@ class TestUnifiedPriceAPIInternalMethods:
 
         with (
             patch.object(self.oracle.calculator, "progressive_retry_params", side_effect=retry_calls),
-            patch.object(self.oracle, "_fetch_ethereum_swaps") as mock_fetch_swaps,
+            patch.object(self.oracle, "_fetch_evm_swaps") as mock_fetch_swaps,
             patch.object(self.oracle.calculator, "extract_prices_from_swaps") as mock_extract,
             patch.object(
                 self.oracle.calculator,
@@ -815,7 +815,7 @@ class TestUnifiedPriceAPIInternalMethods:
 
         with (
             patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
-            patch.object(self.oracle, "_fetch_ethereum_swaps", return_value=[]),
+            patch.object(self.oracle, "_fetch_evm_swaps", return_value=[]),
             patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[]),
         ):
             result = await self.oracle._fetch_ethereum_price(config)
@@ -833,7 +833,7 @@ class TestUnifiedPriceAPIInternalMethods:
 
         with (
             patch.object(self.oracle.calculator, "progressive_retry_params", return_value=(100, 15)),
-            patch.object(self.oracle, "_fetch_ethereum_swaps", side_effect=Exception("Network error")),
+            patch.object(self.oracle, "_fetch_evm_swaps", side_effect=Exception("Network error")),
             patch("builtins.print") as mock_print,
         ):  # Capture print statements
             result = await self.oracle._fetch_ethereum_price(config)
