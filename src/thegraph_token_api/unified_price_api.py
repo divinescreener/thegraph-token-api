@@ -86,7 +86,7 @@ class UnifiedPriceAPI:
         # Validate Currency enum only - no string support
         if not isinstance(currency, Currency):
             msg = (
-                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, or Currency.POL"
+                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, Currency.POL, Currency.BNB, or Currency.AVAX"
             )
             raise TypeError(msg)
 
@@ -132,7 +132,7 @@ class UnifiedPriceAPI:
         """
         if not isinstance(currency, Currency):
             msg = (
-                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, or Currency.POL"
+                f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, Currency.POL, Currency.BNB, or Currency.AVAX"
             )
             raise TypeError(msg)
         return is_currency_supported(currency)
@@ -146,7 +146,7 @@ class UnifiedPriceAPI:
         """
         if currency:
             if not isinstance(currency, Currency):
-                msg = f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, or Currency.POL"
+                msg = f"Currency must be Currency enum, got {type(currency)}. Use Currency.ETH, Currency.SOL, Currency.POL, Currency.BNB, or Currency.AVAX"
                 raise TypeError(msg)
             if currency in self._price_caches:
                 del self._price_caches[currency]
@@ -169,16 +169,22 @@ class UnifiedPriceAPI:
 
         blockchain = config["blockchain"]
 
-        if blockchain == "ethereum":
-            return await self._fetch_ethereum_price(config)
-        if blockchain == "polygon":
-            return await self._fetch_polygon_price(config)
-        if blockchain == "bsc":
-            return await self._fetch_bsc_price(config)
-        if blockchain == "avalanche":
-            return await self._fetch_avalanche_price(config)
+        # Optimized routing with network mapping
         if blockchain == "solana":
             return await self._fetch_solana_price(config)
+
+        # All EVM chains use unified method
+        network_mapping = {
+            "ethereum": NetworkId.MAINNET,
+            "polygon": NetworkId.MATIC,
+            "bsc": NetworkId.BSC,
+            "avalanche": NetworkId.AVALANCHE,
+        }
+
+        network_id = network_mapping.get(blockchain)
+        if network_id:
+            return await self._fetch_evm_price(config, network_id)
+
         return None
 
     async def _fetch_evm_price(self, config: dict[str, Any], network_id: NetworkId) -> dict[str, Any] | None:
@@ -227,66 +233,7 @@ class UnifiedPriceAPI:
         # Calculate statistics
         return self.calculator.calculate_price_statistics(prices, len(swaps))
 
-    async def _fetch_ethereum_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
-        """
-        Fetch ETH price using Ethereum DEX swaps.
 
-        Args:
-            config: Currency configuration dictionary
-
-        Returns:
-            Price statistics or None if failed
-        """
-        return await self._fetch_evm_price(config, NetworkId.MAINNET)
-
-    async def _fetch_polygon_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
-        """
-        Fetch MATIC price using Polygon DEX swaps.
-
-        Args:
-            config: Currency configuration dictionary
-
-        Returns:
-            Price statistics or None if failed
-        """
-        return await self._fetch_evm_price(config, NetworkId.MATIC)
-
-    async def _fetch_bsc_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
-        """
-        Fetch BNB price using BSC DEX swaps.
-
-        Args:
-            config: Currency configuration dictionary
-
-        Returns:
-            Price statistics or None if failed
-        """
-        return await self._fetch_evm_price(config, NetworkId.BSC)
-
-    async def _fetch_avalanche_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
-        """
-        Fetch AVAX price using Avalanche DEX swaps.
-
-        Args:
-            config: Currency configuration dictionary
-
-        Returns:
-            Price statistics or None if failed
-        """
-        return await self._fetch_evm_price(config, NetworkId.AVALANCHE)
-
-    # Backward compatibility methods for tests
-    async def _fetch_ethereum_swaps(
-        self, protocol: Protocol | str, limit: int, minutes_back: int
-    ) -> list[dict[str, Any]]:
-        """Backward compatibility wrapper for _fetch_evm_swaps."""
-        return await self._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
-
-    async def _fetch_polygon_swaps(
-        self, protocol: Protocol | str, limit: int, minutes_back: int
-    ) -> list[dict[str, Any]]:
-        """Backward compatibility wrapper for _fetch_evm_swaps."""
-        return await self._fetch_evm_swaps(NetworkId.MATIC, protocol, limit, minutes_back)
 
     async def _fetch_solana_price(self, config: dict[str, Any]) -> dict[str, Any] | None:
         """
@@ -408,9 +355,7 @@ class UnifiedPriceAPI:
         self, program_id: SwapPrograms | str, token_address: str, base_token_address: str, limit: int, minutes_back: int
     ) -> list[dict[str, Any]]:
         """
-        Fetch Solana swaps for price calculation.
-
-        Aligned with existing SOL price implementation in svm.py for consistency.
+        Fetch Solana swaps for price calculation with single API call.
 
         Args:
             program_id: Solana swap program ID
@@ -425,10 +370,10 @@ class UnifiedPriceAPI:
         end_time = int(time.time())
         start_time = end_time - (minutes_back * 60)
 
-        # Get SVM client - access client directly for consistency with svm.py
+        # Get SVM client - single API call per attempt
         async with self.token_api._api.svm(SolanaNetworkId.SOLANA) as svm_client:
             try:
-                # Try with both input and output mints first (matches svm.py approach)
+                # Single optimized API call - try with specific mints first
                 swaps = await svm_client.get_swaps(
                     program_id=program_id,
                     input_mint=token_address,
@@ -440,18 +385,7 @@ class UnifiedPriceAPI:
                     limit=limit,
                 )
 
-                # If no results, try without specifying mints (matches svm.py fallback)
-                if not swaps or len(swaps) == 0:
-                    swaps = await svm_client.get_swaps(
-                        program_id=program_id,
-                        start_time=start_time,
-                        end_time=end_time,
-                        order_by=OrderBy.TIMESTAMP,
-                        order_direction=OrderDirection.DESC,
-                        limit=limit,
-                    )
-
-                # Convert to list of dicts (matches svm.py conversion logic)
+                # Convert to list of dicts
                 if not swaps:
                     return []
 

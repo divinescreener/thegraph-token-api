@@ -19,7 +19,7 @@ from thegraph_token_api.price_utils import (
     validate_price_confidence,
 )
 from thegraph_token_api.simple import TokenAPI
-from thegraph_token_api.types import Currency, OrderBy, OrderDirection, Protocol, SwapPrograms
+from thegraph_token_api.types import Currency, NetworkId, OrderBy, OrderDirection, Protocol, SwapPrograms
 from thegraph_token_api.unified_price_api import UnifiedPriceAPI
 
 
@@ -577,7 +577,7 @@ class TestUnifiedPriceAPI:
     @pytest.mark.asyncio
     async def test_fetch_price_ethereum(self):
         """Test _fetch_price routing to Ethereum."""
-        with patch.object(self.oracle, "_fetch_ethereum_price") as mock_fetch:
+        with patch.object(self.oracle, "_fetch_evm_price") as mock_fetch:
             mock_fetch.return_value = {"price": 3500.0}
 
             result = await self.oracle._fetch_price(Currency.ETH)
@@ -597,7 +597,7 @@ class TestUnifiedPriceAPI:
     @pytest.mark.asyncio
     async def test_fetch_price_pol(self):
         """Test _fetch_price routing to POL (Polygon)."""
-        with patch.object(self.oracle, "_fetch_polygon_price") as mock_fetch:
+        with patch.object(self.oracle, "_fetch_evm_price") as mock_fetch:
             mock_fetch.return_value = {"price": 0.5}
 
             result = await self.oracle._fetch_price(Currency.POL)
@@ -607,7 +607,7 @@ class TestUnifiedPriceAPI:
     @pytest.mark.asyncio
     async def test_fetch_price_bnb(self):
         """Test _fetch_price routing to BNB (BSC)."""
-        with patch.object(self.oracle, "_fetch_bsc_price") as mock_fetch:
+        with patch.object(self.oracle, "_fetch_evm_price") as mock_fetch:
             mock_fetch.return_value = {"price": 800.0}
 
             result = await self.oracle._fetch_price(Currency.BNB)
@@ -617,7 +617,7 @@ class TestUnifiedPriceAPI:
     @pytest.mark.asyncio
     async def test_fetch_price_avax(self):
         """Test _fetch_price routing to AVAX (Avalanche)."""
-        with patch.object(self.oracle, "_fetch_avalanche_price") as mock_fetch:
+        with patch.object(self.oracle, "_fetch_evm_price") as mock_fetch:
             mock_fetch.return_value = {"price": 25.0}
 
             result = await self.oracle._fetch_price(Currency.AVAX)
@@ -778,8 +778,8 @@ class TestUnifiedPriceAPIInternalMethods:
         self.oracle = UnifiedPriceAPI(self.token_api)
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_price_with_config(self):
-        """Test _fetch_ethereum_price internal method with proper config."""
+    async def test_fetch_evm_price_with_config(self):
+        """Test _fetch_evm_price unified method with proper config."""
         # Mock the configuration structure
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
@@ -800,7 +800,7 @@ class TestUnifiedPriceAPIInternalMethods:
         ):
             mock_fetch_swaps.return_value = [{"swap": "data1"}, {"swap": "data2"}, {"swap": "data3"}]
 
-            result = await self.oracle._fetch_ethereum_price(config)
+            result = await self.oracle._fetch_evm_price(config, NetworkId.MAINNET)
 
             assert result is not None
             assert result["price"] == 2000.0
@@ -808,8 +808,8 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_fetch_swaps.assert_called_once()
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_price_retry_logic(self):
-        """Test _fetch_ethereum_price retry logic when swaps are insufficient."""
+    async def test_fetch_evm_price_retry_logic(self):
+        """Test _fetch_evm_price retry logic when swaps are insufficient."""
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
             "dex_config": MagicMock(protocol=Protocol.UNISWAP_V3),
@@ -848,15 +848,15 @@ class TestUnifiedPriceAPIInternalMethods:
             # Mock minimum sample size
             self.oracle.calculator.settings = MagicMock(min_sample_size=5)
 
-            result = await self.oracle._fetch_ethereum_price(config)
+            result = await self.oracle._fetch_evm_price(config, NetworkId.MAINNET)
 
             assert result is not None
             assert mock_fetch_swaps.call_count == 4  # Should retry 4 times
             assert result["price"] == 2000.0
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_price_all_attempts_fail(self):
-        """Test _fetch_ethereum_price when all retry attempts fail."""
+    async def test_fetch_evm_price_all_attempts_fail(self):
+        """Test _fetch_evm_price when all retry attempts fail."""
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
             "dex_config": MagicMock(protocol=Protocol.UNISWAP_V3),
@@ -868,13 +868,13 @@ class TestUnifiedPriceAPIInternalMethods:
             patch.object(self.oracle, "_fetch_evm_swaps", return_value=[]),
             patch.object(self.oracle.calculator, "extract_prices_from_swaps", return_value=[]),
         ):
-            result = await self.oracle._fetch_ethereum_price(config)
+            result = await self.oracle._fetch_evm_price(config, NetworkId.MAINNET)
 
             assert result is None
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_price_exception_handling(self):
-        """Test _fetch_ethereum_price exception handling during retry."""
+    async def test_fetch_evm_price_exception_handling(self):
+        """Test _fetch_evm_price exception handling during retry."""
         config = {
             "token_config": MagicMock(address="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
             "dex_config": MagicMock(protocol=Protocol.UNISWAP_V3),
@@ -886,7 +886,7 @@ class TestUnifiedPriceAPIInternalMethods:
             patch.object(self.oracle, "_fetch_evm_swaps", side_effect=Exception("Network error")),
             patch("builtins.print") as mock_print,
         ):  # Capture print statements
-            result = await self.oracle._fetch_ethereum_price(config)
+            result = await self.oracle._fetch_evm_price(config, NetworkId.MAINNET)
 
             assert result is None
             # Should have printed warning messages
@@ -959,8 +959,8 @@ class TestUnifiedPriceAPIInternalMethods:
             assert mock_fetch_swaps.call_count == 2
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_swaps_method(self):
-        """Test _fetch_ethereum_swaps internal method."""
+    async def test_fetch_evm_swaps_method(self):
+        """Test _fetch_evm_swaps internal method."""
         protocol = Protocol.UNISWAP_V3
         limit = 100
         minutes_back = 60
@@ -983,7 +983,7 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
 
-            result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
+            result = await self.oracle._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
 
             assert len(result) == 2
             assert result[0]["token_amount"] == "1000000000000000000"
@@ -1000,8 +1000,8 @@ class TestUnifiedPriceAPIInternalMethods:
             )
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_swaps_different_response_formats(self):
-        """Test _fetch_ethereum_swaps with different response formats."""
+    async def test_fetch_evm_swaps_different_response_formats(self):
+        """Test _fetch_evm_swaps with different response formats."""
         protocol = Protocol.UNISWAP_V2
         limit = 50
         minutes_back = 30
@@ -1016,14 +1016,14 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
 
-            result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
+            result = await self.oracle._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
 
             assert len(result) == 2
             assert result[0]["swap"] == "data1"
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_swaps_model_dump_conversion(self):
-        """Test _fetch_ethereum_swaps with model objects that have model_dump method."""
+    async def test_fetch_evm_swaps_model_dump_conversion(self):
+        """Test _fetch_evm_swaps with model objects that have model_dump method."""
         protocol = Protocol.UNISWAP_V3
         limit = 50
         minutes_back = 30
@@ -1044,7 +1044,7 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
 
-            result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
+            result = await self.oracle._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
 
             assert len(result) == 2
             assert result[0] == {"id": 1, "amount": "1000"}
@@ -1053,8 +1053,8 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_swap2.model_dump.assert_called_once()
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_swaps_exception_handling(self):
-        """Test _fetch_ethereum_swaps exception handling."""
+    async def test_fetch_evm_swaps_exception_handling(self):
+        """Test _fetch_evm_swaps exception handling."""
         protocol = Protocol.UNISWAP_V3
         limit = 100
         minutes_back = 60
@@ -1065,7 +1065,7 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
 
-            result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
+            result = await self.oracle._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
 
             assert result == []
 
@@ -1115,22 +1115,22 @@ class TestUnifiedPriceAPIInternalMethods:
             )
 
     @pytest.mark.anyio
-    async def test_fetch_solana_swaps_fallback_logic(self):
-        """Test _fetch_solana_swaps fallback when specific mint search fails."""
+    async def test_fetch_solana_swaps_single_call(self):
+        """Test _fetch_solana_swaps optimized single call behavior."""
         program_id = SwapPrograms.RAYDIUM
         token_address = "So11111111111111111111111111111111111111112"
         base_token_address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         limit = 100
         minutes_back = 60
 
-        # Mock successful fallback response
+        # Mock successful response
         mock_swap = MagicMock()
         mock_swap.__dict__ = {"program_id": str(program_id), "amount": 1000}
 
         with patch.object(self.oracle.token_api._api, "svm") as mock_svm:
             mock_svm_client = AsyncMock()
-            # First call (with mints) returns empty, second call (without mints) succeeds
-            mock_svm_client.get_swaps.side_effect = [[], [mock_swap]]
+            # Single call returns results
+            mock_svm_client.get_swaps.return_value = [mock_swap]
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_svm_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
 
@@ -1141,8 +1141,8 @@ class TestUnifiedPriceAPIInternalMethods:
             assert len(result) == 1
             assert result[0]["program_id"] == str(program_id)
 
-            # Should have called get_swaps twice (fallback logic)
-            assert mock_svm_client.get_swaps.call_count == 2
+            # Should have called get_swaps only once (optimized)
+            assert mock_svm_client.get_swaps.call_count == 1
 
     @pytest.mark.anyio
     async def test_fetch_solana_swaps_plain_dict_objects(self):
@@ -1170,8 +1170,8 @@ class TestUnifiedPriceAPIInternalMethods:
             assert result[0] == {"key1": "value1", "key2": "value2"}
 
     @pytest.mark.anyio
-    async def test_fetch_solana_swaps_fallback_empty_results(self):
-        """Test _fetch_solana_swaps when all swaps are empty."""
+    async def test_fetch_solana_swaps_empty_results(self):
+        """Test _fetch_solana_swaps when swaps are empty."""
         program_id = SwapPrograms.RAYDIUM
         token_address = "So11111111111111111111111111111111111111112"
         base_token_address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
@@ -1180,8 +1180,8 @@ class TestUnifiedPriceAPIInternalMethods:
 
         with patch.object(self.oracle.token_api._api, "svm") as mock_svm:
             mock_svm_client = AsyncMock()
-            # Both calls return empty results
-            mock_svm_client.get_swaps.side_effect = [[], []]
+            # Single call returns empty results
+            mock_svm_client.get_swaps.return_value = []
             mock_svm.return_value.__aenter__ = AsyncMock(return_value=mock_svm_client)
             mock_svm.return_value.__aexit__ = AsyncMock()
 
@@ -1190,12 +1190,12 @@ class TestUnifiedPriceAPIInternalMethods:
             )
 
             assert result == []
-            # Should have tried both calls
-            assert mock_svm_client.get_swaps.call_count == 2
+            # Should have tried only one call (no fallback)
+            assert mock_svm_client.get_swaps.call_count == 1
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_swaps_direct_list_response(self):
-        """Test _fetch_ethereum_swaps when response is directly a list."""
+    async def test_fetch_evm_swaps_direct_list_response(self):
+        """Test _fetch_evm_swaps when response is directly a list."""
         protocol = Protocol.UNISWAP_V3
         limit = 50
         minutes_back = 30
@@ -1209,15 +1209,15 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
 
-            result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
+            result = await self.oracle._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
 
             assert len(result) == 2
             assert result[0]["swap"] == "data1"
             assert result[1]["swap"] == "data2"
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_swaps_object_with_dict_attribute(self):
-        """Test _fetch_ethereum_swaps with objects that have __dict__ attribute."""
+    async def test_fetch_evm_swaps_object_with_dict_attribute(self):
+        """Test _fetch_evm_swaps with objects that have __dict__ attribute."""
         protocol = Protocol.UNISWAP_V2
         limit = 50
         minutes_back = 30
@@ -1240,7 +1240,7 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
             mock_evm.return_value.__aexit__ = AsyncMock()
 
-            result = await self.oracle._fetch_ethereum_swaps(protocol, limit, minutes_back)
+            result = await self.oracle._fetch_evm_swaps(NetworkId.MAINNET, protocol, limit, minutes_back)
 
             assert len(result) == 2
             assert result[0] == {"id": 1, "amount": "1000"}
@@ -1318,8 +1318,8 @@ class TestUnifiedPriceAPIInternalMethods:
             assert "Warning: Price fetch attempt failed" in str(mock_print.call_args_list[0])
 
     @pytest.mark.anyio
-    async def test_fetch_ethereum_swaps_empty_dict_fallback(self):
-        """Test _fetch_ethereum_swaps empty dict fallback (line 313)."""
+    async def test_fetch_evm_swaps_empty_dict_fallback(self):
+        """Test _fetch_evm_swaps empty dict fallback (line 313)."""
         with patch.object(self.oracle.token_api._api, "evm") as mock_evm:
             mock_evm_client = AsyncMock()
             mock_evm.return_value.__aenter__ = AsyncMock(return_value=mock_evm_client)
@@ -1332,7 +1332,7 @@ class TestUnifiedPriceAPIInternalMethods:
             mock_response.data.data = [mock_swap]
             mock_evm_client.get_swaps.return_value = mock_response
 
-            result = await self.oracle._fetch_ethereum_swaps(Protocol.UNISWAP_V3, 10, 60)
+            result = await self.oracle._fetch_evm_swaps(NetworkId.MAINNET, Protocol.UNISWAP_V3, 10, 60)
 
             # Should have one empty dict for the non-convertible swap
             assert len(result) == 1
