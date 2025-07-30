@@ -10,7 +10,10 @@ from typing import Any
 # Import divine-typed-requests (should be installed as a package)
 from typed_requests import NetworkingManager
 
+from .logger import get_logger
 from .types import NetworksResponse, VersionResponse
+
+logger = get_logger(__name__)
 
 
 class BaseTokenAPI:
@@ -32,9 +35,12 @@ class BaseTokenAPI:
         self.base_url = base_url or os.getenv("THEGRAPH_API_ENDPOINT", "https://token-api.thegraph.com")
 
         if not self.api_key:
+            logger.error("API key is required but not provided")
             raise ValueError(
                 "API key is required. Provide it via api_key parameter or THEGRAPH_API_KEY environment variable."
             )
+
+        logger.info("Initializing TheGraph Token API client", base_url=self.base_url)
 
         self.manager = NetworkingManager()
         self._headers = {
@@ -69,11 +75,13 @@ class BaseTokenAPI:
 
     async def __aenter__(self) -> "BaseTokenAPI":
         """Async context manager entry."""
+        logger.debug("Starting networking manager")
         await self.manager.startup()
         return self
 
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
+        logger.debug("Shutting down networking manager")
         await self.manager.shutdown()
 
     # ===== Monitoring Methods =====
@@ -85,8 +93,11 @@ class BaseTokenAPI:
         Returns:
             Health status string (should be "OK")
         """
+        logger.debug("Checking API health")
         response = await self.manager.get(f"{self.base_url}/health", headers=self._headers, timeout=30)
-        return str(response.text)
+        health_status = str(response.text)
+        logger.info("Health check completed", status=health_status)
+        return health_status
 
     async def get_version(self) -> VersionResponse:
         """
@@ -95,9 +106,11 @@ class BaseTokenAPI:
         Returns:
             VersionResponse with version details
         """
+        logger.debug("Fetching API version")
         response = await self.manager.get(
             f"{self.base_url}/version", headers=self._headers, expected_type=VersionResponse, timeout=30
         )
+        logger.info("Version information retrieved", version=response.data.get("version", "unknown"))
         return response.data
 
     async def get_networks(self) -> NetworksResponse:
@@ -107,7 +120,10 @@ class BaseTokenAPI:
         Returns:
             NetworksResponse with supported network information
         """
+        logger.debug("Fetching supported networks")
         response = await self.manager.get(
             f"{self.base_url}/networks", headers=self._headers, expected_type=NetworksResponse, timeout=30
         )
+        networks_count = len(response.data.get("networks", []))
+        logger.info("Networks information retrieved", networks_count=networks_count)
         return response.data

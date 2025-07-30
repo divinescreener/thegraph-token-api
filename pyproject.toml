@@ -14,6 +14,7 @@ dependencies = [
     "divine-typed-requests>=0.1.32",
     "divine-type-enforcer>=0.1.13",
     "httpx[http2]>=0.28.1",
+    "structlog>=25.4.0",
 ]
 
 [project.urls]
