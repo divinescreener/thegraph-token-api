@@ -329,32 +329,29 @@ class TokenAPI:
     - Clean data returns (no response unwrapping)
     - Smart defaults
     - Separated EVM/SVM methods
+    - Async context manager support
 
     Example:
         ```python
         from thegraph_token_api import TokenAPI, SwapPrograms, Protocol
 
+        # Method 1: Direct usage (handles resource cleanup automatically)
         api = TokenAPI()  # Auto-loads API key from .env
 
         # EVM (Ethereum, Polygon, BSC, etc.)
         eth_balances = await api.evm.balances("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
         eth_nfts = await api.evm.nfts.ownerships("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
-        nft_collection = await api.evm.nfts.collection("0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb")
-        nft_activities = await api.evm.nfts.activities("0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb")
         eth_swaps = await api.evm.swaps(protocol=Protocol.UNISWAP_V3, limit=10)
 
         # SVM (Solana)
         sol_balances = await api.svm.balances(mint="So11111111111111111111111111111111111111112")
         sol_swaps = await api.svm.swaps(program_id=SwapPrograms.RAYDIUM, limit=10)
-        sol_transfers = await api.svm.transfers(mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")  # pragma: allowlist secret
 
-        # Unified Price API
-        eth_price = await api.price.get(Currency.ETH)  # Get current ETH price
-        sol_price = await api.price.get(Currency.SOL)  # Get current SOL price
-        eth_stats = await api.price.get(Currency.ETH, include_stats=True)  # With confidence metrics
-
-        # Utility
-        health = await api.health()
+        # Method 2: Context manager usage (recommended for long-lived instances)
+        async with TokenAPI() as api:
+            eth_price = await api.price.get(Currency.ETH)
+            sol_price = await api.price.get(Currency.SOL)
+            health = await api.health()
         ```
     """
 
@@ -388,6 +385,15 @@ class TokenAPI:
         self.evm = EVMWrapper(self)
         self.svm = SVMWrapper(self)
         self.price = UnifiedPriceAPI(self)
+
+    async def __aenter__(self) -> "TokenAPI":
+        """Async context manager entry."""
+        await self._api.__aenter__()
+        return self
+
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        """Async context manager exit."""
+        await self._api.__aexit__(exc_type, exc_val, exc_tb)
 
     def _extract_data(self, response: Any) -> list[dict[str, Any]]:
         """Extract clean data from API response."""
